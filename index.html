@@ -1295,6 +1295,7 @@ function cancelTool() {
   polyState   = {active:false};
   offsetState = {active:false, selectedLine:null, previewPts:null};
   rotateState = {phase:0, pivotX:0, pivotY:0, startAngle:0, previewDelta:0};
+  selBox      = {active:false, pending:false, startSX:0, startSY:0, startWX:0, startWY:0};
   document.getElementById('rect-preview').style.display='none';
 }
 
@@ -1323,7 +1324,7 @@ function setTool(tool) {
   // (selection-based visibility handled by updateSelectionProps)
 
   const hintMap = {
-    select:  'Drag to pan · Left-click line to select · Shift-click multi · <span>Del</span> delete · <span>T</span> rotate',
+    select:  'Click line to select · Shift+click multi · <span>Drag</span> selection box · Middle-drag to pan · <span>Del</span> delete',
     line:    '<span>Click</span> start → <span>click</span> end · Type to enter coords · <span>Enter</span> closes · <span>Esc</span> cancel',
     rect:    '<span>Click</span> corner → <span>click</span> opposite corner',
     polygon: '<span>Click</span> center → <span>click</span> to set radius & rotation',
@@ -1345,6 +1346,47 @@ function updateCursor() {
 // ── PANNING ─────────────────────────────────────────────
 let isPanning=false, panOX=0, panOY=0, camStart={x:0,y:0};
 
+// ── SELECTION BOX ────────────────────────────────────────
+// Left-click-drag in SELECT mode draws a selection rectangle.
+// Middle-mouse always pans. In any drawing tool, left-drag is not used.
+const SEL_DRAG_THRESHOLD = 5; // px before drag mode activates
+let selBox = {
+  active:  false,   // true while dragging a selection box
+  pending: false,   // true on mousedown, before threshold crossed
+  startSX: 0, startSY: 0, // screen start
+  startWX: 0, startWY: 0, // world start
+};
+
+function selBoxContains(obj, wx0, wy0, wx1, wy1) {
+  // Axis-aligned bounding box test — line must be fully inside the box
+  const lx=Math.min(wx0,wx1), rx=Math.max(wx0,wx1);
+  const by=Math.min(wy0,wy1), ty=Math.max(wy0,wy1);
+  if (obj.type === 'LINE') {
+    return obj.x1>=lx && obj.x1<=rx && obj.y1>=by && obj.y1<=ty &&
+           obj.x2>=lx && obj.x2<=rx && obj.y2>=by && obj.y2<=ty;
+  }
+  return false;
+}
+
+function drawSelBox() {
+  if (!selBox.active) return;
+  const sa = worldToScreen(selBox.startWX, selBox.startWY);
+  const sb = worldToScreen(mouseWorld.x, mouseWorld.y);
+  const lx=Math.min(sa.x,sb.x), ly=Math.min(sa.y,sb.y);
+  const w=Math.abs(sb.x-sa.x), h=Math.abs(sb.y-sa.y);
+  ctx.save();
+  // Blue = left-to-right (crossing), green = right-to-left (window) — standard CAD convention
+  const leftToRight = sb.x >= sa.x;
+  ctx.strokeStyle = leftToRight ? 'rgba(0,212,255,0.9)' : 'rgba(0,255,157,0.9)';
+  ctx.fillStyle   = leftToRight ? 'rgba(0,212,255,0.06)' : 'rgba(0,255,157,0.06)';
+  ctx.lineWidth   = 1;
+  if (!leftToRight) ctx.setLineDash([4,3]);
+  ctx.fillRect(lx,ly,w,h);
+  ctx.strokeRect(lx,ly,w,h);
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
 // ── MOUSE EVENTS ────────────────────────────────────────
 canvas.addEventListener('mousedown',  onMouseDown);
 canvas.addEventListener('mousemove',  onMouseMove);
@@ -1364,10 +1406,11 @@ function onMouseDown(e) {
   closeCtxMenu();
   closeMenus();
 
-  if(e.button===1 || (e.button===0 && activeTool==='select')) {
+  // Middle mouse = always pan
+  if(e.button===1) {
     isPanning=true; panOX=e.clientX; panOY=e.clientY;
     camStart={x:cam.panX,y:cam.panY};
-    canvas.style.cursor = e.button===1 ? 'grabbing' : 'grab';
+    canvas.style.cursor='grabbing';
     return;
   }
 
@@ -1375,21 +1418,12 @@ function onMouseDown(e) {
     e.preventDefault();
     const wp = snapActive&&snapPoint ? snapPoint : mouseWorld;
 
+    // SELECT tool: hold off — decide on mousemove whether this is a click, drag-pan, or sel-box
     if(activeTool==='select') {
-      const hit=pickObject(mouseScreen.x,mouseScreen.y);
-      if(hit){
-        if(e.shiftKey) { // shift-click: toggle
-          if(selectedIds.has(hit.id)) selectedIds.delete(hit.id);
-          else selectedIds.add(hit.id);
-        } else {
-          selectedIds.clear();
-          selectedIds.add(hit.id);
-        }
-      } else {
-        selectedIds.clear();
-      }
-      updateSelectionProps();
-      render();
+      selBox.pending=true;
+      selBox.startSX=mouseScreen.x; selBox.startSY=mouseScreen.y;
+      selBox.startWX=mouseWorld.x;  selBox.startWY=mouseWorld.y;
+      selBox.active=false;
       return;
     }
 
@@ -1446,20 +1480,16 @@ function onMouseDown(e) {
 
     if(activeTool==='rotate') {
       if(selectedIds.size===0){
-        // Phase 0: try to pick a line first
         const hit=pickObject(mouseScreen.x,mouseScreen.y);
         if(hit){ selectedIds.add(hit.id); updateSelectionProps(); render(); return; }
         showToast('Select a line first (click it), then click pivot'); return;
       }
       if(rotateState.phase===0){
-        // Phase 1: set pivot
         rotateState.phase=1;
         rotateState.pivotX=wp.x; rotateState.pivotY=wp.y;
-        // start angle = angle from pivot to cursor when pivot was clicked (same point, so use 0)
         rotateState.startAngle=0;
         showToast('Pivot set — move cursor and click to confirm rotation');
       } else {
-        // Phase 2: confirm — apply the previewDelta
         rotateSelected(rotateState.previewDelta, {x:rotateState.pivotX, y:rotateState.pivotY});
         rotateState={phase:0,pivotX:0,pivotY:0,startAngle:0,previewDelta:0};
       }
@@ -1488,6 +1518,16 @@ function onMouseMove(e) {
   if(isPanning){
     cam.panX=camStart.x+(e.clientX-panOX);
     cam.panY=camStart.y+(e.clientY-panOY);
+  }
+
+  // SELECT tool drag logic: after threshold, switch to sel-box or pan
+  if(activeTool==='select' && selBox.pending) {
+    const dx=mouseScreen.x-selBox.startSX, dy=mouseScreen.y-selBox.startSY;
+    if(Math.hypot(dx,dy) > SEL_DRAG_THRESHOLD) {
+      selBox.pending=false;
+      selBox.active=true;
+      canvas.style.cursor='crosshair';
+    }
   }
 
   // Offset preview update
@@ -1524,6 +1564,42 @@ function onMouseMove(e) {
 
 function onMouseUp(e) {
   if(isPanning){ isPanning=false; updateCursor(); }
+
+  if(e.button===0 && activeTool==='select') {
+    if(selBox.active) {
+      // Commit selection box — select all lines whose both endpoints are inside
+      const wx0=selBox.startWX, wy0=selBox.startWY;
+      const wx1=mouseWorld.x,   wy1=mouseWorld.y;
+      if(!e.shiftKey) selectedIds.clear();
+      for(const o of GeoMemory.objects) {
+        if(selBoxContains(o, wx0, wy0, wx1, wy1)) selectedIds.add(o.id);
+      }
+      updateSelectionProps();
+      selBox.active=false;
+      canvas.style.cursor='default';
+      render(); return;
+    }
+
+    if(selBox.pending) {
+      // Was a quick click — treat as point-pick
+      selBox.pending=false;
+      const hit=pickObject(mouseScreen.x,mouseScreen.y);
+      if(hit){
+        if(e.shiftKey){
+          if(selectedIds.has(hit.id)) selectedIds.delete(hit.id);
+          else selectedIds.add(hit.id);
+        } else {
+          selectedIds.clear();
+          selectedIds.add(hit.id);
+        }
+      } else if(!e.shiftKey) {
+        selectedIds.clear();
+      }
+      updateSelectionProps();
+      canvas.style.cursor='default';
+      render();
+    }
+  }
 }
 
 function onWheel(e) {
@@ -1688,6 +1764,7 @@ function render() {
   drawOffsetPreview();
   drawPolyPreview();
   drawRotatePreview();
+  drawSelBox();
 }
 
 function drawGrid(W,H) {
@@ -1840,10 +1917,12 @@ function parseDXF(text) {
   if (entStart < 0) return { lines: [], circles: [], arcs: [], scaleMM, rawInsUnits, error: 'No ENTITIES section found' };
 
   // ── Parse entity blocks ──
+  // IMPORTANT: coordinates are stored RAW (no scale applied).
+  // The caller (commitDxfImport) applies the user-chosen scale at commit time.
   const lines   = [];
   const circles = [];
   const arcs    = [];
-  const S = scaleMM; // shorthand
+  const S = 1; // always 1 — raw values only
 
   let i = entStart;
   while (i < tokens.length) {
@@ -2094,57 +2173,45 @@ function commitDxfImport() {
   const { parsed, unitSel, mergeSel } = dxfDialog;
   if (!parsed) return;
 
-  // Resolve the scale factor based on user's unit selection
-  let scaleMM;
+  // Determine final mm-per-file-unit scale from user choice.
+  // parseDXF now returns raw coordinates (no pre-scaling applied).
+  let S;
   if (unitSel === 'auto') {
-    scaleMM = parsed.scaleMM; // whatever parseDXF detected from $INSUNITS
+    S = DXF_INSUNITS_TO_MM[parsed.rawInsUnits] ?? 1;
   } else if (unitSel === 'in') {
-    scaleMM = 25.4;           // user says: treat all coords as inches
+    S = 25.4;
   } else {
-    scaleMM = 1;              // user says: treat all coords as mm
+    S = 1;
   }
 
-  // The raw coordinates from parseDXF were already multiplied by parsed.scaleMM.
-  // If user overrides unit, we need to re-scale: divide out what was applied, multiply by new scale.
-  const reScale = scaleMM / (parsed.scaleMM || 1);
-
   closeDxfDialog();
-
   if (mergeSel === 'replace') GeoMemory.clear();
 
   const { lines, circles, arcs } = parsed;
 
   for (const ln of lines) {
     GeoMemory.addLine(
-      parseFloat((ln.x1 * reScale).toFixed(6)), parseFloat((ln.y1 * reScale).toFixed(6)),
-      parseFloat((ln.x2 * reScale).toFixed(6)), parseFloat((ln.y2 * reScale).toFixed(6)),
+      parseFloat((ln.x1*S).toFixed(6)), parseFloat((ln.y1*S).toFixed(6)),
+      parseFloat((ln.x2*S).toFixed(6)), parseFloat((ln.y2*S).toFixed(6)),
       ln.layer || 'Layer_0'
     );
   }
-
   for (const c of circles) {
-    const cx = c.cx*reScale, cy = c.cy*reScale, r = c.r*reScale;
-    for (const seg of tessellateCircle(cx, cy, r, c.layer)) {
+    for (const seg of tessellateCircle(c.cx*S, c.cy*S, c.r*S, c.layer))
       GeoMemory.addLine(seg.x1, seg.y1, seg.x2, seg.y2, seg.layer);
-    }
   }
-
   for (const a of arcs) {
-    const cx = a.cx*reScale, cy = a.cy*reScale, r = a.r*reScale;
-    for (const seg of tessellateArc(cx, cy, r, a.startA, a.endA, a.layer)) {
+    for (const seg of tessellateArc(a.cx*S, a.cy*S, a.r*S, a.startA, a.endA, a.layer))
       GeoMemory.addLine(seg.x1, seg.y1, seg.x2, seg.y2, seg.layer);
-    }
   }
 
   render();
   zoomExtents();
 
-  const unitUsed = unitSel === 'auto'
-    ? (parsed.scaleMM === 25.4 ? 'inches (auto)' : parsed.scaleMM === 1 ? 'mm (auto)' : `auto ×${parsed.scaleMM}`)
+  const unitLabel = unitSel==='auto'
+    ? (S===25.4 ? 'inches (file header)' : S===1 ? 'mm (file header)' : `×${S} (file header)`)
     : unitSel;
-  showToast(
-    `Imported ${lines.length + circles.length + arcs.length} entities as ${unitUsed} · ${mergeSel}`
-  );
+  showToast(`Imported ${lines.length+circles.length+arcs.length} entities · ${unitLabel} · ${mergeSel}`);
 }
 
 // ── DXF EXPORT ──────────────────────────────────────────
