@@ -5,658 +5,393 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>.KAD — Kernel-Aided Design</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap');
 
-  :root {
-    --bg-void:       #080a0e;
-    --bg-panel:      #0d1117;
-    --bg-panel2:     #111620;
-    --bg-hover:      #1a2030;
-    --border:        #1e2a3a;
-    --border-bright: #2a3d55;
-    --accent:        #00d4ff;
-    --accent-dim:    #0088aa;
-    --accent-glow:   rgba(0,212,255,0.15);
-    --green:         #00ff9d;
-    --green-dim:     #00aa66;
-    --amber:         #ffaa00;
-    --red:           #ff4455;
-    --text-primary:  #d0dde8;
-    --text-secondary:#6a8099;
-    --text-dim:      #3a5070;
-    --font-mono:     'JetBrains Mono', monospace;
-    --font-ui:       'Space Grotesk', sans-serif;
-    --sidebar-w:     220px;
-    --toolbar-h:     40px;
-    --status-h:      28px;
-  }
+:root {
+  --bg-void:       #080a0e;
+  --bg-panel:      #0d1117;
+  --bg-panel2:     #111620;
+  --bg-hover:      #1a2030;
+  --border:        #1e2a3a;
+  --border-bright: #2a3d55;
+  --accent:        #00d4ff;
+  --accent-dim:    #0088aa;
+  --accent-glow:   rgba(0,212,255,0.15);
+  --green:         #00ff9d;
+  --green-dim:     #00aa66;
+  --amber:         #ffaa00;
+  --red:           #ff4455;
+  --text-primary:  #d0dde8;
+  --text-secondary:#6a8099;
+  --text-dim:      #3a5070;
+  --font-mono:     'JetBrains Mono', monospace;
+  --font-ui:       'Space Grotesk', sans-serif;
+  --sidebar-w:     228px;
+  --toolbar-h:     40px;
+  --status-h:      28px;
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void); color:var(--text-primary); font-family:var(--font-ui); font-size:13px; }
 
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: var(--bg-void);
-    color: var(--text-primary);
-    font-family: var(--font-ui);
-    font-size: 13px;
-  }
+/* ── LAYOUT ── */
+#app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 1fr var(--status-h); width:100vw; height:100vh; }
 
-  /* ─── LAYOUT ─────────────────────────────────────────── */
-  #app {
-    display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr;
-    grid-template-rows: var(--toolbar-h) 1fr var(--status-h);
-    width: 100vw; height: 100vh;
-  }
+/* ── TOPBAR ── */
+#topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--bg-panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
+.brand { display:flex; align-items:center; gap:8px; margin-right:20px; font-family:var(--font-mono); font-weight:700; font-size:14px; color:var(--accent); letter-spacing:0.04em; user-select:none; }
+.brand-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); }
+.brand-sub { font-size:9px; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase; font-weight:400; }
+.tb-menu { display:flex; align-items:center; }
+.tb-menu-item { padding:0 12px; height:var(--toolbar-h); display:flex; align-items:center; font-size:12px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s,background 0.15s; letter-spacing:0.02em; position:relative; }
+.tb-menu-item:hover { color:var(--text-primary); background:var(--bg-hover); }
+.tb-menu-item.open { color:var(--text-primary); background:var(--bg-hover); }
+.tb-sep { width:1px; height:18px; background:var(--border); margin:0 4px; }
+.tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+.tb-badge { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); background:var(--bg-panel2); border:1px solid var(--border); padding:2px 7px; border-radius:3px; letter-spacing:0.06em; }
 
-  /* ─── TOPBAR ──────────────────────────────────────────── */
-  #topbar {
-    grid-column: 1 / -1;
-    display: flex; align-items: center; gap: 0;
-    background: var(--bg-panel);
-    border-bottom: 1px solid var(--border);
-    padding: 0 12px;
-    position: relative; z-index: 20;
-  }
-  .brand {
-    display: flex; align-items: center; gap: 8px;
-    margin-right: 24px;
-    font-family: var(--font-mono);
-    font-weight: 700; font-size: 14px;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-    user-select: none;
-  }
-  .brand-dot { width:6px; height:6px; background: var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); }
-  .brand-sub { font-size:9px; color: var(--text-dim); letter-spacing:0.12em; text-transform: uppercase; font-weight:400; }
+/* Topbar dropdown */
+.tb-dropdown { position:absolute; top:100%; left:0; background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:0 0 4px 4px; min-width:180px; z-index:200; display:none; flex-direction:column; box-shadow:0 8px 24px rgba(0,0,0,0.6); padding:4px 0; }
+.tb-dropdown.open { display:flex; }
+.tb-dd-item { padding:7px 14px; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:16px; transition:background 0.1s,color 0.1s; }
+.tb-dd-item:hover { background:var(--bg-hover); color:var(--text-primary); }
+.tb-dd-item .dd-key { color:var(--text-dim); font-size:9px; }
+.tb-dd-sep { height:1px; background:var(--border); margin:3px 0; }
 
-  .tb-menu { display:flex; align-items:center; gap:0; }
-  .tb-menu-item {
-    padding: 0 12px; height: var(--toolbar-h);
-    display:flex; align-items:center;
-    font-size:12px; color: var(--text-secondary);
-    cursor:pointer; transition: color 0.15s, background 0.15s;
-    letter-spacing:0.02em;
-  }
-  .tb-menu-item:hover { color: var(--text-primary); background: var(--bg-hover); }
+/* ── SIDEBAR ── */
+#sidebar { background:var(--bg-panel); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; position:relative; z-index:10; }
+.section-head { padding:8px 14px 5px; font-family:var(--font-mono); font-size:9px; font-weight:500; color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase; border-bottom:1px solid var(--border); flex-shrink:0; }
+.tool-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; padding:6px; background:var(--border); border-bottom:1px solid var(--border); flex-shrink:0; }
+.tool-btn { background:var(--bg-panel2); border:none; cursor:pointer; padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:3px; transition:background 0.15s,box-shadow 0.15s; position:relative; overflow:hidden; }
+.tool-btn:hover { background:var(--bg-hover); }
+.tool-btn.active { background:var(--bg-hover); box-shadow:inset 0 0 0 1px var(--accent); }
+.tool-btn.active::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); box-shadow:0 0 8px var(--accent); }
+.tool-icon { width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
+.tool-icon svg { width:16px; height:16px; }
+.tool-label { font-size:8px; font-family:var(--font-mono); color:var(--text-secondary); letter-spacing:0.05em; }
+.tool-btn.active .tool-label { color:var(--accent); }
 
-  .tb-sep { width:1px; height:18px; background: var(--border); margin: 0 6px; }
+/* Offset bar */
+#offset-bar { display:none; align-items:center; gap:6px; padding:5px 8px; background:var(--bg-panel2); border-bottom:1px solid var(--border); flex-shrink:0; }
+#offset-bar.visible { display:flex; }
+#offset-bar label { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
+#offset-dist-input { background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:3px; color:var(--accent); font-family:var(--font-mono); font-size:11px; padding:3px 6px; width:60px; outline:none; text-align:right; }
+#offset-dist-input:focus { border-color:var(--accent); }
+#offset-dist-unit { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); }
 
-  .tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
-  .tb-badge {
-    font-family: var(--font-mono);
-    font-size: 10px; color: var(--text-dim);
-    background: var(--bg-panel2);
-    border: 1px solid var(--border);
-    padding: 2px 7px; border-radius: 3px;
-    letter-spacing:0.06em;
-  }
+/* File ops */
+.file-ops { padding:6px; display:flex; flex-direction:column; gap:3px; border-bottom:1px solid var(--border); flex-shrink:0; }
+.op-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; background:var(--bg-panel2); border:1px solid var(--border); border-radius:4px; color:var(--text-secondary); font-size:11px; font-family:var(--font-mono); cursor:pointer; transition:all 0.15s; letter-spacing:0.04em; }
+.op-btn:hover { background:var(--bg-hover); border-color:var(--border-bright); color:var(--text-primary); }
+.op-btn.dxf { color:var(--green); border-color:var(--green-dim); }
+.op-btn.dxf:hover { background:rgba(0,255,157,0.06); border-color:var(--green); }
+.op-btn svg { width:12px; height:12px; flex-shrink:0; }
+#load-kad { display:none; }
 
-  /* ─── SIDEBAR ─────────────────────────────────────────── */
-  #sidebar {
-    background: var(--bg-panel);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    overflow: hidden; position: relative; z-index: 10;
-  }
+/* Coord input panel */
+#coord-panel { flex-shrink:0; border-bottom:1px solid var(--border); }
+#coord-panel-head { padding:6px 14px 5px; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+#coord-panel-head:hover { color:var(--text-secondary); }
+#coord-panel-body { padding:6px 8px 8px; display:none; }
+#coord-panel-body.open { display:block; }
+.coord-example { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); margin-bottom:4px; line-height:1.6; }
+.coord-example b { color:var(--accent); }
+.coord-example i { color:var(--amber); font-style:normal; }
+.coord-example em { color:var(--green); font-style:normal; }
 
-  .section-head {
-    padding: 10px 14px 6px;
-    font-family: var(--font-mono);
-    font-size: 9px; font-weight: 500;
-    color: var(--text-dim);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-  }
+/* Properties */
+.props-panel { flex:1; overflow-y:auto; padding:6px; }
+.props-panel::-webkit-scrollbar { width:3px; }
+.props-panel::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.prop-row { display:flex; justify-content:space-between; align-items:center; padding:3px 8px; border-radius:3px; margin-bottom:1px; }
+.prop-row:hover { background:var(--bg-hover); }
+.prop-key { font-size:10px; color:var(--text-dim); font-family:var(--font-mono); }
+.prop-val { font-size:10px; color:var(--text-secondary); font-family:var(--font-mono); }
+.prop-val.accent { color:var(--accent); }
+.prop-val.green  { color:var(--green); }
+.layer-row { display:flex; align-items:center; gap:8px; padding:4px 8px; cursor:pointer; border-radius:3px; margin-bottom:2px; }
+.layer-row:hover { background:var(--bg-hover); }
+.layer-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.layer-name { font-size:11px; font-family:var(--font-mono); color:var(--text-secondary); flex:1; }
+.layer-count { font-size:10px; color:var(--text-dim); font-family:var(--font-mono); }
 
-  .tool-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 1px; padding: 8px; background: var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .tool-btn {
-    background: var(--bg-panel2);
-    border: none; cursor: pointer;
-    padding: 10px 6px;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 4px;
-    transition: background 0.15s, box-shadow 0.15s;
-    position: relative; overflow: hidden;
-  }
-  .tool-btn:hover { background: var(--bg-hover); }
-  .tool-btn.active {
-    background: var(--bg-hover);
-    box-shadow: inset 0 0 0 1px var(--accent);
-  }
-  .tool-btn.active::after {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background: var(--accent); box-shadow:0 0 8px var(--accent);
-  }
-  .tool-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
-  .tool-icon svg { width:18px; height:18px; }
-  .tool-label { font-size:9px; font-family:var(--font-mono); color:var(--text-secondary); letter-spacing:0.06em; }
-  .tool-btn.active .tool-label { color: var(--accent); }
+/* ── CANVAS AREA ── */
+#canvas-wrap { position:relative; overflow:hidden; background:var(--bg-void); }
+#main-canvas { display:block; }
 
-  /* ─── FILE OPS ────────────────────────────────────────── */
-  .file-ops {
-    padding: 8px;
-    display: flex; flex-direction: column; gap: 4px;
-    border-bottom: 1px solid var(--border);
-  }
-  .op-btn {
-    display:flex; align-items:center; gap:8px;
-    padding: 7px 10px;
-    background: var(--bg-panel2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text-secondary);
-    font-size: 11px; font-family: var(--font-mono);
-    cursor: pointer; transition: all 0.15s;
-    letter-spacing: 0.04em;
-  }
-  .op-btn:hover { background: var(--bg-hover); border-color: var(--border-bright); color: var(--text-primary); }
-  .op-btn.dxf { color: var(--green); border-color: var(--green-dim); }
-  .op-btn.dxf:hover { background: rgba(0,255,157,0.06); border-color: var(--green); box-shadow: 0 0 8px rgba(0,255,157,0.1); }
-  .op-btn svg { width:13px; height:13px; flex-shrink:0; }
-  #load-kad { display:none; }
+/* ── SNAP INDICATOR ── */
+.snap-ring { position:absolute; pointer-events:none; width:12px; height:12px; border:1.5px solid var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); transform:translate(-50%,-50%); display:none; }
 
-  /* ─── PROPERTIES PANEL ───────────────────────────────── */
-  .props-panel {
-    flex:1; overflow-y:auto; padding: 8px;
-  }
-  .props-panel::-webkit-scrollbar { width:4px; }
-  .props-panel::-webkit-scrollbar-track { background: transparent; }
-  .props-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius:2px; }
+/* ── COORD OVERLAY ── */
+#coord-overlay { position:absolute; bottom:8px; right:8px; background:rgba(8,10,14,0.88); border:1px solid var(--border); backdrop-filter:blur(4px); padding:5px 10px; border-radius:4px; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); pointer-events:none; display:flex; gap:12px; letter-spacing:0.04em; }
+#coord-overlay span { color:var(--accent); }
+.coord-label { color:var(--text-dim); }
 
-  .prop-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 4px 8px;
-    border-radius: 3px;
-    margin-bottom:2px;
-  }
-  .prop-row:hover { background: var(--bg-hover); }
-  .prop-key { font-size:10px; color: var(--text-dim); font-family:var(--font-mono); }
-  .prop-val { font-size:10px; color: var(--text-secondary); font-family:var(--font-mono); }
-  .prop-val.accent { color: var(--accent); }
-  .prop-val.green  { color: var(--green); }
+/* ── CONTEXT HINT ── */
+#hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(8,10,14,0.9); border:1px solid var(--border-bright); border-radius:4px; padding:4px 12px; font-size:10px; font-family:var(--font-mono); color:var(--text-secondary); pointer-events:none; white-space:nowrap; letter-spacing:0.05em; }
+#hint span { color:var(--accent); }
 
-  .layer-row {
-    display:flex; align-items:center; gap:8px;
-    padding: 5px 8px; cursor:pointer;
-    border-radius:3px; margin-bottom:2px;
-  }
-  .layer-row:hover { background: var(--bg-hover); }
-  .layer-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .layer-name { font-size:11px; font-family:var(--font-mono); color:var(--text-secondary); flex:1; }
-  .layer-count { font-size:10px; color: var(--text-dim); font-family:var(--font-mono); }
+/* ── STATUS BAR ── */
+#statusbar { grid-column:1/-1; background:var(--bg-panel); border-top:1px solid var(--border); display:flex; align-items:center; padding:0 12px; font-family:var(--font-mono); font-size:10px; color:var(--text-dim); letter-spacing:0.04em; }
+.sb-item { padding:0 10px; border-right:1px solid var(--border); height:100%; display:flex; align-items:center; gap:5px; }
+.sb-item:first-child { padding-left:0; }
+.sb-val { color:var(--text-secondary); }
+.sb-val.ok  { color:var(--green); }
+.sb-val.act { color:var(--accent); }
+.sb-val.warn { color:var(--amber); }
+.sb-right { margin-left:auto; display:flex; align-items:center; }
 
-  /* ─── CANVAS AREA ────────────────────────────────────── */
-  #canvas-wrap {
-    position: relative; overflow: hidden;
-    background: var(--bg-void);
-  }
-  #main-canvas { display:block; cursor:crosshair; }
-  #main-canvas.pan-mode { cursor: grab; }
-  #main-canvas.panning  { cursor: grabbing; }
+/* ── TOAST ── */
+#toast { position:fixed; bottom:46px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--bg-panel2); border:1px solid var(--border-bright); border-radius:4px; padding:6px 14px; font-size:11px; font-family:var(--font-mono); color:var(--text-primary); pointer-events:none; opacity:0; transition:opacity 0.18s,transform 0.18s; z-index:999; }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* ─── COORD OVERLAY ──────────────────────────────────── */
-  #coord-overlay {
-    position: absolute; bottom: 8px; right: 8px;
-    background: rgba(8,10,14,0.85);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(4px);
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-secondary);
-    pointer-events: none;
-    display: flex; gap: 12px;
-    letter-spacing:0.04em;
-  }
-  #coord-overlay span { color: var(--accent); }
-  .coord-label { color: var(--text-dim); }
+/* ── DYNAMIC INPUT ── */
+#dyn-input-wrap { position:absolute; display:none; z-index:80; pointer-events:auto; }
+#dyn-input-box { background:var(--bg-panel); border:1px solid var(--accent); border-radius:3px; box-shadow:0 0 12px rgba(0,212,255,0.3),0 2px 8px rgba(0,0,0,0.7); display:flex; align-items:center; min-width:170px; overflow:hidden; }
+#dyn-input-prefix { background:var(--bg-panel2); border-right:1px solid var(--border); padding:5px 7px; font-family:var(--font-mono); font-size:9px; color:var(--accent); letter-spacing:0.05em; white-space:nowrap; flex-shrink:0; min-width:42px; text-align:center; }
+#dyn-input-field { background:transparent; border:none; outline:none; padding:5px 8px; font-family:var(--font-mono); font-size:11px; color:var(--text-primary); width:130px; caret-color:var(--accent); }
+#dyn-input-field::placeholder { color:var(--text-dim); }
+#dyn-input-hint { position:absolute; top:calc(100% + 4px); left:0; background:rgba(8,10,14,0.95); border:1px solid var(--border); border-radius:3px; padding:3px 8px; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); white-space:nowrap; pointer-events:none; }
+#dyn-input-hint b { color:var(--accent); }
+#dyn-input-hint i { color:var(--amber); font-style:normal; }
+#dyn-input-hint em { color:var(--green); font-style:normal; }
 
-  /* ─── STATUS BAR ─────────────────────────────────────── */
-  #statusbar {
-    grid-column: 1 / -1;
-    background: var(--bg-panel);
-    border-top: 1px solid var(--border);
-    display: flex; align-items: center; gap: 0;
-    padding: 0 12px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 0.04em;
-  }
-  .sb-item { padding: 0 10px; border-right: 1px solid var(--border); height:100%; display:flex; align-items:center; gap:5px; }
-  .sb-item:first-child { padding-left:0; }
-  .sb-val { color: var(--text-secondary); }
-  .sb-val.ok  { color: var(--green); }
-  .sb-val.act { color: var(--accent); }
-  .sb-right { margin-left:auto; display:flex; align-items:center; gap:0; }
+/* ── CONTEXT MENU ── */
+#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow:hidden; padding:4px 0; }
+#ctx-menu.open { display:flex; }
+.ctx-head { padding:4px 12px 3px; font-family:var(--font-mono); font-size:8px; color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase; }
+.ctx-item { display:flex; align-items:center; gap:10px; padding:7px 14px; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); cursor:pointer; transition:background 0.1s,color 0.1s; border:none; background:none; width:100%; text-align:left; }
+.ctx-item:hover { background:var(--bg-hover); color:var(--text-primary); }
+.ctx-item svg { width:13px; height:13px; flex-shrink:0; opacity:0.7; }
+.ctx-item .ctx-key { margin-left:auto; font-size:9px; color:var(--text-dim); }
+.ctx-item.hi { color:var(--accent); }
+.ctx-item.hi:hover { background:rgba(0,212,255,0.08); }
+.ctx-sep { height:1px; background:var(--border); margin:3px 0; }
 
-  /* ─── SNAP INDICATOR ─────────────────────────────────── */
-  .snap-ring {
-    position: absolute; pointer-events:none;
-    width:12px; height:12px;
-    border:1.5px solid var(--accent);
-    border-radius:50%;
-    box-shadow: 0 0 6px var(--accent);
-    transform: translate(-50%,-50%);
-    display:none;
-  }
-
-  /* ─── CONTEXT HINT ───────────────────────────────────── */
-  #hint {
-    position:absolute; top:10px; left:50%;
-    transform: translateX(-50%);
-    background: rgba(8,10,14,0.9);
-    border: 1px solid var(--border-bright);
-    border-radius:4px;
-    padding: 4px 12px;
-    font-size:11px; font-family:var(--font-mono);
-    color: var(--text-secondary);
-    pointer-events:none;
-    white-space:nowrap;
-    letter-spacing:0.05em;
-    opacity:1; transition:opacity 0.3s;
-  }
-  #hint span { color: var(--accent); }
-
-  /* ─── MODAL / TOAST ──────────────────────────────────── */
-  #toast {
-    position:fixed; bottom:50px; left:50%;
-    transform:translateX(-50%) translateY(10px);
-    background: var(--bg-panel2);
-    border:1px solid var(--border-bright);
-    border-radius:4px;
-    padding:7px 16px;
-    font-size:11px; font-family:var(--font-mono);
-    color:var(--text-primary);
-    pointer-events:none;
-    opacity:0; transition: opacity 0.2s, transform 0.2s;
-    z-index:100;
-  }
-  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
-  /* ─── DYNAMIC INPUT BOX ──────────────────────────────── */
-  #dyn-input-wrap {
-    position: absolute;
-    display: none;
-    pointer-events: auto;
-    z-index: 50;
-  }
-  #dyn-input-box {
-    background: var(--bg-panel);
-    border: 1px solid var(--accent);
-    border-radius: 3px;
-    box-shadow: 0 0 10px rgba(0,212,255,0.25), 0 2px 8px rgba(0,0,0,0.6);
-    padding: 0;
-    display: flex;
-    align-items: center;
-    gap: 0;
-    min-width: 160px;
-    overflow: hidden;
-  }
-  #dyn-input-prefix {
-    background: var(--bg-panel2);
-    border-right: 1px solid var(--border);
-    padding: 5px 7px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  #dyn-input-field {
-    background: transparent;
-    border: none;
-    outline: none;
-    padding: 5px 8px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-primary);
-    width: 130px;
-    letter-spacing: 0.04em;
-    caret-color: var(--accent);
-  }
-  #dyn-input-field::placeholder { color: var(--text-dim); }
-  #dyn-input-hint {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    background: rgba(8,10,14,0.92);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 3px 8px;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: var(--text-dim);
-    white-space: nowrap;
-    letter-spacing: 0.04em;
-    pointer-events: none;
-  }
-  #dyn-input-hint span { color: var(--accent); }
-
-  /* ─── OFFSET DISTANCE BAR ────────────────────────────── */
-  #offset-bar {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 10px;
-    background: var(--bg-panel2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    margin: 8px 8px 0;
-  }
-  #offset-bar.visible { display: flex; }
-  #offset-bar label {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  #offset-dist-input {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-bright);
-    border-radius: 3px;
-    color: var(--accent);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    padding: 3px 6px;
-    width: 70px;
-    outline: none;
-    text-align: right;
-  }
-  #offset-dist-input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
-  #offset-dist-unit {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: var(--text-dim);
-  }
-
-  /* ─── CONTEXT MENU ───────────────────────────────────── */
-  #ctx-menu {
-    position: fixed;
-    display: none;
-    flex-direction: column;
-    background: var(--bg-panel);
-    border: 1px solid var(--border-bright);
-    border-radius: 5px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,212,255,0.06);
-    min-width: 190px;
-    z-index: 200;
-    overflow: hidden;
-    padding: 4px 0;
-    pointer-events: auto;
-  }
-  #ctx-menu.visible { display: flex; }
-  .ctx-section-label {
-    padding: 5px 12px 3px;
-    font-family: var(--font-mono);
-    font-size: 8px;
-    color: var(--text-dim);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 3px;
-  }
-  .ctx-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 14px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: background 0.1s, color 0.1s;
-    letter-spacing: 0.03em;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-  }
-  .ctx-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-  .ctx-item .ctx-icon {
-    width: 14px;
-    height: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .ctx-item .ctx-icon svg { width: 13px; height: 13px; }
-  .ctx-item .ctx-key {
-    margin-left: auto;
-    font-size: 9px;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-  }
-  .ctx-item.accent-item { color: var(--accent); }
-  .ctx-item.accent-item:hover { background: var(--accent-glow); color: var(--accent); }
-  .ctx-item.danger-item { color: var(--red); }
-  .ctx-item.danger-item:hover { background: rgba(255,68,85,0.08); }
-  .ctx-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 3px 0;
-  }
+/* ── RECT DRAG PREVIEW ── */
+#rect-preview { position:absolute; pointer-events:none; border:1px dashed var(--accent); background:rgba(0,212,255,0.04); display:none; }
 </style>
 </head>
 <body>
-
 <div id="app">
 
-  <!-- ── TOPBAR ── -->
-  <div id="topbar">
-    <div class="brand">
-      <div class="brand-dot"></div>
-      <span>.KAD</span>
-      <div class="brand-sub">Kernel-Aided Design</div>
-    </div>
-    <div class="tb-sep"></div>
-    <div class="tb-menu">
-      <div class="tb-menu-item" onclick="newDocument()">File</div>
-      <div class="tb-menu-item">Edit</div>
-      <div class="tb-menu-item">View</div>
-      <div class="tb-menu-item">Draw</div>
-      <div class="tb-menu-item">Tools</div>
-    </div>
-    <div class="tb-right">
-      <span class="tb-badge">v0.1.0-proto</span>
-      <span class="tb-badge" id="unit-badge">mm</span>
-    </div>
-  </div>
-
-  <!-- ── SIDEBAR ── -->
-  <div id="sidebar">
-
-    <div class="section-head">Tools</div>
-    <div class="tool-grid">
-      <button class="tool-btn active" id="btn-select" onclick="setTool('select')">
-        <div class="tool-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M5 3l14 9-7 1-4 7z"/>
-          </svg>
-        </div>
-        <span class="tool-label">SELECT</span>
-      </button>
-      <button class="tool-btn" id="btn-line" onclick="setTool('line')">
-        <div class="tool-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <line x1="4" y1="20" x2="20" y2="4"/>
-            <circle cx="4" cy="20" r="2" fill="currentColor"/>
-            <circle cx="20" cy="4" r="2" fill="currentColor"/>
-          </svg>
-        </div>
-        <span class="tool-label">LINE</span>
-      </button>
-      <button class="tool-btn" id="btn-poly" onclick="setTool('polyline')" style="opacity:0.4;cursor:not-allowed;" disabled>
-        <div class="tool-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polyline points="4,20 9,8 15,14 20,4"/>
-          </svg>
-        </div>
-        <span class="tool-label">POLY</span>
-      </button>
-      <button class="tool-btn" id="btn-offset" onclick="setTool('offset')">
-        <div class="tool-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <line x1="3" y1="7" x2="21" y2="7"/>
-            <line x1="3" y1="17" x2="21" y2="17"/>
-            <path d="M15 11l3 2.5-3 2.5" stroke-width="1.2"/>
-          </svg>
-        </div>
-        <span class="tool-label">OFFSET</span>
-      </button>
-    </div>
-    <div id="offset-bar">
-      <label>DIST</label>
-      <input type="number" id="offset-dist-input" value="10" min="0.0001" step="0.5" placeholder="10"/>
-      <span id="offset-dist-unit">mm</span>
-    </div>
-
-    <div class="section-head">File</div>
-    <div class="file-ops">
-      <button class="op-btn" onclick="saveKAD()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save .kad
-      </button>
-      <button class="op-btn" onclick="document.getElementById('load-kad').click()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Open .kad
-      </button>
-      <input type="file" id="load-kad" accept=".kad" onchange="loadKAD(event)">
-      <button class="op-btn dxf" onclick="exportDXF()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Export .dxf
-      </button>
-    </div>
-
-    <div class="section-head">Layers</div>
-    <div class="props-panel" id="layers-panel">
-      <div class="layer-row">
-        <div class="layer-dot" style="background:#00d4ff;box-shadow:0 0 5px #00d4ff;"></div>
-        <span class="layer-name">Layer_0</span>
-        <span class="layer-count" id="layer0-count">0</span>
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="brand"><div class="brand-dot"></div><span>.KAD</span><div class="brand-sub">Kernel-Aided Design</div></div>
+  <div class="tb-sep"></div>
+  <div class="tb-menu">
+    <div class="tb-menu-item" id="menu-file" onmouseenter="openMenu('file')" onmouseleave="scheduleClose()">File
+      <div class="tb-dropdown" id="dd-file" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
+        <div class="tb-dd-item" onclick="newDocument();closeMenus()">New Document<span class="dd-key">Ctrl+N</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="saveKAD();closeMenus()">Save .kad<span class="dd-key">Ctrl+S</span></div>
+        <div class="tb-dd-item" onclick="document.getElementById('load-kad').click();closeMenus()">Open .kad<span class="dd-key">Ctrl+O</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="exportDXF();closeMenus()">Export .dxf<span class="dd-key">Ctrl+E</span></div>
       </div>
     </div>
-
-    <div class="section-head">Properties</div>
-    <div class="props-panel">
-      <div class="prop-row">
-        <span class="prop-key">Objects</span>
-        <span class="prop-val accent" id="prop-objects">0</span>
+    <div class="tb-menu-item" id="menu-edit" onmouseenter="openMenu('edit')" onmouseleave="scheduleClose()">Edit
+      <div class="tb-dropdown" id="dd-edit" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
+        <div class="tb-dd-item" onclick="deleteSelected();closeMenus()">Delete Selected<span class="dd-key">Del</span></div>
+        <div class="tb-dd-item" onclick="GeoMemory.clear();render();showToast('Canvas cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="setTool('select');closeMenus()">Select Mode<span class="dd-key">S</span></div>
       </div>
-      <div class="prop-row">
-        <span class="prop-key">Lines</span>
-        <span class="prop-val" id="prop-lines">0</span>
+    </div>
+    <div class="tb-menu-item" id="menu-view" onmouseenter="openMenu('view')" onmouseleave="scheduleClose()">View
+      <div class="tb-dropdown" id="dd-view" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
+        <div class="tb-dd-item" onclick="zoomExtents();closeMenus()">Zoom Extents<span class="dd-key">Z</span></div>
+        <div class="tb-dd-item" onclick="initCamera();render();closeMenus()">Reset View<span class="dd-key">Home</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="toggleGrid();closeMenus()">Toggle Grid<span class="dd-key">G</span></div>
+        <div class="tb-dd-item" onclick="toggleSnap();closeMenus()">Toggle Snap<span class="dd-key">F3</span></div>
       </div>
-      <div class="prop-row">
-        <span class="prop-key">Points</span>
-        <span class="prop-val" id="prop-points">0</span>
+    </div>
+    <div class="tb-menu-item" id="menu-draw" onmouseenter="openMenu('draw')" onmouseleave="scheduleClose()">Draw
+      <div class="tb-dropdown" id="dd-draw" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
+        <div class="tb-dd-item" onclick="setTool('line');closeMenus()">Line<span class="dd-key">L</span></div>
+        <div class="tb-dd-item" onclick="setTool('rect');closeMenus()">Rectangle<span class="dd-key">R</span></div>
+        <div class="tb-dd-item" onclick="setTool('polygon');closeMenus()">Polygon<span class="dd-key">P</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="setTool('offset');closeMenus()">Offset<span class="dd-key">O</span></div>
       </div>
-      <div class="prop-row">
-        <span class="prop-key">Units</span>
-        <span class="prop-val green">mm</span>
-      </div>
-      <div class="prop-row">
-        <span class="prop-key">Zoom</span>
-        <span class="prop-val" id="prop-zoom">1.00×</span>
-      </div>
-      <div class="prop-row">
-        <span class="prop-key">Snap</span>
-        <span class="prop-val green" id="prop-snap">ON</span>
+    </div>
+    <div class="tb-menu-item" id="menu-tools" onmouseenter="openMenu('tools')" onmouseleave="scheduleClose()">Tools
+      <div class="tb-dropdown" id="dd-tools" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
+        <div class="tb-dd-item" onclick="zoomExtents();closeMenus()">Zoom Extents<span class="dd-key">Z</span></div>
+        <div class="tb-dd-item" onclick="setTool('offset');closeMenus()">Offset Tool<span class="dd-key">O</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="showCoordHelp();closeMenus()">Coordinate Help<span class="dd-key">?</span></div>
       </div>
     </div>
   </div>
-
-  <!-- ── CANVAS ── -->
-  <div id="canvas-wrap">
-    <canvas id="main-canvas" tabindex="0"></canvas>
-    <div class="snap-ring" id="snap-ring"></div>
-
-    <!-- Dynamic Coordinate Input Box -->
-    <div id="dyn-input-wrap">
-      <div id="dyn-input-box">
-        <div id="dyn-input-prefix">CMD</div>
-        <input id="dyn-input-field" type="text" spellcheck="false" autocomplete="off"
-               placeholder="X,Y  @dX,dY  @D&lt;A"/>
-      </div>
-      <div id="dyn-input-hint">
-        <span>X,Y</span> absolute · <span>@dX,dY</span> relative · <span>@D&lt;A</span> polar
-      </div>
-    </div>
-
-    <div id="coord-overlay">
-      <span><span class="coord-label">X </span><span id="cx">0.0000</span></span>
-      <span><span class="coord-label">Y </span><span id="cy">0.0000</span></span>
-    </div>
-    <div id="hint">Select <span>SELECT</span> to pan · <span>LINE</span> to draw · <span>OFFSET</span> to offset · Type coords for precision · Middle-drag to pan · Scroll to zoom</div>
+  <div class="tb-right">
+    <span class="tb-badge">v0.2.0</span>
+    <span class="tb-badge">mm</span>
   </div>
-
-  <!-- ── STATUSBAR ── -->
-  <div id="statusbar">
-    <div class="sb-item"><span>MODE</span><span class="sb-val act" id="sb-mode">SELECT</span></div>
-    <div class="sb-item"><span>SNAP</span><span class="sb-val ok" id="sb-snap">ACTIVE</span></div>
-    <div class="sb-item"><span>GRID</span><span class="sb-val" id="sb-grid">10mm</span></div>
-    <div class="sb-item"><span>LAYER</span><span class="sb-val">Layer_0</span></div>
-    <div class="sb-right">
-      <div class="sb-item"><span>L</span><span class="sb-val">LINE</span></div>
-      <div class="sb-item"><span>O</span><span class="sb-val">OFFSET</span></div>
-      <div class="sb-item"><span>Z</span><span class="sb-val">EXTENTS</span></div>
-      <div class="sb-item"><span>.KAD Kernel Shell</span><span class="sb-val ok">READY</span></div>
-    </div>
-  </div>
-
 </div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="section-head">Draw Tools</div>
+  <div class="tool-grid">
+    <button class="tool-btn active" id="btn-select" onclick="setTool('select')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3l14 9-7 1-4 7z"/></svg></div>
+      <span class="tool-label">SELECT</span>
+    </button>
+    <button class="tool-btn" id="btn-line" onclick="setTool('line')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="4"/><circle cx="4" cy="20" r="2" fill="currentColor"/><circle cx="20" cy="4" r="2" fill="currentColor"/></svg></div>
+      <span class="tool-label">LINE</span>
+    </button>
+    <button class="tool-btn" id="btn-rect" onclick="setTool('rect')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></div>
+      <span class="tool-label">RECT</span>
+    </button>
+    <button class="tool-btn" id="btn-polygon" onclick="setTool('polygon')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,3 21,9 17,20 7,20 3,9"/></svg></div>
+      <span class="tool-label">POLY</span>
+    </button>
+    <button class="tool-btn" id="btn-offset" onclick="setTool('offset')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><path d="M14 11.5l3 2.5-3 2.5" stroke-width="1.2"/></svg></div>
+      <span class="tool-label">OFFSET</span>
+    </button>
+    <button class="tool-btn" id="btn-select2" onclick="deleteSelected()" title="Delete selected (Del)">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+      <span class="tool-label">DELETE</span>
+    </button>
+  </div>
+
+  <div id="offset-bar">
+    <label>DIST</label>
+    <input type="number" id="offset-dist-input" value="10" min="0.0001" step="0.5"/>
+    <span id="offset-dist-unit">mm</span>
+  </div>
+
+  <!-- Polygon sides input (only shown for polygon tool) -->
+  <div id="poly-bar" style="display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--bg-panel2);border-bottom:1px solid var(--border);flex-shrink:0;">
+    <label style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;">SIDES</label>
+    <input type="number" id="poly-sides-input" value="6" min="3" max="64" step="1" style="background:var(--bg-panel);border:1px solid var(--border-bright);border-radius:3px;color:var(--accent);font-family:var(--font-mono);font-size:11px;padding:3px 6px;width:52px;outline:none;text-align:right;"/>
+    <label style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);text-transform:uppercase;">CIRC</label>
+    <input type="checkbox" id="poly-inscribed" checked title="Inscribed (vertices on circle) vs circumscribed"/>
+  </div>
+
+  <div class="section-head">File</div>
+  <div class="file-ops">
+    <button class="op-btn" onclick="saveKAD()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save .kad
+    </button>
+    <button class="op-btn" onclick="document.getElementById('load-kad').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Open .kad
+    </button>
+    <input type="file" id="load-kad" accept=".kad" onchange="loadKAD(event)">
+    <button class="op-btn dxf" onclick="exportDXF()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Export .dxf
+    </button>
+  </div>
+
+  <!-- Coordinate Input Help -->
+  <div id="coord-panel">
+    <div class="section-head" id="coord-panel-head" onclick="toggleCoordPanel()" style="cursor:pointer;display:flex;justify-content:space-between;">
+      <span>Coord Input</span><span id="coord-chevron">▶</span>
+    </div>
+    <div id="coord-panel-body">
+      <div class="coord-example">While LINE active, type to open input:</div>
+      <div class="coord-example"><b>100,50</b> — absolute X,Y</div>
+      <div class="coord-example"><i>@50,-20</i> — relative dX,dY</div>
+      <div class="coord-example"><em>@100&lt;45</em> — polar dist&lt;angle°</div>
+      <div class="coord-example" style="margin-top:4px;color:var(--text-dim);">Press <b>Enter</b> to commit, <b>Esc</b> to cancel</div>
+    </div>
+  </div>
+
+  <div class="section-head">Properties</div>
+  <div class="props-panel">
+    <div class="prop-row"><span class="prop-key">Objects</span><span class="prop-val accent" id="prop-objects">0</span></div>
+    <div class="prop-row"><span class="prop-key">Lines</span><span class="prop-val" id="prop-lines">0</span></div>
+    <div class="prop-row"><span class="prop-key">Selected</span><span class="prop-val warn" id="prop-sel">—</span></div>
+    <div class="prop-row"><span class="prop-key">Units</span><span class="prop-val green">mm</span></div>
+    <div class="prop-row"><span class="prop-key">Zoom</span><span class="prop-val" id="prop-zoom">3.00×</span></div>
+    <div class="prop-row"><span class="prop-key">Snap</span><span class="prop-val green" id="prop-snap">ON</span></div>
+    <div class="prop-row"><span class="prop-key">Grid</span><span class="prop-val green" id="prop-grid-st">ON</span></div>
+    <div class="prop-row" style="margin-top:6px;"><span class="prop-key">Layer</span><span class="prop-val"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00d4ff;box-shadow:0 0 4px #00d4ff;margin-right:4px;"></span>Layer_0</span></div>
+  </div>
+</div>
+
+<!-- CANVAS -->
+<div id="canvas-wrap">
+  <canvas id="main-canvas" tabindex="0"></canvas>
+  <div class="snap-ring" id="snap-ring"></div>
+  <div id="rect-preview"></div>
+
+  <!-- Dynamic Coordinate Input -->
+  <div id="dyn-input-wrap">
+    <div id="dyn-input-box">
+      <div id="dyn-input-prefix">ABS</div>
+      <input id="dyn-input-field" type="text" spellcheck="false" autocomplete="off" placeholder="X,Y  @dX,dY  @D&lt;A"/>
+    </div>
+    <div id="dyn-input-hint"><b>X,Y</b> abs &nbsp;·&nbsp; <i>@dX,dY</i> rel &nbsp;·&nbsp; <em>@D&lt;A°</em> polar</div>
+  </div>
+
+  <div id="coord-overlay">
+    <span><span class="coord-label">X </span><span id="cx">0.0000</span></span>
+    <span><span class="coord-label">Y </span><span id="cy">0.0000</span></span>
+  </div>
+  <div id="hint">Press <span>L</span> for Line · <span>R</span> for Rect · <span>P</span> for Polygon · Right-click for menu</div>
+</div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <div class="sb-item"><span>MODE</span><span class="sb-val act" id="sb-mode">SELECT</span></div>
+  <div class="sb-item"><span>SNAP</span><span class="sb-val ok" id="sb-snap">ON</span></div>
+  <div class="sb-item"><span>GRID</span><span class="sb-val" id="sb-grid">10mm</span></div>
+  <div class="sb-right">
+    <div class="sb-item"><span>L</span><span class="sb-val">line</span></div>
+    <div class="sb-item"><span>R</span><span class="sb-val">rect</span></div>
+    <div class="sb-item"><span>P</span><span class="sb-val">poly</span></div>
+    <div class="sb-item"><span>O</span><span class="sb-val">offset</span></div>
+    <div class="sb-item"><span>Z</span><span class="sb-val">extents</span></div>
+    <div class="sb-item"><span class="sb-val ok">.KAD v0.2</span></div>
+  </div>
+</div>
+
+</div><!-- end #app -->
 
 <div id="toast"></div>
 
-<!-- Right-Click Context Menu -->
+<!-- RIGHT-CLICK CONTEXT MENU — lives on body, outside canvas-wrap -->
 <div id="ctx-menu">
-  <div class="ctx-section-label">Actions</div>
-  <button class="ctx-item accent-item" id="ctx-commit" onclick="ctxCommitOrCancel()">
-    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></span>
-    Cancel / Commit
-    <span class="ctx-key">Esc/↵</span>
+  <div class="ctx-head">Quick Actions</div>
+  <button class="ctx-item hi" id="ctx-cancel-btn" onclick="ctxCancelCommit()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="ctx-cancel-label">Cancel / Commit</span>
+    <span class="ctx-key">Esc</span>
   </button>
-  <button class="ctx-item" onclick="ctxClearSelection()">
-    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+  <button class="ctx-item" onclick="ctxClearSel()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     Clear Selection
-    <span class="ctx-key">SEL</span>
+    <span class="ctx-key">S</span>
   </button>
-  <div class="ctx-divider"></div>
-  <div class="ctx-section-label">Tools</div>
-  <button class="ctx-item" onclick="ctxActivateOffset()">
-    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="17" x2="21" y2="17"/><path d="M15 11l3 2.5-3 2.5" stroke-width="1.2"/></svg></span>
-    Offset Geometry
-    <span class="ctx-key">OFS</span>
-  </button>
-  <div class="ctx-divider"></div>
-  <div class="ctx-section-label">View</div>
-  <button class="ctx-item" onclick="ctxZoomExtents()">
-    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg></span>
-    Zoom Extents
-    <span class="ctx-key">ZE</span>
-  </button>
+  <div class="ctx-sep"></div>
+  <div class="ctx-head">Draw</div>
+  <button class="ctx-item" onclick="setTool('line');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="4"/></svg>Line Tool<span class="ctx-key">L</span></button>
+  <button class="ctx-item" onclick="setTool('rect');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>Rectangle<span class="ctx-key">R</span></button>
+  <button class="ctx-item" onclick="setTool('polygon');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,3 21,9 17,20 7,20 3,9"/></svg>Polygon<span class="ctx-key">P</span></button>
+  <button class="ctx-item" onclick="setTool('offset');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/></svg>Offset<span class="ctx-key">O</span></button>
+  <div class="ctx-sep"></div>
+  <div class="ctx-head">View</div>
+  <button class="ctx-item" onclick="zoomExtents();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>Zoom Extents<span class="ctx-key">Z</span></button>
+  <button class="ctx-item" onclick="initCamera();render();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>Reset View<span class="ctx-key">Home</span></button>
 </div>
 
 <script>
 'use strict';
-// ═══════════════════════════════════════════════════════════════════════════
-//  .KAD — Kernel-Aided Design  |  Prototype Kernel v0.1
-//  Single-file: Rendering Engine + Geometry Memory + Interaction + File I/O
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  .KAD  v0.2  — Kernel-Aided Design
+// ═══════════════════════════════════════════════════════════
 
-// ─── CANVAS SETUP ────────────────────────────────────────────────────────
+// ── CANVAS ──────────────────────────────────────────────
 const canvas = document.getElementById('main-canvas');
 const ctx    = canvas.getContext('2d');
 const wrap   = document.getElementById('canvas-wrap');
@@ -668,1085 +403,866 @@ function resizeCanvas() {
 }
 window.addEventListener('resize', resizeCanvas);
 
-// ─── CAMERA STATE ─────────────────────────────────────────────────────────
-// World origin mapped to screen: screen = world * zoom + pan
-const cam = {
-  panX: 0,       // screen-space pan offset X
-  panY: 0,       // screen-space pan offset Y
-  zoom: 1.0,     // pixels per world unit (1 world unit = 1 mm)
-  minZoom: 0.05,
-  maxZoom: 200,
-};
+// ── CAMERA ──────────────────────────────────────────────
+const cam = { panX:0, panY:0, zoom:3.0, minZoom:0.05, maxZoom:200 };
 
-// Initialize camera: place origin at canvas center
 function initCamera() {
   cam.panX = canvas.width  / 2;
   cam.panY = canvas.height / 2;
-  cam.zoom = 3.0; // start at 3px/mm — comfortable for A4 sheet
+  cam.zoom = 3.0;
+  document.getElementById('prop-zoom').textContent = cam.zoom.toFixed(2) + '×';
+  updateGridLabel();
 }
 
-// World → Screen
-function worldToScreen(wx, wy) {
-  return {
-    x: wx * cam.zoom + cam.panX,
-    y: -wy * cam.zoom + cam.panY,   // Y-flip: CAD uses Y-up
-  };
-}
+function worldToScreen(wx, wy) { return { x: wx*cam.zoom+cam.panX, y: -wy*cam.zoom+cam.panY }; }
+function screenToWorld(sx, sy) { return { x:(sx-cam.panX)/cam.zoom, y:-(sy-cam.panY)/cam.zoom }; }
 
-// Screen → World
-function screenToWorld(sx, sy) {
-  return {
-    x: (sx - cam.panX) / cam.zoom,
-    y: -(sy - cam.panY) / cam.zoom,
-  };
-}
-
-// ─── GEOMETRY MEMORY ENGINE ───────────────────────────────────────────────
-// Linear array of primitives — simulates a flat typed memory block
+// ── GEO MEMORY ──────────────────────────────────────────
 const GeoMemory = {
-  objects: [],    // [{ id, type, layer, ...coords }]
-  nextId: 1,
+  objects:[], nextId:1,
 
-  addLine(x1, y1, x2, y2, layer = 'Layer_0') {
-    const obj = { id: this.nextId++, type: 'LINE', layer, x1, y1, x2, y2 };
-    this.objects.push(obj);
-    updateProps();
-    return obj;
+  addLine(x1,y1,x2,y2,layer='Layer_0') {
+    const o={id:this.nextId++,type:'LINE',layer,x1,y1,x2,y2};
+    this.objects.push(o); updateProps(); return o;
   },
-
-  addPoint(x, y, layer = 'Layer_0') {
-    const obj = { id: this.nextId++, type: 'POINT', layer, x, y };
-    this.objects.push(obj);
-    updateProps();
-    return obj;
+  addPoint(x,y,layer='Layer_0') {
+    const o={id:this.nextId++,type:'POINT',layer,x,y};
+    this.objects.push(o); updateProps(); return o;
   },
-
-  clear() {
-    this.objects = [];
-    this.nextId  = 1;
-    updateProps();
+  remove(id) {
+    this.objects = this.objects.filter(o=>o.id!==id); updateProps();
   },
+  clear() { this.objects=[]; this.nextId=1; updateProps(); },
 
-  // Collect all unique endpoints for snap queries
   allEndpoints() {
-    const pts = [];
-    for (const o of this.objects) {
-      if (o.type === 'LINE') {
-        pts.push({ x: o.x1, y: o.y1 });
-        pts.push({ x: o.x2, y: o.y2 });
-      } else if (o.type === 'POINT') {
-        pts.push({ x: o.x, y: o.y });
-      }
+    const pts=[];
+    for(const o of this.objects){
+      if(o.type==='LINE'){ pts.push({x:o.x1,y:o.y1}); pts.push({x:o.x2,y:o.y2}); }
     }
     return pts;
   },
 
-  serialize() {
-    return JSON.stringify({
-      version: '0.1',
-      units:   'mm',
-      layers:  ['Layer_0'],
-      nextId:  this.nextId,
-      objects: this.objects,
-    }, null, 2);
-  },
-
-  deserialize(str) {
-    try {
-      const data = JSON.parse(str);
-      this.objects = data.objects || [];
-      this.nextId  = data.nextId  || 1;
-      updateProps();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  },
+  serialize()   { return JSON.stringify({version:'0.2',units:'mm',nextId:this.nextId,objects:this.objects},null,2); },
+  deserialize(s){ try{ const d=JSON.parse(s); this.objects=d.objects||[]; this.nextId=d.nextId||1; updateProps(); return true; }catch(e){ return false; } },
 };
 
-// ─── SNAP SYSTEM ──────────────────────────────────────────────────────────
-const SNAP_THRESHOLD_PX = 12; // pixels
+// ── SNAP ────────────────────────────────────────────────
+const SNAP_PX = 14;
+let snapEnabled = true;
 let snapActive  = false;
-let snapPoint   = null; // { x, y } in world coords
+let snapPoint   = null;
 
 function findSnap(wx, wy) {
+  if (!snapEnabled) return null;
   const pts = GeoMemory.allEndpoints();
-  let best = null, bestDist = Infinity;
-  for (const p of pts) {
-    const sp = worldToScreen(p.x, p.y);
-    const dx = sp.x - worldToScreen(wx, wy).x;
-    const dy = sp.y - worldToScreen(wx, wy).y;
-    const d  = Math.sqrt(dx*dx + dy*dy);
-    if (d < SNAP_THRESHOLD_PX && d < bestDist) {
-      best = p; bestDist = d;
-    }
+  let best=null, bestD=Infinity;
+  const test = worldToScreen(wx,wy);
+  for(const p of pts){
+    const sp=worldToScreen(p.x,p.y);
+    const d=Math.hypot(sp.x-test.x, sp.y-test.y);
+    if(d<SNAP_PX && d<bestD){ bestD=d; best=p; }
   }
   return best;
 }
 
-// ─── TOOL STATE ───────────────────────────────────────────────────────────
-let activeTool  = 'select';
-let lineState   = { active: false, x1: 0, y1: 0 };
-let mouseWorld  = { x: 0, y: 0 };
-let mouseScreen = { x: 0, y: 0 };
+// ── STATE ───────────────────────────────────────────────
+let activeTool   = 'select';
+let mouseWorld   = {x:0,y:0};
+let mouseScreen  = {x:0,y:0};
+let selectedIds  = new Set(); // selection set
+let showGrid     = true;
 
-// Offset tool state
-let offsetState = {
-  active:       false,   // line has been selected, waiting for side-click
-  selectedLine: null,    // reference to GeoMemory line object
-  side:         0,       // +1 or -1 as determined by mouse position
-  previewPts:   null,    // { x1,y1,x2,y2 } in world coords
-};
+// Line tool
+let lineState = { active:false, x1:0, y1:0 };
 
-// ─── DYNAMIC INPUT STATE ──────────────────────────────────────────────────
-const dynInput = {
-  visible: false,
-  buffer:  '',
-};
+// Rect tool
+let rectState = { active:false, x1:0, y1:0 };
+
+// Polygon tool  (center+radius mode)
+let polyState = { active:false, cx:0, cy:0 };
+
+// Offset tool
+let offsetState = { active:false, selectedLine:null, previewPts:null };
+
+// ── TOPBAR MENUS ────────────────────────────────────────
+let menuCloseTimer = null;
+
+function openMenu(name) {
+  cancelClose();
+  closeMenus();
+  const item = document.getElementById('menu-'+name);
+  const dd   = document.getElementById('dd-'+name);
+  if(item&&dd){ item.classList.add('open'); dd.classList.add('open'); }
+}
+function scheduleClose() { menuCloseTimer = setTimeout(closeMenus, 180); }
+function cancelClose()   { if(menuCloseTimer){ clearTimeout(menuCloseTimer); menuCloseTimer=null; } }
+function closeMenus() {
+  document.querySelectorAll('.tb-menu-item').forEach(el=>el.classList.remove('open'));
+  document.querySelectorAll('.tb-dropdown').forEach(el=>el.classList.remove('open'));
+}
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('#topbar')) closeMenus();
+});
+
+// ── COORD PANEL TOGGLE ──────────────────────────────────
+let coordPanelOpen = false;
+function toggleCoordPanel() {
+  coordPanelOpen = !coordPanelOpen;
+  document.getElementById('coord-panel-body').classList.toggle('open', coordPanelOpen);
+  document.getElementById('coord-chevron').textContent = coordPanelOpen ? '▼' : '▶';
+}
+function showCoordHelp() {
+  if(!coordPanelOpen) toggleCoordPanel();
+  document.getElementById('coord-panel').scrollIntoView({behavior:'smooth'});
+}
+
+// ── VIEW TOGGLES ────────────────────────────────────────
+function toggleGrid() {
+  showGrid = !showGrid;
+  document.getElementById('prop-grid-st').textContent = showGrid?'ON':'OFF';
+  document.getElementById('prop-grid-st').className   = 'prop-val '+(showGrid?'green':'');
+  render();
+}
+function toggleSnap() {
+  snapEnabled = !snapEnabled;
+  document.getElementById('sb-snap').textContent  = snapEnabled?'ON':'OFF';
+  document.getElementById('sb-snap').className    = 'sb-val '+(snapEnabled?'ok':'');
+  document.getElementById('prop-snap').textContent = snapEnabled?'ON':'OFF';
+  document.getElementById('prop-snap').className   = 'prop-val '+(snapEnabled?'green':'');
+  showToast('Snap '+(snapEnabled?'enabled':'disabled'));
+}
+
+// ── DYNAMIC INPUT ────────────────────────────────────────
 const dynWrap   = document.getElementById('dyn-input-wrap');
 const dynField  = document.getElementById('dyn-input-field');
 const dynPrefix = document.getElementById('dyn-input-prefix');
+let dynVisible  = false;
 
-function openDynInput() {
-  if (dynInput.visible) return;
-  dynInput.visible = true;
-  dynInput.buffer  = '';
-  dynField.value   = '';
+function openDynInput(seed) {
+  dynVisible = true;
+  dynField.value = seed||'';
   dynWrap.style.display = 'block';
   positionDynInput();
   dynField.focus();
   updateDynPrefix();
 }
-
 function closeDynInput() {
-  dynInput.visible = false;
-  dynInput.buffer  = '';
+  dynVisible = false;
   dynWrap.style.display = 'none';
-  dynField.value   = '';
+  dynField.value = '';
   canvas.focus();
 }
-
 function positionDynInput() {
-  const PAD = 20; // offset below cursor
-  let sx = mouseScreen.x + 16;
-  let sy = mouseScreen.y + PAD;
-  // Keep inside canvas
-  const cw = canvas.width, ch = canvas.height;
-  if (sx + 200 > cw) sx = mouseScreen.x - 200;
-  if (sy + 70  > ch) sy = mouseScreen.y - 70;
-  dynWrap.style.left = sx + 'px';
-  dynWrap.style.top  = sy + 'px';
+  let sx = mouseScreen.x + 18, sy = mouseScreen.y + 22;
+  if(sx+190>canvas.width)  sx = mouseScreen.x - 190;
+  if(sy+72>canvas.height)  sy = mouseScreen.y - 72;
+  dynWrap.style.left = sx+'px';
+  dynWrap.style.top  = sy+'px';
 }
-
 function updateDynPrefix() {
   const v = dynField.value;
-  if (v.startsWith('@') && v.includes('<')) {
-    dynPrefix.textContent = 'POLAR';
-    dynPrefix.style.color = 'var(--green)';
-  } else if (v.startsWith('@')) {
-    dynPrefix.textContent = 'REL';
-    dynPrefix.style.color = 'var(--amber)';
-  } else {
-    dynPrefix.textContent = 'ABS';
-    dynPrefix.style.color = 'var(--accent)';
-  }
+  if(v.startsWith('@')&&v.includes('<')){ dynPrefix.textContent='POLAR'; dynPrefix.style.color='var(--green)'; }
+  else if(v.startsWith('@'))             { dynPrefix.textContent='REL';   dynPrefix.style.color='var(--amber)'; }
+  else                                   { dynPrefix.textContent='ABS';   dynPrefix.style.color='var(--accent)'; }
 }
 
-// Intercept typing into dyn-input-field
-dynField.addEventListener('input', () => {
-  dynInput.buffer = dynField.value;
-  updateDynPrefix();
-});
-
-dynField.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.stopPropagation();
-    commitDynInput();
-  } else if (e.key === 'Escape') {
-    e.stopPropagation();
-    closeDynInput();
-    if (activeTool === 'line') {
-      lineState = { active: false };
-      render();
-    }
-  }
+dynField.addEventListener('input', updateDynPrefix);
+dynField.addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.stopPropagation(); commitDynInput(); }
+  if(e.key==='Escape'){ e.stopPropagation(); closeDynInput(); cancelTool(); render(); }
 });
 
 function commitDynInput() {
   const raw = dynField.value.trim();
-  if (!raw) { closeDynInput(); return; }
-
-  const resolved = parseDynCoord(raw);
-  if (!resolved) {
-    showToast('Invalid coordinate: ' + raw);
-    dynField.select();
-    return;
-  }
-
   closeDynInput();
+  if(!raw) return;
+  const pt = parseDynCoord(raw);
+  if(!pt){ showToast('Bad coordinate: '+raw); return; }
 
-  if (activeTool === 'line') {
-    if (!lineState.active) {
-      lineState = { active: true, x1: resolved.x, y1: resolved.y };
-      GeoMemory.addPoint(resolved.x, resolved.y);
+  if(activeTool==='line') {
+    if(!lineState.active){
+      lineState={active:true, x1:pt.x, y1:pt.y};
+      GeoMemory.addPoint(pt.x,pt.y);
     } else {
-      const sx = resolved.x, sy = resolved.y;
-      if (Math.abs(sx - lineState.x1) > 1e-9 || Math.abs(sy - lineState.y1) > 1e-9) {
-        GeoMemory.addLine(lineState.x1, lineState.y1, sx, sy);
-        showToast(`Line → (${sx.toFixed(4)}, ${sy.toFixed(4)})`);
-      }
-      // chain: new start = end of last line, keep drawing
-      lineState = { active: true, x1: sx, y1: sy };
+      if(Math.abs(pt.x-lineState.x1)>1e-9||Math.abs(pt.y-lineState.y1)>1e-9)
+        GeoMemory.addLine(lineState.x1,lineState.y1,pt.x,pt.y);
+      lineState={active:true, x1:pt.x, y1:pt.y};
     }
-    render();
   }
+  render();
 }
 
-// Parse coordinate string — returns { x, y } in world coords or null
 function parseDynCoord(str) {
-  str = str.trim();
+  str=str.trim();
+  const base = lineState.active ? {x:lineState.x1,y:lineState.y1} : {x:0,y:0};
 
-  // Relative Polar: @Distance<Angle  (e.g. @100<45)
-  const polarMatch = str.match(/^@([\d.+\-eE]+)<([\d.+\-eE]+)$/);
-  if (polarMatch) {
-    const dist  = parseFloat(polarMatch[1]);
-    const angle = parseFloat(polarMatch[2]) * Math.PI / 180; // deg → rad
-    if (isNaN(dist) || isNaN(angle)) return null;
-    const base = lineState.active ? { x: lineState.x1, y: lineState.y1 } : { x: 0, y: 0 };
-    return {
-      x: parseFloat((base.x + dist * Math.cos(angle)).toFixed(4)),
-      y: parseFloat((base.y + dist * Math.sin(angle)).toFixed(4)),
-    };
+  // @dist<angle  polar
+  let m = str.match(/^@([+\-]?[\d.eE]+)<([+\-]?[\d.eE]+)$/);
+  if(m){
+    const d=parseFloat(m[1]), a=parseFloat(m[2])*Math.PI/180;
+    if(isNaN(d)||isNaN(a)) return null;
+    return { x:parseFloat((base.x+d*Math.cos(a)).toFixed(4)), y:parseFloat((base.y+d*Math.sin(a)).toFixed(4)) };
   }
-
-  // Relative Cartesian: @dX,dY  (e.g. @50,-20)
-  const relMatch = str.match(/^@([\d.+\-eE]+)[,\s]([\d.+\-eE]+)$/);
-  if (relMatch) {
-    const dx = parseFloat(relMatch[1]);
-    const dy = parseFloat(relMatch[2]);
-    if (isNaN(dx) || isNaN(dy)) return null;
-    const base = lineState.active ? { x: lineState.x1, y: lineState.y1 } : { x: 0, y: 0 };
-    return {
-      x: parseFloat((base.x + dx).toFixed(4)),
-      y: parseFloat((base.y + dy).toFixed(4)),
-    };
+  // @dx,dy  relative
+  m = str.match(/^@([+\-]?[\d.eE]+)[, ]([+\-]?[\d.eE]+)$/);
+  if(m){
+    const dx=parseFloat(m[1]), dy=parseFloat(m[2]);
+    if(isNaN(dx)||isNaN(dy)) return null;
+    return { x:parseFloat((base.x+dx).toFixed(4)), y:parseFloat((base.y+dy).toFixed(4)) };
   }
-
-  // Absolute Cartesian: X,Y  (e.g. 100,50)
-  const absMatch = str.match(/^([\d.+\-eE]+)[,\s]([\d.+\-eE]+)$/);
-  if (absMatch) {
-    const x = parseFloat(absMatch[1]);
-    const y = parseFloat(absMatch[2]);
-    if (isNaN(x) || isNaN(y)) return null;
-    return {
-      x: parseFloat(x.toFixed(4)),
-      y: parseFloat(y.toFixed(4)),
-    };
+  // x,y  absolute
+  m = str.match(/^([+\-]?[\d.eE]+)[, ]([+\-]?[\d.eE]+)$/);
+  if(m){
+    const x=parseFloat(m[1]), y=parseFloat(m[2]);
+    if(isNaN(x)||isNaN(y)) return null;
+    return { x:parseFloat(x.toFixed(4)), y:parseFloat(y.toFixed(4)) };
   }
-
   return null;
 }
 
-// ─── OFFSET TOOL MATH ─────────────────────────────────────────────────────
-function getOffsetDistance() {
-  const v = parseFloat(document.getElementById('offset-dist-input').value);
-  return isNaN(v) || v <= 0 ? 10.0 : parseFloat(v.toFixed(4));
+// ── OFFSET MATH ─────────────────────────────────────────
+function getOffsetDist() {
+  const v=parseFloat(document.getElementById('offset-dist-input').value);
+  return isNaN(v)||v<=0 ? 10 : parseFloat(v.toFixed(4));
 }
-
-// Returns normalized perpendicular vector { nx, ny } for a line
-function lineNormal(x1, y1, x2, y2) {
-  const dx  = x2 - x1;
-  const dy  = y2 - y1;
-  const len = Math.sqrt(dx * dx + dy * dy);
-  if (len < 1e-10) return { nx: 0, ny: 1 };
-  // Perpendicular: rotate 90°  (−dy, dx) — left-hand normal
-  return { nx: -dy / len, ny: dx / len };
+function lineNormal(x1,y1,x2,y2) {
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
+  if(len<1e-10) return {nx:0,ny:1};
+  return {nx:-dy/len, ny:dx/len};
 }
-
-// Which side of the line is a world point on? +1 or -1
-function sideOfLine(lx1, ly1, lx2, ly2, px, py) {
-  const cross = (lx2 - lx1) * (py - ly1) - (ly2 - ly1) * (px - lx1);
-  return cross >= 0 ? 1 : -1;
+function sideOfLine(lx1,ly1,lx2,ly2,px,py) {
+  return ((lx2-lx1)*(py-ly1)-(ly2-ly1)*(px-lx1))>=0 ? 1 : -1;
 }
-
-// Build offset preview { x1,y1,x2,y2 } given a line object and signed distance
 function buildOffsetLine(line, signedDist) {
-  const { nx, ny } = lineNormal(line.x1, line.y1, line.x2, line.y2);
+  const {nx,ny}=lineNormal(line.x1,line.y1,line.x2,line.y2);
   return {
-    x1: parseFloat((line.x1 + nx * signedDist).toFixed(4)),
-    y1: parseFloat((line.y1 + ny * signedDist).toFixed(4)),
-    x2: parseFloat((line.x2 + nx * signedDist).toFixed(4)),
-    y2: parseFloat((line.y2 + ny * signedDist).toFixed(4)),
+    x1:parseFloat((line.x1+nx*signedDist).toFixed(4)),
+    y1:parseFloat((line.y1+ny*signedDist).toFixed(4)),
+    x2:parseFloat((line.x2+nx*signedDist).toFixed(4)),
+    y2:parseFloat((line.y2+ny*signedDist).toFixed(4)),
   };
 }
-
-// Hit-test: find closest LINE entity to a screen point (within threshold px)
-const OFFSET_HIT_PX = 16;
-function pickLine(sx, sy) {
-  let best = null, bestDist = Infinity;
-  for (const obj of GeoMemory.objects) {
-    if (obj.type !== 'LINE') continue;
-    const a = worldToScreen(obj.x1, obj.y1);
-    const b = worldToScreen(obj.x2, obj.y2);
-    const d = pointToSegmentDist(sx, sy, a.x, a.y, b.x, b.y);
-    if (d < OFFSET_HIT_PX && d < bestDist) {
-      bestDist = d;
-      best = obj;
-    }
+const HIT_PX = 16;
+function pickLine(sx,sy) {
+  let best=null, bestD=Infinity;
+  for(const o of GeoMemory.objects){
+    if(o.type!=='LINE') continue;
+    const a=worldToScreen(o.x1,o.y1), b=worldToScreen(o.x2,o.y2);
+    const d=ptSegDist(sx,sy,a.x,a.y,b.x,b.y);
+    if(d<HIT_PX&&d<bestD){ bestD=d; best=o; }
   }
   return best;
 }
-
-// Point-to-segment distance (screen space)
-function pointToSegmentDist(px, py, ax, ay, bx, by) {
-  const dx = bx - ax, dy = by - ay;
-  const lenSq = dx * dx + dy * dy;
-  if (lenSq < 1e-10) return Math.hypot(px - ax, py - ay);
-  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
-  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+function ptSegDist(px,py,ax,ay,bx,by) {
+  const dx=bx-ax, dy=by-ay, lenSq=dx*dx+dy*dy;
+  if(lenSq<1e-10) return Math.hypot(px-ax,py-ay);
+  const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/lenSq));
+  return Math.hypot(px-(ax+t*dx), py-(ay+t*dy));
 }
 
-// ─── CONTEXT MENU ─────────────────────────────────────────────────────────
-const ctxMenu = document.getElementById('ctx-menu');
+// ── RECTANGLE TOOL ──────────────────────────────────────
+function commitRect(x1,y1,x2,y2) {
+  const lx=Math.min(x1,x2), rx=Math.max(x1,x2);
+  const by=Math.min(y1,y2), ty=Math.max(y1,y2);
+  GeoMemory.addLine(lx,by,rx,by);
+  GeoMemory.addLine(rx,by,rx,ty);
+  GeoMemory.addLine(rx,ty,lx,ty);
+  GeoMemory.addLine(lx,ty,lx,by);
+  showToast(`Rect ${Math.abs(x2-x1).toFixed(2)}×${Math.abs(y2-y1).toFixed(2)} mm`);
+}
 
-function openCtxMenu(x, y) {
-  // Update dynamic label
-  const commitBtn = document.getElementById('ctx-commit');
-  if (activeTool === 'line' && lineState.active) {
-    commitBtn.querySelector('span:not(.ctx-icon):not(.ctx-key)') && null; // guard
-    commitBtn.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = ' Commit Line '; });
+// ── POLYGON TOOL ────────────────────────────────────────
+function getPolySides()      { return Math.max(3,parseInt(document.getElementById('poly-sides-input').value)||6); }
+function getPolyInscribed()  { return document.getElementById('poly-inscribed').checked; }
+
+function commitPolygon(cx,cy,px,py) {
+  const n = getPolySides();
+  const r = Math.hypot(px-cx, py-cy);
+  if(r<1e-6){ showToast('Polygon too small'); return; }
+  const inscribed = getPolyInscribed();
+  // inscribed: vertices on circle of radius r
+  // circumscribed: edges tangent to circle (so vertex radius = r/cos(pi/n))
+  const vr = inscribed ? r : r/Math.cos(Math.PI/n);
+  const startAngle = Math.atan2(py-cy, px-cx);
+  const pts=[];
+  for(let i=0;i<n;i++){
+    const a=startAngle+i*(2*Math.PI/n);
+    pts.push({x:parseFloat((cx+vr*Math.cos(a)).toFixed(4)), y:parseFloat((cy+vr*Math.sin(a)).toFixed(4))});
   }
-  ctxMenu.style.left = x + 'px';
-  ctxMenu.style.top  = y + 'px';
-  ctxMenu.classList.add('visible');
-  // Clamp to viewport
-  requestAnimationFrame(() => {
-    const r = ctxMenu.getBoundingClientRect();
-    if (r.right  > window.innerWidth)  ctxMenu.style.left = (x - r.width)  + 'px';
-    if (r.bottom > window.innerHeight) ctxMenu.style.top  = (y - r.height) + 'px';
-  });
+  for(let i=0;i<n;i++){
+    const a=pts[i], b=pts[(i+1)%n];
+    GeoMemory.addLine(a.x,a.y,b.x,b.y);
+  }
+  showToast(`${n}-gon r=${r.toFixed(2)}mm`);
 }
 
-function closeCtxMenu() {
-  ctxMenu.classList.remove('visible');
+function drawPolyPreview() {
+  if(activeTool!=='polygon'||!polyState.active) return;
+  const n  = getPolySides();
+  const cx = polyState.cx, cy = polyState.cy;
+  const px = snapActive&&snapPoint?snapPoint.x:mouseWorld.x;
+  const py = snapActive&&snapPoint?snapPoint.y:mouseWorld.y;
+  const r  = Math.hypot(px-cx,py-cy);
+  if(r<1e-6) return;
+  const inscribed = getPolyInscribed();
+  const vr = inscribed ? r : r/Math.cos(Math.PI/n);
+  const startAngle = Math.atan2(py-cy,px-cx);
+  ctx.save();
+  ctx.strokeStyle='rgba(0,255,157,0.7)';
+  ctx.setLineDash([5,4]);
+  ctx.lineWidth=1.2;
+  ctx.beginPath();
+  for(let i=0;i<=n;i++){
+    const a=startAngle+i*(2*Math.PI/n);
+    const sp=worldToScreen(cx+vr*Math.cos(a), cy+vr*Math.sin(a));
+    if(i===0) ctx.moveTo(sp.x,sp.y); else ctx.lineTo(sp.x,sp.y);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // center dot
+  const sc=worldToScreen(cx,cy);
+  ctx.strokeStyle='var(--green)';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.arc(sc.x,sc.y,4,0,Math.PI*2);
+  ctx.stroke();
+  // radius line
+  const sp=worldToScreen(px,py);
+  ctx.strokeStyle='rgba(0,255,157,0.35)';
+  ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(sc.x,sc.y); ctx.lineTo(sp.x,sp.y); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
 }
 
-// Context menu actions
-function ctxCommitOrCancel() {
-  closeCtxMenu();
-  if (activeTool === 'line' && lineState.active) {
-    // Commit with current mouse position
-    const wp = snapActive && snapPoint ? snapPoint : mouseWorld;
-    if (Math.abs(wp.x - lineState.x1) > 1e-9 || Math.abs(wp.y - lineState.y1) > 1e-9) {
-      GeoMemory.addLine(lineState.x1, lineState.y1, wp.x, wp.y);
-      showToast(`Line committed`);
+// ── SELECTION ───────────────────────────────────────────
+function pickObject(sx,sy) {
+  // Try line hit first
+  for(const o of [...GeoMemory.objects].reverse()){
+    if(o.type==='LINE'){
+      const a=worldToScreen(o.x1,o.y1), b=worldToScreen(o.x2,o.y2);
+      if(ptSegDist(sx,sy,a.x,a.y,b.x,b.y)<HIT_PX) return o;
     }
-    lineState = { active: false };
-  } else {
-    lineState   = { active: false };
-    offsetState = { active: false, selectedLine: null };
   }
-  closeDynInput();
+  return null;
+}
+
+function deleteSelected() {
+  if(selectedIds.size===0){ showToast('Nothing selected'); return; }
+  for(const id of selectedIds) GeoMemory.remove(id);
+  showToast(`Deleted ${selectedIds.size} object(s)`);
+  selectedIds.clear();
+  updateSelectionProps();
   render();
 }
 
-function ctxClearSelection() {
-  closeCtxMenu();
-  setTool('select');
+function updateSelectionProps() {
+  const el=document.getElementById('prop-sel');
+  el.textContent = selectedIds.size>0 ? selectedIds.size+' obj' : '—';
 }
 
-function ctxActivateOffset() {
-  closeCtxMenu();
-  setTool('offset');
+// ── TOOL MANAGEMENT ─────────────────────────────────────
+function cancelTool() {
+  lineState   = {active:false};
+  rectState   = {active:false};
+  polyState   = {active:false};
+  offsetState = {active:false, selectedLine:null, previewPts:null};
+  document.getElementById('rect-preview').style.display='none';
 }
-
-function ctxZoomExtents() {
-  closeCtxMenu();
-  zoomExtents();
-}
-
-// Zoom to fit all objects in view
-function zoomExtents() {
-  const lines  = GeoMemory.objects.filter(o => o.type === 'LINE');
-  const points = GeoMemory.objects.filter(o => o.type === 'POINT');
-  if (lines.length === 0 && points.length === 0) {
-    // Reset to default
-    initCamera();
-    render();
-    showToast('No geometry — reset to origin');
-    return;
-  }
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (const l of lines) {
-    minX = Math.min(minX, l.x1, l.x2); maxX = Math.max(maxX, l.x1, l.x2);
-    minY = Math.min(minY, l.y1, l.y2); maxY = Math.max(maxY, l.y1, l.y2);
-  }
-  for (const p of points) {
-    minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
-    minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
-  }
-  // Add 15% padding
-  const rangeX = (maxX - minX) || 20;
-  const rangeY = (maxY - minY) || 20;
-  const pad    = 0.15;
-  const extX   = rangeX * (1 + pad * 2);
-  const extY   = rangeY * (1 + pad * 2);
-  const zoom   = Math.min(canvas.width / extX, canvas.height / extY);
-  const cx     = (minX + maxX) / 2;
-  const cy     = (minY + maxY) / 2;
-  cam.zoom = Math.max(cam.minZoom, Math.min(cam.maxZoom, zoom));
-  cam.panX = canvas.width  / 2 - cx * cam.zoom;
-  cam.panY = canvas.height / 2 + cy * cam.zoom;
-  document.getElementById('prop-zoom').textContent = cam.zoom.toFixed(2) + '×';
-  updateGridLabel();
-  render();
-  showToast('Zoom Extents');
-}
-
-// Close ctx-menu on any outside click
-document.addEventListener('mousedown', (e) => {
-  if (!ctxMenu.contains(e.target)) closeCtxMenu();
-}, true);
-
-// Suppress context menu on canvas, open custom one
-canvas.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  openCtxMenu(e.clientX, e.clientY);
-});
 
 function setTool(tool) {
-  activeTool = tool;
-  lineState  = { active: false, x1: 0, y1: 0 };
-  offsetState = { active: false, selectedLine: null, side: 0 };
+  cancelTool();
   closeDynInput();
   closeCtxMenu();
+  selectedIds.clear();
+  updateSelectionProps();
 
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  const map = { select:'btn-select', line:'btn-line', polyline:'btn-poly', offset:'btn-offset' };
-  if (map[tool]) document.getElementById(map[tool]).classList.add('active');
+  activeTool = tool;
 
-  const labels = { select:'SELECT', line:'LINE', polyline:'POLYLINE', offset:'OFFSET' };
-  document.getElementById('sb-mode').textContent = labels[tool] || tool.toUpperCase();
+  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset'};
+  if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
 
-  // Offset bar visibility
-  const offsetBar = document.getElementById('offset-bar');
-  if (tool === 'offset') {
-    offsetBar.classList.add('visible');
-  } else {
-    offsetBar.classList.remove('visible');
-  }
+  document.getElementById('sb-mode').textContent=tool.toUpperCase();
 
-  const hints = {
-    select:   'Drag to pan · Scroll to zoom · Middle-drag to pan',
-    line:     '<span>Click</span> start · <span>Click</span> end · Type coords for precision · <span>Esc</span> cancel',
-    polyline: 'Polyline — coming soon',
-    offset:   '<span>Click</span> a line to select · move cursor to choose side · <span>Click</span> to confirm offset',
+  // Offset bar
+  document.getElementById('offset-bar').style.display = tool==='offset'?'flex':'none';
+  // Poly bar
+  document.getElementById('poly-bar').style.display   = tool==='polygon'?'flex':'none';
+
+  const hintMap = {
+    select:  'Drag to pan · Left-click line to select · <span>Del</span> to delete',
+    line:    '<span>Click</span> start → <span>click</span> end · Type to enter coords · <span>Enter</span> closes · <span>Esc</span> cancel',
+    rect:    '<span>Click</span> corner → <span>click</span> opposite corner · Or type <b>W,H</b> in input',
+    polygon: '<span>Click</span> center → <span>click</span> to set radius & rotation',
+    offset:  '<span>Click</span> a line → move cursor to side → <span>click</span> to commit',
   };
-  document.getElementById('hint').innerHTML = hints[tool] || '';
+  document.getElementById('hint').innerHTML = hintMap[tool]||'';
 
   updateCursor();
+  render();
 }
 
 function updateCursor() {
-  if (activeTool === 'select') {
-    canvas.style.cursor = 'grab';
-    canvas.className = 'pan-mode';
-  } else if (activeTool === 'offset') {
-    canvas.style.cursor = offsetState.active ? 'crosshair' : 'pointer';
-    canvas.className = '';
-  } else {
-    canvas.style.cursor = 'crosshair';
-    canvas.className = '';
-  }
+  if(activeTool==='select') { canvas.style.cursor='default'; }
+  else if(activeTool==='offset' && offsetState.active) { canvas.style.cursor='crosshair'; }
+  else { canvas.style.cursor='crosshair'; }
 }
 
-// ─── PANNING ──────────────────────────────────────────────────────────────
-let isPanning   = false;
-let panOriginX  = 0;
-let panOriginY  = 0;
-let camPanStart = { x: 0, y: 0 };
+// ── PANNING ─────────────────────────────────────────────
+let isPanning=false, panOX=0, panOY=0, camStart={x:0,y:0};
 
-// ─── INPUT EVENTS ─────────────────────────────────────────────────────────
-canvas.addEventListener('mousedown', onMouseDown);
-canvas.addEventListener('mousemove', onMouseMove);
-canvas.addEventListener('mouseup',   onMouseUp);
-canvas.addEventListener('wheel',     onWheel, { passive: false });
-window.addEventListener('keydown',   onKeyDown);
+// ── MOUSE EVENTS ────────────────────────────────────────
+canvas.addEventListener('mousedown',  onMouseDown);
+canvas.addEventListener('mousemove',  onMouseMove);
+canvas.addEventListener('mouseup',    onMouseUp);
+canvas.addEventListener('wheel',      onWheel, {passive:false});
+
+// RIGHT-CLICK: attach to document to guarantee firing
+document.addEventListener('contextmenu', e=>{
+  if(e.target===canvas || canvas.contains(e.target)){
+    e.preventDefault();
+    openCtxMenu(e.clientX, e.clientY);
+  }
+});
 
 function onMouseDown(e) {
-  e.preventDefault();
+  if(e.button===2) return; // handled by contextmenu
   closeCtxMenu();
+  closeMenus();
 
-  if (e.button === 1) { // Middle mouse — pan
-    isPanning    = true;
-    panOriginX   = e.clientX;
-    panOriginY   = e.clientY;
-    camPanStart  = { x: cam.panX, y: cam.panY };
-    canvas.classList.add('panning');
+  if(e.button===1 || (e.button===0 && activeTool==='select')) {
+    isPanning=true; panOX=e.clientX; panOY=e.clientY;
+    camStart={x:cam.panX,y:cam.panY};
+    canvas.style.cursor = e.button===1 ? 'grabbing' : 'grab';
     return;
   }
 
-  if (e.button === 2) return; // handled by contextmenu event
+  if(e.button===0) {
+    e.preventDefault();
+    const wp = snapActive&&snapPoint ? snapPoint : mouseWorld;
 
-  if (e.button === 0) {
-    if (activeTool === 'select') {
-      // Left drag on select also pans
-      isPanning   = true;
-      panOriginX  = e.clientX;
-      panOriginY  = e.clientY;
-      camPanStart = { x: cam.panX, y: cam.panY };
-      canvas.classList.add('panning');
-      return;
-    }
-
-    if (activeTool === 'line') {
-      // If dynamic input is visible, suppress canvas click (handled by dynField)
-      if (dynInput.visible) return;
-      const wp = snapActive && snapPoint ? snapPoint : mouseWorld;
-      if (!lineState.active) {
-        lineState = { active: true, x1: wp.x, y1: wp.y };
-        GeoMemory.addPoint(wp.x, wp.y);
-      } else {
-        if (Math.abs(wp.x - lineState.x1) > 1e-9 || Math.abs(wp.y - lineState.y1) > 1e-9) {
-          GeoMemory.addLine(lineState.x1, lineState.y1, wp.x, wp.y);
-          showToast(`Line: (${fmt(lineState.x1)}, ${fmt(lineState.y1)}) → (${fmt(wp.x)}, ${fmt(wp.y)})`);
-        }
-        // Chain: end of this segment becomes start of next
-        lineState = { active: true, x1: wp.x, y1: wp.y };
-      }
-      render();
-      return;
-    }
-
-    if (activeTool === 'offset') {
-      if (!offsetState.active) {
-        // Phase 1: pick a line
-        const hit = pickLine(mouseScreen.x, mouseScreen.y);
-        if (hit) {
-          offsetState.active       = true;
-          offsetState.selectedLine = hit;
-          showToast(`Line selected — move cursor to choose offset side`);
+    if(activeTool==='select') {
+      const hit=pickObject(mouseScreen.x,mouseScreen.y);
+      if(hit){
+        if(e.shiftKey) { // shift-click: toggle
+          if(selectedIds.has(hit.id)) selectedIds.delete(hit.id);
+          else selectedIds.add(hit.id);
         } else {
-          showToast('No line found — click closer to a line entity');
+          selectedIds.clear();
+          selectedIds.add(hit.id);
         }
       } else {
-        // Phase 2: confirm side
-        if (offsetState.previewPts) {
-          const p = offsetState.previewPts;
-          GeoMemory.addLine(p.x1, p.y1, p.x2, p.y2);
-          showToast(`Offset line committed (dist: ${getOffsetDistance()}mm)`);
-        }
-        offsetState = { active: false, selectedLine: null, side: 0, previewPts: null };
+        selectedIds.clear();
       }
+      updateSelectionProps();
       render();
       return;
+    }
+
+    if(activeTool==='line') {
+      if(dynVisible) return;
+      if(!lineState.active){
+        lineState={active:true, x1:wp.x, y1:wp.y};
+        GeoMemory.addPoint(wp.x,wp.y);
+      } else {
+        if(Math.abs(wp.x-lineState.x1)>1e-9||Math.abs(wp.y-lineState.y1)>1e-9)
+          GeoMemory.addLine(lineState.x1,lineState.y1,wp.x,wp.y);
+        lineState={active:true, x1:wp.x, y1:wp.y};
+      }
+      render(); return;
+    }
+
+    if(activeTool==='rect') {
+      if(dynVisible) return;
+      if(!rectState.active){
+        rectState={active:true, x1:wp.x, y1:wp.y};
+      } else {
+        commitRect(rectState.x1,rectState.y1,wp.x,wp.y);
+        rectState={active:false};
+        document.getElementById('rect-preview').style.display='none';
+      }
+      render(); return;
+    }
+
+    if(activeTool==='polygon') {
+      if(!polyState.active){
+        polyState={active:true, cx:wp.x, cy:wp.y};
+      } else {
+        commitPolygon(polyState.cx,polyState.cy,wp.x,wp.y);
+        polyState={active:false};
+      }
+      render(); return;
+    }
+
+    if(activeTool==='offset') {
+      if(!offsetState.active){
+        const hit=pickLine(mouseScreen.x,mouseScreen.y);
+        if(hit){ offsetState.active=true; offsetState.selectedLine=hit; showToast('Line selected — click to confirm side'); }
+        else   { showToast('Click closer to a line'); }
+      } else {
+        if(offsetState.previewPts){
+          const p=offsetState.previewPts;
+          GeoMemory.addLine(p.x1,p.y1,p.x2,p.y2);
+          showToast('Offset committed · '+getOffsetDist()+'mm');
+        }
+        offsetState={active:false,selectedLine:null,previewPts:null};
+      }
+      render(); return;
     }
   }
 }
 
 function onMouseMove(e) {
-  const rect = canvas.getBoundingClientRect();
-  mouseScreen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-  const raw   = screenToWorld(mouseScreen.x, mouseScreen.y);
+  const rect=canvas.getBoundingClientRect();
+  mouseScreen={x:e.clientX-rect.left, y:e.clientY-rect.top};
+  const raw=screenToWorld(mouseScreen.x,mouseScreen.y);
+  const snap=findSnap(raw.x,raw.y);
+  snapActive=!!snap; snapPoint=snap;
+  mouseWorld=snapActive?snapPoint:raw;
 
-  // Snap check
-  const snap = findSnap(raw.x, raw.y);
-  snapActive = !!snap;
-  snapPoint  = snap;
+  document.getElementById('cx').textContent=mouseWorld.x.toFixed(4);
+  document.getElementById('cy').textContent=mouseWorld.y.toFixed(4);
 
-  mouseWorld = snapActive ? snapPoint : raw;
+  const ring=document.getElementById('snap-ring');
+  if(snapActive){
+    const sp=worldToScreen(snapPoint.x,snapPoint.y);
+    ring.style.display='block'; ring.style.left=sp.x+'px'; ring.style.top=sp.y+'px';
+  } else { ring.style.display='none'; }
 
-  // Coord overlay
-  document.getElementById('cx').textContent = mouseWorld.x.toFixed(4);
-  document.getElementById('cy').textContent = mouseWorld.y.toFixed(4);
+  if(isPanning){
+    cam.panX=camStart.x+(e.clientX-panOX);
+    cam.panY=camStart.y+(e.clientY-panOY);
+  }
 
-  // Snap ring
-  const ring = document.getElementById('snap-ring');
-  if (snapActive) {
-    const sp = worldToScreen(snapPoint.x, snapPoint.y);
-    ring.style.display  = 'block';
-    ring.style.left     = sp.x + 'px';
-    ring.style.top      = sp.y + 'px';
+  // Offset preview update
+  if(activeTool==='offset'&&offsetState.active&&offsetState.selectedLine){
+    const ln=offsetState.selectedLine;
+    const side=sideOfLine(ln.x1,ln.y1,ln.x2,ln.y2,mouseWorld.x,mouseWorld.y);
+    offsetState.previewPts=buildOffsetLine(ln,side*getOffsetDist());
+  }
+
+  // Rect preview overlay (CSS div approach for cheap preview)
+  if(activeTool==='rect'&&rectState.active){
+    const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
+    const sa=worldToScreen(rectState.x1,rectState.y1);
+    const sb=worldToScreen(wp.x,wp.y);
+    const lx=Math.min(sa.x,sb.x), ly=Math.min(sa.y,sb.y);
+    const w=Math.abs(sb.x-sa.x), h=Math.abs(sb.y-sa.y);
+    const rp=document.getElementById('rect-preview');
+    rp.style.display='block'; rp.style.left=lx+'px'; rp.style.top=ly+'px';
+    rp.style.width=w+'px'; rp.style.height=h+'px';
   } else {
-    ring.style.display  = 'none';
+    document.getElementById('rect-preview').style.display='none';
   }
 
-  if (isPanning) {
-    cam.panX = camPanStart.x + (e.clientX - panOriginX);
-    cam.panY = camPanStart.y + (e.clientY - panOriginY);
-  }
-
-  // Offset preview: update previewPts from mouse side
-  if (activeTool === 'offset' && offsetState.active && offsetState.selectedLine) {
-    const line = offsetState.selectedLine;
-    const side = sideOfLine(line.x1, line.y1, line.x2, line.y2, mouseWorld.x, mouseWorld.y);
-    const dist = getOffsetDistance();
-    offsetState.side       = side;
-    offsetState.previewPts = buildOffsetLine(line, side * dist);
-  }
-
-  // Reposition dynamic input if visible
-  if (dynInput.visible) {
-    positionDynInput();
-  }
-
+  if(dynVisible) positionDynInput();
   render();
 }
 
 function onMouseUp(e) {
-  if (isPanning) {
-    isPanning = false;
-    canvas.classList.remove('panning');
-  }
+  if(isPanning){ isPanning=false; updateCursor(); }
 }
 
-// Zoom-to-cursor
 function onWheel(e) {
   e.preventDefault();
-  const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
-  const rect   = canvas.getBoundingClientRect();
-  const mx     = e.clientX - rect.left;
-  const my     = e.clientY - rect.top;
-
-  const newZoom = Math.max(cam.minZoom, Math.min(cam.maxZoom, cam.zoom * factor));
-  // Adjust pan so zoom anchors to cursor
-  cam.panX = mx - (mx - cam.panX) * (newZoom / cam.zoom);
-  cam.panY = my - (my - cam.panY) * (newZoom / cam.zoom);
-  cam.zoom = newZoom;
-
-  document.getElementById('prop-zoom').textContent = cam.zoom.toFixed(2) + '×';
-  updateGridLabel();
-  render();
+  const f=e.deltaY<0?1.12:1/1.12;
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const nz=Math.max(cam.minZoom,Math.min(cam.maxZoom,cam.zoom*f));
+  cam.panX=mx-(mx-cam.panX)*(nz/cam.zoom);
+  cam.panY=my-(my-cam.panY)*(nz/cam.zoom);
+  cam.zoom=nz;
+  document.getElementById('prop-zoom').textContent=cam.zoom.toFixed(2)+'×';
+  updateGridLabel(); render();
 }
 
+// ── KEYBOARD ────────────────────────────────────────────
+window.addEventListener('keydown', onKeyDown);
+
 function onKeyDown(e) {
-  // If the dyn input field has focus, let its own listeners handle it
-  if (document.activeElement === dynField) return;
+  if(document.activeElement===dynField) return;
+  if(document.activeElement.tagName==='INPUT') return;
 
-  if (e.key === 'Escape') {
+  const k=e.key;
+  if(k==='Escape'){
     closeDynInput();
-    if (activeTool === 'offset') {
-      offsetState = { active: false, selectedLine: null, side: 0, previewPts: null };
-    }
-    lineState = { active: false };
-    render();
-    return;
+    if(activeTool!=='select') cancelTool();
+    else selectedIds.clear();
+    updateSelectionProps();
+    render(); return;
   }
-
-  if (e.key === 'Enter') {
-    // Enter with line tool + active drawing = close polyline segment
-    if (activeTool === 'line' && lineState.active) {
-      lineState = { active: false };
+  if(k==='Enter'){
+    if(activeTool==='line'&&lineState.active){ lineState={active:false}; render(); }
+    if(activeTool==='rect'&&rectState.active){
+      const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
+      commitRect(rectState.x1,rectState.y1,wp.x,wp.y);
+      rectState={active:false};
+      document.getElementById('rect-preview').style.display='none';
       render();
     }
     return;
   }
+  if(k==='Delete'||k==='Backspace'){ deleteSelected(); return; }
+  if(k==='Home'){ initCamera(); render(); return; }
 
-  if (e.key === 'Delete' || e.key === 'Backspace') {
-    // Future: delete selected
-    return;
+  // Type-to-input while LINE active
+  if(activeTool==='line' && /^[@\d.,\-<+]$/.test(k) && !e.ctrlKey && !e.metaKey && !e.altKey){
+    e.preventDefault(); openDynInput(k); return;
   }
 
-  // Typing while LINE tool is active: open dynamic input
-  if (activeTool === 'line') {
-    const isCoordChar = /^[@\d.,\-<+]$/.test(e.key);
-    if (isCoordChar && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      e.preventDefault();
-      openDynInput();
-      // Seed the field with the first typed character
-      dynField.value   = e.key;
-      dynInput.buffer  = e.key;
-      updateDynPrefix();
+  if(!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    if(k==='l'||k==='L') setTool('line');
+    if(k==='r'||k==='R') setTool('rect');
+    if(k==='p'||k==='P') setTool('polygon');
+    if(k==='s'||k==='S') setTool('select');
+    if(k==='o'||k==='O') setTool('offset');
+    if(k==='z'||k==='Z') zoomExtents();
+    if(k==='g'||k==='G') toggleGrid();
+    if(k==='F3')         toggleSnap();
+    if(k==='?')          showCoordHelp();
+  }
+  if(e.ctrlKey){
+    if(k==='s'){ e.preventDefault(); saveKAD(); }
+    if(k==='n'){ e.preventDefault(); newDocument(); }
+  }
+}
+
+// ── CONTEXT MENU ────────────────────────────────────────
+const ctxMenu = document.getElementById('ctx-menu');
+
+function openCtxMenu(cx, cy) {
+  // Update label
+  const lbl=document.getElementById('ctx-cancel-label');
+  lbl.textContent = (activeTool==='line'&&lineState.active) ? 'Commit Line' :
+                    (activeTool==='rect'&&rectState.active) ? 'Cancel Rect' : 'Cancel / Select';
+  ctxMenu.style.left=cx+'px'; ctxMenu.style.top=cy+'px';
+  ctxMenu.classList.add('open');
+  // Clamp
+  requestAnimationFrame(()=>{
+    const r=ctxMenu.getBoundingClientRect();
+    if(r.right>window.innerWidth)  ctxMenu.style.left=(cx-r.width)+'px';
+    if(r.bottom>window.innerHeight) ctxMenu.style.top=(cy-r.height)+'px';
+  });
+}
+function closeCtxMenu() { ctxMenu.classList.remove('open'); }
+
+// Close ctx on outside click — on document, not canvas
+document.addEventListener('mousedown', e=>{
+  if(!ctxMenu.contains(e.target)) closeCtxMenu();
+});
+
+function ctxCancelCommit() {
+  closeCtxMenu();
+  if(activeTool==='line'&&lineState.active){
+    lineState={active:false}; render(); return;
+  }
+  cancelTool(); render();
+}
+function ctxClearSel() {
+  closeCtxMenu();
+  selectedIds.clear(); updateSelectionProps();
+  setTool('select');
+}
+
+// ── VIEW ────────────────────────────────────────────────
+function zoomExtents() {
+  const objs=GeoMemory.objects;
+  if(objs.length===0){ initCamera(); render(); showToast('No geometry'); return; }
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(const o of objs){
+    if(o.type==='LINE'){
+      x0=Math.min(x0,o.x1,o.x2); x1=Math.max(x1,o.x1,o.x2);
+      y0=Math.min(y0,o.y1,o.y2); y1=Math.max(y1,o.y1,o.y2);
     }
   }
-
-  // Keyboard shortcuts
-  if (!e.ctrlKey && !e.metaKey) {
-    if (e.key === 'l' || e.key === 'L') setTool('line');
-    if (e.key === 's' || e.key === 'S') setTool('select');
-    if (e.key === 'o' || e.key === 'O') setTool('offset');
-    if (e.key === 'z' || e.key === 'Z') zoomExtents();
-  }
+  const rx=(x1-x0)||20, ry=(y1-y0)||20, pad=0.15;
+  const zoom=Math.min(canvas.width/(rx*(1+2*pad)), canvas.height/(ry*(1+2*pad)));
+  cam.zoom=Math.max(cam.minZoom,Math.min(cam.maxZoom,zoom));
+  cam.panX=canvas.width/2-((x0+x1)/2)*cam.zoom;
+  cam.panY=canvas.height/2+((y0+y1)/2)*cam.zoom;
+  document.getElementById('prop-zoom').textContent=cam.zoom.toFixed(2)+'×';
+  updateGridLabel(); render(); showToast('Zoom Extents');
 }
 
-// ─── DYNAMIC GRID ─────────────────────────────────────────────────────────
-// Grid spacing in world units, chosen to keep screen spacing between 30-100px
+// ── GRID ────────────────────────────────────────────────
 function getGridSpacing() {
-  const steps = [0.1, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
-  for (const s of steps) {
-    if (s * cam.zoom >= 40) return s;
-  }
+  const steps=[0.1,0.5,1,2,5,10,20,50,100,200,500,1000];
+  for(const s of steps){ if(s*cam.zoom>=38) return s; }
   return 1000;
 }
-
 function updateGridLabel() {
-  const s = getGridSpacing();
-  document.getElementById('sb-grid').textContent = s < 1 ? `${s*1000}μm` : s < 1000 ? `${s}mm` : `${s/1000}m`;
+  const s=getGridSpacing();
+  const txt=s<1?`${s*1000}μm`:s<1000?`${s}mm`:`${s/1000}m`;
+  document.getElementById('sb-grid').textContent=txt;
 }
 
-// ─── RENDER PIPELINE ──────────────────────────────────────────────────────
-const COLORS = {
-  grid:        '#151c28',
-  gridMajor:   '#1c2535',
-  gridOrigin:  '#1e3050',
-  axis:        '#223344',
-  entity:      '#00d4ff',
-  entityHover: '#66e8ff',
-  point:       '#ffaa00',
-  snapPt:      '#00ff9d',
-  rubber:      'rgba(0,212,255,0.5)',
-  rubberLine:  '#00d4ff',
-  startPt:     '#00ff9d',
-  bg:          '#080a0e',
+// ── RENDER ──────────────────────────────────────────────
+const C={
+  bg:'#080a0e', grid:'#141c28', gridMaj:'#1c2535', axis:'#1e3348',
+  entity:'#00d4ff', entitySel:'#ffaa00', point:'#ffaa00',
+  rubberLine:'#00d4ff', startPt:'#00ff9d',
 };
 
 function render() {
-  const W = canvas.width;
-  const H = canvas.height;
-
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = COLORS.bg;
-  ctx.fillRect(0, 0, W, H);
-
-  drawGrid(W, H);
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H);
+  if(showGrid) drawGrid(W,H);
   drawEntities();
   drawRubberBand();
   drawOffsetPreview();
+  drawPolyPreview();
 }
 
-function drawGrid(W, H) {
-  const spacing = getGridSpacing();
-  const major   = 10; // every 10 minor lines = 1 major
+function drawGrid(W,H) {
+  const spacing=getGridSpacing(), major=10;
+  const tl=screenToWorld(0,0), br=screenToWorld(W,H);
+  const x0=Math.floor(tl.x/spacing)*spacing, x1=Math.ceil(br.x/spacing)*spacing;
+  const y0=Math.floor(br.y/spacing)*spacing, y1=Math.ceil(tl.y/spacing)*spacing;
 
-  const tl = screenToWorld(0, 0);
-  const br = screenToWorld(W, H);
-  const x0 = Math.floor(tl.x / spacing) * spacing;
-  const x1 = Math.ceil(br.x  / spacing) * spacing;
-  const y0 = Math.floor(br.y / spacing) * spacing;
-  const y1 = Math.ceil(tl.y  / spacing) * spacing;
-
-  ctx.lineWidth = 1;
-
-  // Minor grid lines
-  ctx.strokeStyle = COLORS.grid;
-  ctx.beginPath();
-  for (let x = x0; x <= x1; x += spacing) {
-    const sx = worldToScreen(x, 0).x;
-    const isMaj = Math.round(x / spacing) % major === 0;
-    if (!isMaj) { ctx.moveTo(sx, 0); ctx.lineTo(sx, H); }
-  }
-  for (let y = y0; y <= y1; y += spacing) {
-    const sy = worldToScreen(0, y).y;
-    const isMaj = Math.round(y / spacing) % major === 0;
-    if (!isMaj) { ctx.moveTo(0, sy); ctx.lineTo(W, sy); }
-  }
+  ctx.lineWidth=1;
+  ctx.strokeStyle=C.grid; ctx.beginPath();
+  for(let x=x0;x<=x1;x+=spacing){ if(Math.round(x/spacing)%major!==0){ const sx=worldToScreen(x,0).x; ctx.moveTo(sx,0); ctx.lineTo(sx,H); } }
+  for(let y=y0;y<=y1;y+=spacing){ if(Math.round(y/spacing)%major!==0){ const sy=worldToScreen(0,y).y; ctx.moveTo(0,sy); ctx.lineTo(W,sy); } }
   ctx.stroke();
 
-  // Major grid lines
-  ctx.strokeStyle = COLORS.gridMajor;
-  ctx.beginPath();
-  for (let x = x0; x <= x1; x += spacing) {
-    if (Math.round(x / spacing) % major === 0) {
-      const sx = worldToScreen(x, 0).x;
-      ctx.moveTo(sx, 0); ctx.lineTo(sx, H);
-    }
-  }
-  for (let y = y0; y <= y1; y += spacing) {
-    if (Math.round(y / spacing) % major === 0) {
-      const sy = worldToScreen(0, y).y;
-      ctx.moveTo(0, sy); ctx.lineTo(W, sy);
-    }
-  }
+  ctx.strokeStyle=C.gridMaj; ctx.beginPath();
+  for(let x=x0;x<=x1;x+=spacing){ if(Math.round(x/spacing)%major===0){ const sx=worldToScreen(x,0).x; ctx.moveTo(sx,0); ctx.lineTo(sx,H); } }
+  for(let y=y0;y<=y1;y+=spacing){ if(Math.round(y/spacing)%major===0){ const sy=worldToScreen(0,y).y; ctx.moveTo(0,sy); ctx.lineTo(W,sy); } }
   ctx.stroke();
 
-  // Axes
-  ctx.strokeStyle = COLORS.axis;
-  ctx.lineWidth   = 1.5;
-  ctx.beginPath();
-  const ox = worldToScreen(0, 0).x;
-  const oy = worldToScreen(0, 0).y;
-  ctx.moveTo(ox, 0); ctx.lineTo(ox, H);
-  ctx.moveTo(0, oy); ctx.lineTo(W, oy);
-  ctx.stroke();
+  ctx.strokeStyle=C.axis; ctx.lineWidth=1.5; ctx.beginPath();
+  const ox=worldToScreen(0,0).x, oy=worldToScreen(0,0).y;
+  ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke();
 
-  // Origin cross
-  ctx.strokeStyle = '#2a4060';
-  ctx.lineWidth   = 1;
-  ctx.beginPath();
-  ctx.moveTo(ox - 6, oy); ctx.lineTo(ox + 6, oy);
-  ctx.moveTo(ox, oy - 6); ctx.lineTo(ox, oy + 6);
-  ctx.stroke();
+  ctx.strokeStyle='#243550'; ctx.lineWidth=1; ctx.beginPath();
+  ctx.moveTo(ox-6,oy); ctx.lineTo(ox+6,oy); ctx.moveTo(ox,oy-6); ctx.lineTo(ox,oy+6); ctx.stroke();
 }
 
 function drawEntities() {
-  const dpr = window.devicePixelRatio || 1;
   ctx.save();
-
-  for (const obj of GeoMemory.objects) {
-    if (obj.type === 'LINE') {
-      const a = worldToScreen(obj.x1, obj.y1);
-      const b = worldToScreen(obj.x2, obj.y2);
-      ctx.strokeStyle = COLORS.entity;
-      ctx.lineWidth   = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.stroke();
-
-      // Draw endpoint markers
-      drawEndpoint(a.x, a.y, COLORS.entity);
-      drawEndpoint(b.x, b.y, COLORS.entity);
-    } else if (obj.type === 'POINT') {
-      const p = worldToScreen(obj.x, obj.y);
-      drawEndpoint(p.x, p.y, COLORS.point);
+  for(const o of GeoMemory.objects){
+    const sel=selectedIds.has(o.id);
+    if(o.type==='LINE'){
+      const a=worldToScreen(o.x1,o.y1), b=worldToScreen(o.x2,o.y2);
+      if(sel){ ctx.shadowColor='rgba(255,170,0,0.5)'; ctx.shadowBlur=8; }
+      ctx.strokeStyle=sel?C.entitySel:C.entity;
+      ctx.lineWidth=sel?2:1.2;
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+      ctx.shadowBlur=0;
+      drawDot(a.x,a.y,sel?C.entitySel:C.entity);
+      drawDot(b.x,b.y,sel?C.entitySel:C.entity);
+    } else if(o.type==='POINT'){
+      const p=worldToScreen(o.x,o.y);
+      drawDot(p.x,p.y,C.point);
     }
   }
-
   ctx.restore();
 }
 
-function drawEndpoint(sx, sy, color) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
-  ctx.fill();
+function drawDot(sx,sy,color) {
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(sx,sy,2.5,0,Math.PI*2); ctx.fill();
 }
 
 function drawRubberBand() {
-  if (activeTool !== 'line' || !lineState.active) return;
-
-  const start  = worldToScreen(lineState.x1, lineState.y1);
-  const end    = worldToScreen(
-    (snapActive && snapPoint) ? snapPoint.x : mouseWorld.x,
-    (snapActive && snapPoint) ? snapPoint.y : mouseWorld.y,
-  );
-
-  // Rubber line
+  if(activeTool!=='line'||!lineState.active) return;
+  const start=worldToScreen(lineState.x1,lineState.y1);
+  const ep=snapActive&&snapPoint?snapPoint:mouseWorld;
+  const end=worldToScreen(ep.x,ep.y);
   ctx.save();
-  ctx.setLineDash([4, 4]);
-  ctx.strokeStyle = COLORS.rubberLine;
-  ctx.lineWidth   = 1;
-  ctx.globalAlpha = 0.8;
-  ctx.beginPath();
-  ctx.moveTo(start.x, start.y);
-  ctx.lineTo(end.x,   end.y);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Start point highlight
-  ctx.strokeStyle = COLORS.startPt;
-  ctx.lineWidth   = 1.5;
-  ctx.globalAlpha = 1;
-  ctx.beginPath();
-  ctx.arc(start.x, start.y, 5, 0, Math.PI * 2);
-  ctx.stroke();
-
+  ctx.setLineDash([5,4]); ctx.strokeStyle=C.rubberLine; ctx.lineWidth=1; ctx.globalAlpha=0.85;
+  ctx.beginPath(); ctx.moveTo(start.x,start.y); ctx.lineTo(end.x,end.y); ctx.stroke();
+  ctx.setLineDash([]); ctx.strokeStyle=C.startPt; ctx.lineWidth=1.5; ctx.globalAlpha=1;
+  ctx.beginPath(); ctx.arc(start.x,start.y,5,0,Math.PI*2); ctx.stroke();
   ctx.restore();
 }
 
 function drawOffsetPreview() {
-  if (activeTool !== 'offset') return;
-
+  if(activeTool!=='offset') return;
   ctx.save();
-
-  // Highlight selected line (phase 1 or 2)
-  if (offsetState.selectedLine) {
-    const ln = offsetState.selectedLine;
-    const a  = worldToScreen(ln.x1, ln.y1);
-    const b  = worldToScreen(ln.x2, ln.y2);
-    ctx.strokeStyle = 'rgba(255,170,0,0.9)';
-    ctx.lineWidth   = 2.5;
-    ctx.shadowColor = 'rgba(255,170,0,0.5)';
-    ctx.shadowBlur  = 6;
-    ctx.setLineDash([]);
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+  if(offsetState.selectedLine){
+    const ln=offsetState.selectedLine;
+    const a=worldToScreen(ln.x1,ln.y1), b=worldToScreen(ln.x2,ln.y2);
+    ctx.strokeStyle='rgba(255,170,0,0.9)'; ctx.lineWidth=2.5;
+    ctx.shadowColor='rgba(255,170,0,0.4)'; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    ctx.shadowBlur=0;
   }
-
-  // Draw preview offset line (phase 2)
-  if (offsetState.active && offsetState.previewPts) {
-    const p  = offsetState.previewPts;
-    const a  = worldToScreen(p.x1, p.y1);
-    const b  = worldToScreen(p.x2, p.y2);
-    ctx.strokeStyle = 'rgba(0,255,157,0.85)';
-    ctx.lineWidth   = 1.5;
-    ctx.shadowColor = 'rgba(0,255,157,0.4)';
-    ctx.shadowBlur  = 8;
-    ctx.setLineDash([5, 4]);
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.shadowBlur = 0;
-
-    // Draw endpoint crosses for the preview
-    [{ x: a.x, y: a.y }, { x: b.x, y: b.y }].forEach(pt => {
-      ctx.strokeStyle = 'rgba(0,255,157,0.6)';
-      ctx.lineWidth   = 1;
-      ctx.beginPath();
-      ctx.moveTo(pt.x - 4, pt.y); ctx.lineTo(pt.x + 4, pt.y);
-      ctx.moveTo(pt.x, pt.y - 4); ctx.lineTo(pt.x, pt.y + 4);
-      ctx.stroke();
-    });
+  if(offsetState.previewPts){
+    const p=offsetState.previewPts;
+    const a=worldToScreen(p.x1,p.y1), b=worldToScreen(p.x2,p.y2);
+    ctx.strokeStyle='rgba(0,255,157,0.85)'; ctx.lineWidth=1.5;
+    ctx.shadowColor='rgba(0,255,157,0.35)'; ctx.shadowBlur=8;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    ctx.setLineDash([]); ctx.shadowBlur=0;
   }
-
   ctx.restore();
 }
 
-// ─── DXF EXPORTER ─────────────────────────────────────────────────────────
+// ── DXF EXPORT ──────────────────────────────────────────
 function buildDXF(objects) {
-  const f = n => n.toFixed(4);
-  const lines = [];
-
-  // HEADER
-  lines.push('0', 'SECTION', '2', 'HEADER');
-  lines.push('9', '$ACADVER', '1', 'AC1009');
-  lines.push('9', '$INSUNITS', '70', '4');   // 4 = mm
-  lines.push('0', 'ENDSEC');
-
-  // TABLES — minimal layer table
-  lines.push('0', 'SECTION', '2', 'TABLES');
-  lines.push('0', 'TABLE',   '2', 'LAYER', '70', '1');
-  lines.push('0', 'LAYER',
-    '2',  'Layer_0',
-    '70', '0',
-    '62', '7',        // white
-    '6',  'CONTINUOUS'
-  );
-  lines.push('0', 'ENDTAB');
-  lines.push('0', 'ENDSEC');
-
-  // ENTITIES
-  lines.push('0', 'SECTION', '2', 'ENTITIES');
-
-  for (const obj of objects) {
-    if (obj.type === 'LINE') {
-      lines.push(
-        '0',  'LINE',
-        '8',  obj.layer,      // group 8 = layer name
-        '10', f(obj.x1),      // start X
-        '20', f(obj.y1),      // start Y
-        '30', '0.0000',       // start Z
-        '11', f(obj.x2),      // end X
-        '21', f(obj.y2),      // end Y
-        '31', '0.0000',       // end Z
-      );
-    }
-    // POINT entities
-    if (obj.type === 'POINT') {
-      lines.push(
-        '0',  'POINT',
-        '8',  obj.layer,
-        '10', f(obj.x),
-        '20', f(obj.y),
-        '30', '0.0000',
-      );
-    }
+  const f=n=>n.toFixed(4), lines=[];
+  lines.push('0','SECTION','2','HEADER','9','$ACADVER','1','AC1009','9','$INSUNITS','70','4','0','ENDSEC');
+  lines.push('0','SECTION','2','TABLES','0','TABLE','2','LAYER','70','1','0','LAYER','2','Layer_0','70','0','62','7','6','CONTINUOUS','0','ENDTAB','0','ENDSEC');
+  lines.push('0','SECTION','2','ENTITIES');
+  for(const o of objects){
+    if(o.type==='LINE') lines.push('0','LINE','8',o.layer,'10',f(o.x1),'20',f(o.y1),'30','0.0000','11',f(o.x2),'21',f(o.y2),'31','0.0000');
+    if(o.type==='POINT') lines.push('0','POINT','8',o.layer,'10',f(o.x),'20',f(o.y),'30','0.0000');
   }
-
-  lines.push('0', 'ENDSEC');
-  lines.push('0', 'EOF');
-
-  // DXF spec: each group code on its own line, followed by value
+  lines.push('0','ENDSEC','0','EOF');
   return lines.join('\n');
 }
 
-// ─── FILE I/O ─────────────────────────────────────────────────────────────
-function saveKAD() {
-  const payload = GeoMemory.serialize();
-  downloadText(payload, 'drawing.kad', 'application/json');
-  showToast('Saved drawing.kad');
-}
-
+// ── FILE I/O ────────────────────────────────────────────
+function saveKAD() { downloadText(GeoMemory.serialize(),'drawing.kad','application/json'); showToast('Saved drawing.kad'); }
 function loadKAD(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const ok = GeoMemory.deserialize(e.target.result);
-    if (ok) {
-      render();
-      showToast(`Loaded: ${file.name} — ${GeoMemory.objects.length} objects`);
-    } else {
-      showToast('Error: Invalid .kad file');
-    }
-    event.target.value = '';
-  };
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ const ok=GeoMemory.deserialize(e.target.result); ok?render():null; showToast(ok?`Loaded ${file.name}`:'Invalid .kad'); event.target.value=''; };
   reader.readAsText(file);
 }
-
 function exportDXF() {
-  const lines = GeoMemory.objects.filter(o => o.type === 'LINE' || o.type === 'POINT');
-  if (lines.length === 0) {
-    showToast('Nothing to export — draw some geometry first');
-    return;
-  }
-  const dxf = buildDXF(lines);
-  downloadText(dxf, 'drawing.dxf', 'text/plain');
-  showToast(`Exported drawing.dxf — ${lines.length} entities`);
+  const objs=GeoMemory.objects;
+  if(!objs.length){ showToast('No geometry to export'); return; }
+  downloadText(buildDXF(objs),'drawing.dxf','text/plain');
+  showToast(`Exported ${objs.length} entities`);
 }
-
-function downloadText(content, filename, mime) {
-  const blob = new Blob([content], { type: mime });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+function downloadText(content,filename,mime) {
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([content],{type:mime})),download:filename});
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
-
 function newDocument() {
-  if (GeoMemory.objects.length > 0) {
-    if (!confirm('Create new document? Unsaved changes will be lost.')) return;
-  }
-  GeoMemory.clear();
-  render();
-  showToast('New document');
+  if(GeoMemory.objects.length&&!confirm('New document? Unsaved changes will be lost.')) return;
+  GeoMemory.clear(); cancelTool(); selectedIds.clear(); updateSelectionProps(); render(); showToast('New document');
 }
 
-// ─── UI HELPERS ───────────────────────────────────────────────────────────
-function fmt(n) { return n.toFixed(4); }
-
+// ── UI HELPERS ──────────────────────────────────────────
 function updateProps() {
-  const lines  = GeoMemory.objects.filter(o => o.type === 'LINE').length;
-  const points = GeoMemory.objects.filter(o => o.type === 'POINT').length;
-  document.getElementById('prop-objects').textContent = GeoMemory.objects.length;
-  document.getElementById('prop-lines').textContent   = lines;
-  document.getElementById('prop-points').textContent  = points;
-  document.getElementById('layer0-count').textContent = GeoMemory.objects.length;
+  const lines=GeoMemory.objects.filter(o=>o.type==='LINE').length;
+  document.getElementById('prop-objects').textContent=GeoMemory.objects.length;
+  document.getElementById('prop-lines').textContent=lines;
 }
 
-let toastTimer;
+let toastT;
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────
+// ── INIT ────────────────────────────────────────────────
 resizeCanvas();
 initCamera();
 setTool('select');
-updateGridLabel();
 canvas.focus();
-render();
 
-// Draw a small demo cross at origin after a short delay to prove the system
-setTimeout(() => {
-  GeoMemory.addLine(-10, 0, 10, 0);
-  GeoMemory.addLine(0, -10, 0, 10);
+setTimeout(()=>{
+  GeoMemory.addLine(-15,0,15,0);
+  GeoMemory.addLine(0,-15,0,15);
   render();
-  showToast('Demo geometry loaded — origin cross (±10mm). Clear with File → New.');
-}, 300);
-
+  showToast('Demo loaded · origin cross ±15mm · Right-click for menu · Press L/R/P to draw');
+}, 250);
 </script>
 </body>
 </html>
