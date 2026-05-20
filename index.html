@@ -281,6 +281,173 @@
     z-index:100;
   }
   #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ─── DYNAMIC INPUT BOX ──────────────────────────────── */
+  #dyn-input-wrap {
+    position: absolute;
+    display: none;
+    pointer-events: auto;
+    z-index: 50;
+  }
+  #dyn-input-box {
+    background: var(--bg-panel);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(0,212,255,0.25), 0 2px 8px rgba(0,0,0,0.6);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 160px;
+    overflow: hidden;
+  }
+  #dyn-input-prefix {
+    background: var(--bg-panel2);
+    border-right: 1px solid var(--border);
+    padding: 5px 7px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #dyn-input-field {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 5px 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-primary);
+    width: 130px;
+    letter-spacing: 0.04em;
+    caret-color: var(--accent);
+  }
+  #dyn-input-field::placeholder { color: var(--text-dim); }
+  #dyn-input-hint {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: rgba(8,10,14,0.92);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+  }
+  #dyn-input-hint span { color: var(--accent); }
+
+  /* ─── OFFSET DISTANCE BAR ────────────────────────────── */
+  #offset-bar {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    background: var(--bg-panel2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin: 8px 8px 0;
+  }
+  #offset-bar.visible { display: flex; }
+  #offset-bar label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  #offset-dist-input {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-bright);
+    border-radius: 3px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 3px 6px;
+    width: 70px;
+    outline: none;
+    text-align: right;
+  }
+  #offset-dist-input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+  #offset-dist-unit {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  /* ─── CONTEXT MENU ───────────────────────────────────── */
+  #ctx-menu {
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-bright);
+    border-radius: 5px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,212,255,0.06);
+    min-width: 190px;
+    z-index: 200;
+    overflow: hidden;
+    padding: 4px 0;
+    pointer-events: auto;
+  }
+  #ctx-menu.visible { display: flex; }
+  .ctx-section-label {
+    padding: 5px 12px 3px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3px;
+  }
+  .ctx-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+    letter-spacing: 0.03em;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .ctx-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .ctx-item .ctx-icon {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .ctx-item .ctx-icon svg { width: 13px; height: 13px; }
+  .ctx-item .ctx-key {
+    margin-left: auto;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+  .ctx-item.accent-item { color: var(--accent); }
+  .ctx-item.accent-item:hover { background: var(--accent-glow); color: var(--accent); }
+  .ctx-item.danger-item { color: var(--red); }
+  .ctx-item.danger-item:hover { background: rgba(255,68,85,0.08); }
+  .ctx-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 3px 0;
+  }
 </style>
 </head>
 <body>
@@ -339,14 +506,21 @@
         </div>
         <span class="tool-label">POLY</span>
       </button>
-      <button class="tool-btn" id="btn-rect" onclick="" style="opacity:0.4;cursor:not-allowed;" disabled>
+      <button class="tool-btn" id="btn-offset" onclick="setTool('offset')">
         <div class="tool-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="4" y="6" width="16" height="12" rx="1"/>
+            <line x1="3" y1="7" x2="21" y2="7"/>
+            <line x1="3" y1="17" x2="21" y2="17"/>
+            <path d="M15 11l3 2.5-3 2.5" stroke-width="1.2"/>
           </svg>
         </div>
-        <span class="tool-label">RECT</span>
+        <span class="tool-label">OFFSET</span>
       </button>
+    </div>
+    <div id="offset-bar">
+      <label>DIST</label>
+      <input type="number" id="offset-dist-input" value="10" min="0.0001" step="0.5" placeholder="10"/>
+      <span id="offset-dist-unit">mm</span>
     </div>
 
     <div class="section-head">File</div>
@@ -406,13 +580,26 @@
 
   <!-- ── CANVAS ── -->
   <div id="canvas-wrap">
-    <canvas id="main-canvas"></canvas>
+    <canvas id="main-canvas" tabindex="0"></canvas>
     <div class="snap-ring" id="snap-ring"></div>
+
+    <!-- Dynamic Coordinate Input Box -->
+    <div id="dyn-input-wrap">
+      <div id="dyn-input-box">
+        <div id="dyn-input-prefix">CMD</div>
+        <input id="dyn-input-field" type="text" spellcheck="false" autocomplete="off"
+               placeholder="X,Y  @dX,dY  @D&lt;A"/>
+      </div>
+      <div id="dyn-input-hint">
+        <span>X,Y</span> absolute · <span>@dX,dY</span> relative · <span>@D&lt;A</span> polar
+      </div>
+    </div>
+
     <div id="coord-overlay">
       <span><span class="coord-label">X </span><span id="cx">0.0000</span></span>
       <span><span class="coord-label">Y </span><span id="cy">0.0000</span></span>
     </div>
-    <div id="hint">Select <span>SELECT</span> to pan · <span>LINE</span> to draw · Middle-drag to pan · Scroll to zoom</div>
+    <div id="hint">Select <span>SELECT</span> to pan · <span>LINE</span> to draw · <span>OFFSET</span> to offset · Type coords for precision · Middle-drag to pan · Scroll to zoom</div>
   </div>
 
   <!-- ── STATUSBAR ── -->
@@ -422,6 +609,9 @@
     <div class="sb-item"><span>GRID</span><span class="sb-val" id="sb-grid">10mm</span></div>
     <div class="sb-item"><span>LAYER</span><span class="sb-val">Layer_0</span></div>
     <div class="sb-right">
+      <div class="sb-item"><span>L</span><span class="sb-val">LINE</span></div>
+      <div class="sb-item"><span>O</span><span class="sb-val">OFFSET</span></div>
+      <div class="sb-item"><span>Z</span><span class="sb-val">EXTENTS</span></div>
       <div class="sb-item"><span>.KAD Kernel Shell</span><span class="sb-val ok">READY</span></div>
     </div>
   </div>
@@ -429,6 +619,35 @@
 </div>
 
 <div id="toast"></div>
+
+<!-- Right-Click Context Menu -->
+<div id="ctx-menu">
+  <div class="ctx-section-label">Actions</div>
+  <button class="ctx-item accent-item" id="ctx-commit" onclick="ctxCommitOrCancel()">
+    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+    Cancel / Commit
+    <span class="ctx-key">Esc/↵</span>
+  </button>
+  <button class="ctx-item" onclick="ctxClearSelection()">
+    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+    Clear Selection
+    <span class="ctx-key">SEL</span>
+  </button>
+  <div class="ctx-divider"></div>
+  <div class="ctx-section-label">Tools</div>
+  <button class="ctx-item" onclick="ctxActivateOffset()">
+    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="17" x2="21" y2="17"/><path d="M15 11l3 2.5-3 2.5" stroke-width="1.2"/></svg></span>
+    Offset Geometry
+    <span class="ctx-key">OFS</span>
+  </button>
+  <div class="ctx-divider"></div>
+  <div class="ctx-section-label">View</div>
+  <button class="ctx-item" onclick="ctxZoomExtents()">
+    <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg></span>
+    Zoom Extents
+    <span class="ctx-key">ZE</span>
+  </button>
+</div>
 
 <script>
 'use strict';
@@ -571,21 +790,357 @@ let lineState   = { active: false, x1: 0, y1: 0 };
 let mouseWorld  = { x: 0, y: 0 };
 let mouseScreen = { x: 0, y: 0 };
 
+// Offset tool state
+let offsetState = {
+  active:       false,   // line has been selected, waiting for side-click
+  selectedLine: null,    // reference to GeoMemory line object
+  side:         0,       // +1 or -1 as determined by mouse position
+  previewPts:   null,    // { x1,y1,x2,y2 } in world coords
+};
+
+// ─── DYNAMIC INPUT STATE ──────────────────────────────────────────────────
+const dynInput = {
+  visible: false,
+  buffer:  '',
+};
+const dynWrap   = document.getElementById('dyn-input-wrap');
+const dynField  = document.getElementById('dyn-input-field');
+const dynPrefix = document.getElementById('dyn-input-prefix');
+
+function openDynInput() {
+  if (dynInput.visible) return;
+  dynInput.visible = true;
+  dynInput.buffer  = '';
+  dynField.value   = '';
+  dynWrap.style.display = 'block';
+  positionDynInput();
+  dynField.focus();
+  updateDynPrefix();
+}
+
+function closeDynInput() {
+  dynInput.visible = false;
+  dynInput.buffer  = '';
+  dynWrap.style.display = 'none';
+  dynField.value   = '';
+  canvas.focus();
+}
+
+function positionDynInput() {
+  const PAD = 20; // offset below cursor
+  let sx = mouseScreen.x + 16;
+  let sy = mouseScreen.y + PAD;
+  // Keep inside canvas
+  const cw = canvas.width, ch = canvas.height;
+  if (sx + 200 > cw) sx = mouseScreen.x - 200;
+  if (sy + 70  > ch) sy = mouseScreen.y - 70;
+  dynWrap.style.left = sx + 'px';
+  dynWrap.style.top  = sy + 'px';
+}
+
+function updateDynPrefix() {
+  const v = dynField.value;
+  if (v.startsWith('@') && v.includes('<')) {
+    dynPrefix.textContent = 'POLAR';
+    dynPrefix.style.color = 'var(--green)';
+  } else if (v.startsWith('@')) {
+    dynPrefix.textContent = 'REL';
+    dynPrefix.style.color = 'var(--amber)';
+  } else {
+    dynPrefix.textContent = 'ABS';
+    dynPrefix.style.color = 'var(--accent)';
+  }
+}
+
+// Intercept typing into dyn-input-field
+dynField.addEventListener('input', () => {
+  dynInput.buffer = dynField.value;
+  updateDynPrefix();
+});
+
+dynField.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.stopPropagation();
+    commitDynInput();
+  } else if (e.key === 'Escape') {
+    e.stopPropagation();
+    closeDynInput();
+    if (activeTool === 'line') {
+      lineState = { active: false };
+      render();
+    }
+  }
+});
+
+function commitDynInput() {
+  const raw = dynField.value.trim();
+  if (!raw) { closeDynInput(); return; }
+
+  const resolved = parseDynCoord(raw);
+  if (!resolved) {
+    showToast('Invalid coordinate: ' + raw);
+    dynField.select();
+    return;
+  }
+
+  closeDynInput();
+
+  if (activeTool === 'line') {
+    if (!lineState.active) {
+      lineState = { active: true, x1: resolved.x, y1: resolved.y };
+      GeoMemory.addPoint(resolved.x, resolved.y);
+    } else {
+      const sx = resolved.x, sy = resolved.y;
+      if (Math.abs(sx - lineState.x1) > 1e-9 || Math.abs(sy - lineState.y1) > 1e-9) {
+        GeoMemory.addLine(lineState.x1, lineState.y1, sx, sy);
+        showToast(`Line → (${sx.toFixed(4)}, ${sy.toFixed(4)})`);
+      }
+      // chain: new start = end of last line, keep drawing
+      lineState = { active: true, x1: sx, y1: sy };
+    }
+    render();
+  }
+}
+
+// Parse coordinate string — returns { x, y } in world coords or null
+function parseDynCoord(str) {
+  str = str.trim();
+
+  // Relative Polar: @Distance<Angle  (e.g. @100<45)
+  const polarMatch = str.match(/^@([\d.+\-eE]+)<([\d.+\-eE]+)$/);
+  if (polarMatch) {
+    const dist  = parseFloat(polarMatch[1]);
+    const angle = parseFloat(polarMatch[2]) * Math.PI / 180; // deg → rad
+    if (isNaN(dist) || isNaN(angle)) return null;
+    const base = lineState.active ? { x: lineState.x1, y: lineState.y1 } : { x: 0, y: 0 };
+    return {
+      x: parseFloat((base.x + dist * Math.cos(angle)).toFixed(4)),
+      y: parseFloat((base.y + dist * Math.sin(angle)).toFixed(4)),
+    };
+  }
+
+  // Relative Cartesian: @dX,dY  (e.g. @50,-20)
+  const relMatch = str.match(/^@([\d.+\-eE]+)[,\s]([\d.+\-eE]+)$/);
+  if (relMatch) {
+    const dx = parseFloat(relMatch[1]);
+    const dy = parseFloat(relMatch[2]);
+    if (isNaN(dx) || isNaN(dy)) return null;
+    const base = lineState.active ? { x: lineState.x1, y: lineState.y1 } : { x: 0, y: 0 };
+    return {
+      x: parseFloat((base.x + dx).toFixed(4)),
+      y: parseFloat((base.y + dy).toFixed(4)),
+    };
+  }
+
+  // Absolute Cartesian: X,Y  (e.g. 100,50)
+  const absMatch = str.match(/^([\d.+\-eE]+)[,\s]([\d.+\-eE]+)$/);
+  if (absMatch) {
+    const x = parseFloat(absMatch[1]);
+    const y = parseFloat(absMatch[2]);
+    if (isNaN(x) || isNaN(y)) return null;
+    return {
+      x: parseFloat(x.toFixed(4)),
+      y: parseFloat(y.toFixed(4)),
+    };
+  }
+
+  return null;
+}
+
+// ─── OFFSET TOOL MATH ─────────────────────────────────────────────────────
+function getOffsetDistance() {
+  const v = parseFloat(document.getElementById('offset-dist-input').value);
+  return isNaN(v) || v <= 0 ? 10.0 : parseFloat(v.toFixed(4));
+}
+
+// Returns normalized perpendicular vector { nx, ny } for a line
+function lineNormal(x1, y1, x2, y2) {
+  const dx  = x2 - x1;
+  const dy  = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len < 1e-10) return { nx: 0, ny: 1 };
+  // Perpendicular: rotate 90°  (−dy, dx) — left-hand normal
+  return { nx: -dy / len, ny: dx / len };
+}
+
+// Which side of the line is a world point on? +1 or -1
+function sideOfLine(lx1, ly1, lx2, ly2, px, py) {
+  const cross = (lx2 - lx1) * (py - ly1) - (ly2 - ly1) * (px - lx1);
+  return cross >= 0 ? 1 : -1;
+}
+
+// Build offset preview { x1,y1,x2,y2 } given a line object and signed distance
+function buildOffsetLine(line, signedDist) {
+  const { nx, ny } = lineNormal(line.x1, line.y1, line.x2, line.y2);
+  return {
+    x1: parseFloat((line.x1 + nx * signedDist).toFixed(4)),
+    y1: parseFloat((line.y1 + ny * signedDist).toFixed(4)),
+    x2: parseFloat((line.x2 + nx * signedDist).toFixed(4)),
+    y2: parseFloat((line.y2 + ny * signedDist).toFixed(4)),
+  };
+}
+
+// Hit-test: find closest LINE entity to a screen point (within threshold px)
+const OFFSET_HIT_PX = 16;
+function pickLine(sx, sy) {
+  let best = null, bestDist = Infinity;
+  for (const obj of GeoMemory.objects) {
+    if (obj.type !== 'LINE') continue;
+    const a = worldToScreen(obj.x1, obj.y1);
+    const b = worldToScreen(obj.x2, obj.y2);
+    const d = pointToSegmentDist(sx, sy, a.x, a.y, b.x, b.y);
+    if (d < OFFSET_HIT_PX && d < bestDist) {
+      bestDist = d;
+      best = obj;
+    }
+  }
+  return best;
+}
+
+// Point-to-segment distance (screen space)
+function pointToSegmentDist(px, py, ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay;
+  const lenSq = dx * dx + dy * dy;
+  if (lenSq < 1e-10) return Math.hypot(px - ax, py - ay);
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
+
+// ─── CONTEXT MENU ─────────────────────────────────────────────────────────
+const ctxMenu = document.getElementById('ctx-menu');
+
+function openCtxMenu(x, y) {
+  // Update dynamic label
+  const commitBtn = document.getElementById('ctx-commit');
+  if (activeTool === 'line' && lineState.active) {
+    commitBtn.querySelector('span:not(.ctx-icon):not(.ctx-key)') && null; // guard
+    commitBtn.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = ' Commit Line '; });
+  }
+  ctxMenu.style.left = x + 'px';
+  ctxMenu.style.top  = y + 'px';
+  ctxMenu.classList.add('visible');
+  // Clamp to viewport
+  requestAnimationFrame(() => {
+    const r = ctxMenu.getBoundingClientRect();
+    if (r.right  > window.innerWidth)  ctxMenu.style.left = (x - r.width)  + 'px';
+    if (r.bottom > window.innerHeight) ctxMenu.style.top  = (y - r.height) + 'px';
+  });
+}
+
+function closeCtxMenu() {
+  ctxMenu.classList.remove('visible');
+}
+
+// Context menu actions
+function ctxCommitOrCancel() {
+  closeCtxMenu();
+  if (activeTool === 'line' && lineState.active) {
+    // Commit with current mouse position
+    const wp = snapActive && snapPoint ? snapPoint : mouseWorld;
+    if (Math.abs(wp.x - lineState.x1) > 1e-9 || Math.abs(wp.y - lineState.y1) > 1e-9) {
+      GeoMemory.addLine(lineState.x1, lineState.y1, wp.x, wp.y);
+      showToast(`Line committed`);
+    }
+    lineState = { active: false };
+  } else {
+    lineState   = { active: false };
+    offsetState = { active: false, selectedLine: null };
+  }
+  closeDynInput();
+  render();
+}
+
+function ctxClearSelection() {
+  closeCtxMenu();
+  setTool('select');
+}
+
+function ctxActivateOffset() {
+  closeCtxMenu();
+  setTool('offset');
+}
+
+function ctxZoomExtents() {
+  closeCtxMenu();
+  zoomExtents();
+}
+
+// Zoom to fit all objects in view
+function zoomExtents() {
+  const lines  = GeoMemory.objects.filter(o => o.type === 'LINE');
+  const points = GeoMemory.objects.filter(o => o.type === 'POINT');
+  if (lines.length === 0 && points.length === 0) {
+    // Reset to default
+    initCamera();
+    render();
+    showToast('No geometry — reset to origin');
+    return;
+  }
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const l of lines) {
+    minX = Math.min(minX, l.x1, l.x2); maxX = Math.max(maxX, l.x1, l.x2);
+    minY = Math.min(minY, l.y1, l.y2); maxY = Math.max(maxY, l.y1, l.y2);
+  }
+  for (const p of points) {
+    minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+  }
+  // Add 15% padding
+  const rangeX = (maxX - minX) || 20;
+  const rangeY = (maxY - minY) || 20;
+  const pad    = 0.15;
+  const extX   = rangeX * (1 + pad * 2);
+  const extY   = rangeY * (1 + pad * 2);
+  const zoom   = Math.min(canvas.width / extX, canvas.height / extY);
+  const cx     = (minX + maxX) / 2;
+  const cy     = (minY + maxY) / 2;
+  cam.zoom = Math.max(cam.minZoom, Math.min(cam.maxZoom, zoom));
+  cam.panX = canvas.width  / 2 - cx * cam.zoom;
+  cam.panY = canvas.height / 2 + cy * cam.zoom;
+  document.getElementById('prop-zoom').textContent = cam.zoom.toFixed(2) + '×';
+  updateGridLabel();
+  render();
+  showToast('Zoom Extents');
+}
+
+// Close ctx-menu on any outside click
+document.addEventListener('mousedown', (e) => {
+  if (!ctxMenu.contains(e.target)) closeCtxMenu();
+}, true);
+
+// Suppress context menu on canvas, open custom one
+canvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  openCtxMenu(e.clientX, e.clientY);
+});
+
 function setTool(tool) {
   activeTool = tool;
   lineState  = { active: false, x1: 0, y1: 0 };
+  offsetState = { active: false, selectedLine: null, side: 0 };
+  closeDynInput();
+  closeCtxMenu();
 
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  const map = { select:'btn-select', line:'btn-line', polyline:'btn-poly' };
+  const map = { select:'btn-select', line:'btn-line', polyline:'btn-poly', offset:'btn-offset' };
   if (map[tool]) document.getElementById(map[tool]).classList.add('active');
 
-  const labels = { select:'SELECT', line:'LINE', polyline:'POLYLINE' };
+  const labels = { select:'SELECT', line:'LINE', polyline:'POLYLINE', offset:'OFFSET' };
   document.getElementById('sb-mode').textContent = labels[tool] || tool.toUpperCase();
+
+  // Offset bar visibility
+  const offsetBar = document.getElementById('offset-bar');
+  if (tool === 'offset') {
+    offsetBar.classList.add('visible');
+  } else {
+    offsetBar.classList.remove('visible');
+  }
 
   const hints = {
     select:   'Drag to pan · Scroll to zoom · Middle-drag to pan',
-    line:     '<span>Click</span> to set start point · <span>Click</span> again to set end point · <span>Esc</span> to cancel',
+    line:     '<span>Click</span> start · <span>Click</span> end · Type coords for precision · <span>Esc</span> cancel',
     polyline: 'Polyline — coming soon',
+    offset:   '<span>Click</span> a line to select · move cursor to choose side · <span>Click</span> to confirm offset',
   };
   document.getElementById('hint').innerHTML = hints[tool] || '';
 
@@ -593,7 +1148,16 @@ function setTool(tool) {
 }
 
 function updateCursor() {
-  canvas.className = activeTool === 'select' ? 'pan-mode' : '';
+  if (activeTool === 'select') {
+    canvas.style.cursor = 'grab';
+    canvas.className = 'pan-mode';
+  } else if (activeTool === 'offset') {
+    canvas.style.cursor = offsetState.active ? 'crosshair' : 'pointer';
+    canvas.className = '';
+  } else {
+    canvas.style.cursor = 'crosshair';
+    canvas.className = '';
+  }
 }
 
 // ─── PANNING ──────────────────────────────────────────────────────────────
@@ -611,6 +1175,7 @@ window.addEventListener('keydown',   onKeyDown);
 
 function onMouseDown(e) {
   e.preventDefault();
+  closeCtxMenu();
 
   if (e.button === 1) { // Middle mouse — pan
     isPanning    = true;
@@ -620,6 +1185,8 @@ function onMouseDown(e) {
     canvas.classList.add('panning');
     return;
   }
+
+  if (e.button === 2) return; // handled by contextmenu event
 
   if (e.button === 0) {
     if (activeTool === 'select') {
@@ -633,21 +1200,46 @@ function onMouseDown(e) {
     }
 
     if (activeTool === 'line') {
+      // If dynamic input is visible, suppress canvas click (handled by dynField)
+      if (dynInput.visible) return;
       const wp = snapActive && snapPoint ? snapPoint : mouseWorld;
       if (!lineState.active) {
-        // Set start
         lineState = { active: true, x1: wp.x, y1: wp.y };
         GeoMemory.addPoint(wp.x, wp.y);
       } else {
-        // Set end — commit line
         if (Math.abs(wp.x - lineState.x1) > 1e-9 || Math.abs(wp.y - lineState.y1) > 1e-9) {
           GeoMemory.addLine(lineState.x1, lineState.y1, wp.x, wp.y);
           showToast(`Line: (${fmt(lineState.x1)}, ${fmt(lineState.y1)}) → (${fmt(wp.x)}, ${fmt(wp.y)})`);
         }
-        lineState = { active: false, x1: wp.x, y1: wp.y };
-        // Chain: start of next line from end of previous
-        lineState = { active: false };
+        // Chain: end of this segment becomes start of next
+        lineState = { active: true, x1: wp.x, y1: wp.y };
       }
+      render();
+      return;
+    }
+
+    if (activeTool === 'offset') {
+      if (!offsetState.active) {
+        // Phase 1: pick a line
+        const hit = pickLine(mouseScreen.x, mouseScreen.y);
+        if (hit) {
+          offsetState.active       = true;
+          offsetState.selectedLine = hit;
+          showToast(`Line selected — move cursor to choose offset side`);
+        } else {
+          showToast('No line found — click closer to a line entity');
+        }
+      } else {
+        // Phase 2: confirm side
+        if (offsetState.previewPts) {
+          const p = offsetState.previewPts;
+          GeoMemory.addLine(p.x1, p.y1, p.x2, p.y2);
+          showToast(`Offset line committed (dist: ${getOffsetDistance()}mm)`);
+        }
+        offsetState = { active: false, selectedLine: null, side: 0, previewPts: null };
+      }
+      render();
+      return;
     }
   }
 }
@@ -684,6 +1276,20 @@ function onMouseMove(e) {
     cam.panY = camPanStart.y + (e.clientY - panOriginY);
   }
 
+  // Offset preview: update previewPts from mouse side
+  if (activeTool === 'offset' && offsetState.active && offsetState.selectedLine) {
+    const line = offsetState.selectedLine;
+    const side = sideOfLine(line.x1, line.y1, line.x2, line.y2, mouseWorld.x, mouseWorld.y);
+    const dist = getOffsetDistance();
+    offsetState.side       = side;
+    offsetState.previewPts = buildOffsetLine(line, side * dist);
+  }
+
+  // Reposition dynamic input if visible
+  if (dynInput.visible) {
+    positionDynInput();
+  }
+
   render();
 }
 
@@ -714,12 +1320,52 @@ function onWheel(e) {
 }
 
 function onKeyDown(e) {
+  // If the dyn input field has focus, let its own listeners handle it
+  if (document.activeElement === dynField) return;
+
   if (e.key === 'Escape') {
+    closeDynInput();
+    if (activeTool === 'offset') {
+      offsetState = { active: false, selectedLine: null, side: 0, previewPts: null };
+    }
     lineState = { active: false };
     render();
+    return;
   }
+
+  if (e.key === 'Enter') {
+    // Enter with line tool + active drawing = close polyline segment
+    if (activeTool === 'line' && lineState.active) {
+      lineState = { active: false };
+      render();
+    }
+    return;
+  }
+
   if (e.key === 'Delete' || e.key === 'Backspace') {
     // Future: delete selected
+    return;
+  }
+
+  // Typing while LINE tool is active: open dynamic input
+  if (activeTool === 'line') {
+    const isCoordChar = /^[@\d.,\-<+]$/.test(e.key);
+    if (isCoordChar && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      openDynInput();
+      // Seed the field with the first typed character
+      dynField.value   = e.key;
+      dynInput.buffer  = e.key;
+      updateDynPrefix();
+    }
+  }
+
+  // Keyboard shortcuts
+  if (!e.ctrlKey && !e.metaKey) {
+    if (e.key === 'l' || e.key === 'L') setTool('line');
+    if (e.key === 's' || e.key === 'S') setTool('select');
+    if (e.key === 'o' || e.key === 'O') setTool('offset');
+    if (e.key === 'z' || e.key === 'Z') zoomExtents();
   }
 }
 
@@ -765,6 +1411,7 @@ function render() {
   drawGrid(W, H);
   drawEntities();
   drawRubberBand();
+  drawOffsetPreview();
 }
 
 function drawGrid(W, H) {
@@ -893,6 +1540,59 @@ function drawRubberBand() {
   ctx.beginPath();
   ctx.arc(start.x, start.y, 5, 0, Math.PI * 2);
   ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawOffsetPreview() {
+  if (activeTool !== 'offset') return;
+
+  ctx.save();
+
+  // Highlight selected line (phase 1 or 2)
+  if (offsetState.selectedLine) {
+    const ln = offsetState.selectedLine;
+    const a  = worldToScreen(ln.x1, ln.y1);
+    const b  = worldToScreen(ln.x2, ln.y2);
+    ctx.strokeStyle = 'rgba(255,170,0,0.9)';
+    ctx.lineWidth   = 2.5;
+    ctx.shadowColor = 'rgba(255,170,0,0.5)';
+    ctx.shadowBlur  = 6;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  // Draw preview offset line (phase 2)
+  if (offsetState.active && offsetState.previewPts) {
+    const p  = offsetState.previewPts;
+    const a  = worldToScreen(p.x1, p.y1);
+    const b  = worldToScreen(p.x2, p.y2);
+    ctx.strokeStyle = 'rgba(0,255,157,0.85)';
+    ctx.lineWidth   = 1.5;
+    ctx.shadowColor = 'rgba(0,255,157,0.4)';
+    ctx.shadowBlur  = 8;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.shadowBlur = 0;
+
+    // Draw endpoint crosses for the preview
+    [{ x: a.x, y: a.y }, { x: b.x, y: b.y }].forEach(pt => {
+      ctx.strokeStyle = 'rgba(0,255,157,0.6)';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(pt.x - 4, pt.y); ctx.lineTo(pt.x + 4, pt.y);
+      ctx.moveTo(pt.x, pt.y - 4); ctx.lineTo(pt.x, pt.y + 4);
+      ctx.stroke();
+    });
+  }
 
   ctx.restore();
 }
@@ -1036,6 +1736,7 @@ resizeCanvas();
 initCamera();
 setTool('select');
 updateGridLabel();
+canvas.focus();
 render();
 
 // Draw a small demo cross at origin after a short delay to prove the system
