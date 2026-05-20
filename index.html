@@ -437,12 +437,14 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 
   <!-- Rotation controls (shown when rotate tool is active OR objects are selected) -->
   <div id="rotate-bar">
-    <label>ANGLE</label>
+    <button class="rot-btn" onclick="rotateSelected(-90)" title="Rotate 90° counter-clockwise (Q)">↺90°</button>
+    <button class="rot-btn" onclick="rotateSelected(90)"  title="Rotate 90° clockwise (E)">↻90°</button>
+    <label style="margin-left:2px;">Δ</label>
     <input type="number" id="rotate-angle-input" value="0" step="1" placeholder="0"/>
     <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);">°</span>
-    <button class="rot-btn hi" onclick="applyRotationInput(false)" title="Rotate by this angle (relative)">+Δ°</button>
+    <button class="rot-btn hi" onclick="applyRotationInput(false)" title="Rotate by typed angle (relative)">+Δ</button>
     <button class="rot-btn" onclick="applyRotationInput(true)" title="Set absolute angle">ABS</button>
-    <button class="rot-btn" onclick="flattenSelection()" title="Rotate selection to 0° (horizontal)">→0°</button>
+    <button class="rot-btn" onclick="flattenSelection()" title="Rotate to 0° horizontal">→0°</button>
   </div>
 
   <div id="offset-bar">
@@ -544,6 +546,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="sb-item"><span>P</span><span class="sb-val">poly</span></div>
     <div class="sb-item"><span>O</span><span class="sb-val">offset</span></div>
     <div class="sb-item"><span>T</span><span class="sb-val">rotate</span></div>
+    <div class="sb-item"><span>Q/E</span><span class="sb-val">±90°</span></div>
     <div class="sb-item"><span>Z</span><span class="sb-val">extents</span></div>
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span class="sb-val ok">.KAD v0.3</span></div>
@@ -823,7 +826,15 @@ let polyState = { active:false, cx:0, cy:0 };
 let offsetState = { active:false, selectedLine:null, previewPts:null };
 
 // Rotate tool
-let rotateState = { phase:0, pivotX:0, pivotY:0, startAngle:0, previewDelta:0 };
+let rotateState = {
+  phase:        0,     // 0=idle, 1=dragging angle
+  pivotX:       0,
+  pivotY:       0,
+  pivotSet:     false, // true once user has dragged the pivot away from centroid
+  draggingPivot:false, // true while pivot handle is being dragged
+  startAngle:   0,
+  previewDelta: 0,
+};
 
 // ── TOPBAR MENUS ────────────────────────────────────────
 let menuCloseTimer = null;
@@ -1224,65 +1235,100 @@ function flattenSelection() {
 }
 
 // ── ROTATE TOOL (interactive mouse drag) ────────────────
-// The ROTATE tool lets you: click to pick a pivot point on canvas,
-// then drag to set the rotation angle visually.
+// rotateState tracks the pivot point and drag phase.
+// The pivot handle is draggable — mousedown near it enters pivot-drag mode.
+
+const PIVOT_HANDLE_PX = 10; // screen px radius for pivot handle hit test
+
+// Returns the current pivot in world coords.
+// If user hasn't manually set one yet, defaults to centroid.
+function getActivePivot() {
+  if (rotateState.pivotSet) return { x: rotateState.pivotX, y: rotateState.pivotY };
+  return selectionCentroid() || { x: 0, y: 0 };
+}
 
 function drawRotatePreview() {
   if (activeTool !== 'rotate') return;
   ctx.save();
 
-  // Draw selection centroid indicator
-  const cen = selectionCentroid();
-  if (cen) {
-    const sc = worldToScreen(cen.x, cen.y);
-    ctx.strokeStyle = 'rgba(255,170,0,0.7)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3,3]);
-    ctx.beginPath(); ctx.arc(sc.x, sc.y, 8, 0, Math.PI*2); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(255,170,0,0.5)';
-    ctx.beginPath(); ctx.arc(sc.x, sc.y, 2.5, 0, Math.PI*2); ctx.fill();
+  const piv = getActivePivot();
+  const sp  = worldToScreen(piv.x, piv.y);
+
+  // ── Pivot handle ─────────────────────────────────────
+  // Outer ring
+  ctx.strokeStyle = rotateState.draggingPivot ? 'var(--green)' : 'rgba(255,170,0,0.9)';
+  ctx.lineWidth   = 1.5;
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(sp.x, sp.y, PIVOT_HANDLE_PX, 0, Math.PI*2); ctx.stroke();
+  // Cross hair inside pivot
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(sp.x-6, sp.y); ctx.lineTo(sp.x+6, sp.y);
+  ctx.moveTo(sp.x, sp.y-6); ctx.lineTo(sp.x, sp.y+6);
+  ctx.stroke();
+  // Filled dot
+  ctx.fillStyle = rotateState.draggingPivot ? 'var(--green)' : 'rgba(255,170,0,0.8)';
+  ctx.beginPath(); ctx.arc(sp.x, sp.y, 2.5, 0, Math.PI*2); ctx.fill();
+
+  // Tooltip when hovering pivot
+  if (!rotateState.draggingPivot && !rotateState.phase &&
+      Math.hypot(mouseScreen.x-sp.x, mouseScreen.y-sp.y) < PIVOT_HANDLE_PX+4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(sp.x+12, sp.y-16, 76, 16);
+    ctx.fillStyle = 'rgba(255,170,0,0.9)';
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.fillText('drag to move pivot', sp.x+15, sp.y-4);
   }
 
   if (rotateState.phase === 1) {
-    // Pivot chosen — show angle guide line to cursor
-    const pv = worldToScreen(rotateState.pivotX, rotateState.pivotY);
     const cur = mouseScreen;
-    const angleToMouse = Math.atan2(
-      -(cur.y - pv.y), // negate because Y is flipped
-      cur.x - pv.x
-    ) * 180 / Math.PI;
+    const angleToMouse = Math.atan2(-(cur.y - sp.y), cur.x - sp.x) * 180 / Math.PI;
     const delta = normaliseAngle(angleToMouse - rotateState.startAngle);
     rotateState.previewDelta = delta;
 
     // Guide line pivot → cursor
     ctx.strokeStyle = 'rgba(0,212,255,0.6)';
-    ctx.lineWidth = 1;
+    ctx.lineWidth   = 1;
     ctx.setLineDash([4,3]);
-    ctx.beginPath(); ctx.moveTo(pv.x, pv.y); ctx.lineTo(cur.x, cur.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sp.x, sp.y); ctx.lineTo(cur.x, cur.y); ctx.stroke();
     ctx.setLineDash([]);
 
     // Angle arc
-    const radius = Math.hypot(cur.x - pv.x, cur.y - pv.y);
+    const radius = Math.hypot(cur.x - sp.x, cur.y - sp.y);
     if (radius > 12) {
       ctx.strokeStyle = 'rgba(0,212,255,0.3)';
-      ctx.lineWidth = 1;
+      ctx.lineWidth   = 1;
       ctx.beginPath();
-      ctx.arc(pv.x, pv.y, Math.min(radius * 0.5, 30),
-        -rotateState.startAngle * Math.PI / 180,
-        -angleToMouse * Math.PI / 180, delta < 0);
+      ctx.arc(sp.x, sp.y, Math.min(radius*0.5, 36),
+        -rotateState.startAngle * Math.PI/180,
+        -angleToMouse           * Math.PI/180, delta < 0);
       ctx.stroke();
     }
 
-    // Live angle readout near cursor
-    ctx.fillStyle = 'rgba(0,212,255,0.9)';
-    ctx.font = '10px JetBrains Mono, monospace';
-    ctx.fillText(delta.toFixed(2) + '°', cur.x + 12, cur.y - 8);
+    // Live angle readout
+    ctx.fillStyle = 'rgba(0,212,255,0.95)';
+    ctx.font      = '10px JetBrains Mono, monospace';
+    ctx.fillText(delta.toFixed(2) + '°', cur.x + 14, cur.y - 8);
+  }
 
-    // Pivot marker
-    ctx.strokeStyle = 'var(--green)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(pv.x, pv.y, 5, 0, Math.PI*2); ctx.stroke();
+  // Draw ghost of rotated selection if dragging angle
+  if (rotateState.phase === 1 && rotateState.previewDelta !== 0) {
+    ctx.strokeStyle = 'rgba(0,212,255,0.22)';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([3,3]);
+    const rad = rotateState.previewDelta * Math.PI / 180;
+    const cos = Math.cos(rad), sin = Math.sin(rad);
+    const px  = piv.x, py = piv.y;
+    for (const o of GeoMemory.objects) {
+      if (!selectedIds.has(o.id) || o.type !== 'LINE') continue;
+      // Rotate endpoints around pivot
+      const dx1=o.x1-px, dy1=o.y1-py;
+      const dx2=o.x2-px, dy2=o.y2-py;
+      const ga = worldToScreen(px+dx1*cos-dy1*sin, py+dx1*sin+dy1*cos);
+      const gb = worldToScreen(px+dx2*cos-dy2*sin, py+dx2*sin+dy2*cos);
+      ctx.beginPath(); ctx.moveTo(ga.x,ga.y); ctx.lineTo(gb.x,gb.y); ctx.stroke();
+    }
+    ctx.setLineDash([]);
   }
 
   ctx.restore();
@@ -1294,7 +1340,7 @@ function cancelTool() {
   rectState   = {active:false};
   polyState   = {active:false};
   offsetState = {active:false, selectedLine:null, previewPts:null};
-  rotateState = {phase:0, pivotX:0, pivotY:0, startAngle:0, previewDelta:0};
+  rotateState = {phase:0,pivotX:0,pivotY:0,pivotSet:false,draggingPivot:false,startAngle:0,previewDelta:0};
   selBox      = {active:false, pending:false, startSX:0, startSY:0, startWX:0, startWY:0};
   document.getElementById('rect-preview').style.display='none';
 }
@@ -1303,8 +1349,12 @@ function setTool(tool) {
   cancelTool();
   closeDynInput();
   closeCtxMenu();
-  selectedIds.clear();
-  updateSelectionProps();
+
+  // Preserve selection when entering rotate tool so box-selected geometry rotates immediately
+  if (tool !== 'rotate') {
+    selectedIds.clear();
+    updateSelectionProps();
+  }
 
   activeTool = tool;
 
@@ -1329,7 +1379,7 @@ function setTool(tool) {
     rect:    '<span>Click</span> corner → <span>click</span> opposite corner',
     polygon: '<span>Click</span> center → <span>click</span> to set radius & rotation',
     offset:  '<span>Click</span> a line → move cursor to side → <span>click</span> to commit',
-    rotate:  'Select objects first · then <span>Click</span> pivot → <span>click</span> to confirm angle · or use sidebar controls',
+    rotate:  'Drag box to select · <span>Click</span> canvas to set angle · Drag <span>pivot ⊕</span> to reposition it · <span>Q/E</span> ±90° · sidebar for precision',
   };
   document.getElementById('hint').innerHTML = hintMap[tool]||'';
 
@@ -1357,15 +1407,43 @@ let selBox = {
   startWX: 0, startWY: 0, // world start
 };
 
-function selBoxContains(obj, wx0, wy0, wx1, wy1) {
-  // Axis-aligned bounding box test — line must be fully inside the box
-  const lx=Math.min(wx0,wx1), rx=Math.max(wx0,wx1);
-  const by=Math.min(wy0,wy1), ty=Math.max(wy0,wy1);
-  if (obj.type === 'LINE') {
-    return obj.x1>=lx && obj.x1<=rx && obj.y1>=by && obj.y1<=ty &&
-           obj.x2>=lx && obj.x2<=rx && obj.y2>=by && obj.y2<=ty;
+// Two selection modes matching AutoCAD convention:
+//   Left-to-right drag  → WINDOW  (solid blue)  — object fully inside box
+//   Right-to-left drag  → CROSSING (dashed green) — object touches or crosses box
+function selBoxWindow(obj, lx, rx, by, ty) {
+  if (obj.type !== 'LINE') return false;
+  return obj.x1>=lx && obj.x1<=rx && obj.y1>=by && obj.y1<=ty &&
+         obj.x2>=lx && obj.x2<=rx && obj.y2>=by && obj.y2<=ty;
+}
+
+function selBoxCrossing(obj, lx, rx, by, ty) {
+  // Either endpoint inside, OR segment intersects any edge of the box
+  if (obj.type !== 'LINE') return false;
+  // Endpoint containment check (fast path)
+  if ((obj.x1>=lx&&obj.x1<=rx&&obj.y1>=by&&obj.y1<=ty) ||
+      (obj.x2>=lx&&obj.x2<=rx&&obj.y2>=by&&obj.y2<=ty)) return true;
+  // Segment vs each of the 4 box edges
+  return segIntersectsBox(obj.x1,obj.y1,obj.x2,obj.y2, lx,rx,by,ty);
+}
+
+function segIntersectsBox(ax,ay,bx,by, lx,rx,bby,ty) {
+  // Cohen–Sutherland style: test line against all 4 box edges
+  const edges = [
+    [lx,bby, lx,ty], [rx,bby, rx,ty],
+    [lx,bby, rx,bby], [lx,ty, rx,ty],
+  ];
+  for (const [ex1,ey1,ex2,ey2] of edges) {
+    if (segIntersects(ax,ay,bx,by, ex1,ey1,ex2,ey2)) return true;
   }
   return false;
+}
+
+function segIntersects(ax,ay,bx,by, cx,cy,dx,dy) {
+  const denom = (bx-ax)*(dy-cy)-(by-ay)*(dx-cx);
+  if (Math.abs(denom)<1e-12) return false;
+  const t = ((cx-ax)*(dy-cy)-(cy-ay)*(dx-cx)) / denom;
+  const u = ((cx-ax)*(by-ay)-(cy-ay)*(bx-ax)) / denom;
+  return t>=0&&t<=1&&u>=0&&u<=1;
 }
 
 function drawSelBox() {
@@ -1479,19 +1557,39 @@ function onMouseDown(e) {
     }
 
     if(activeTool==='rotate') {
+      // If nothing selected, allow point-pick or box-select first
       if(selectedIds.size===0){
         const hit=pickObject(mouseScreen.x,mouseScreen.y);
         if(hit){ selectedIds.add(hit.id); updateSelectionProps(); render(); return; }
-        showToast('Select a line first (click it), then click pivot'); return;
+        // Start a selection box — same pending logic as select tool
+        selBox.pending=true;
+        selBox.startSX=mouseScreen.x; selBox.startSY=mouseScreen.y;
+        selBox.startWX=mouseWorld.x;  selBox.startWY=mouseWorld.y;
+        selBox.active=false;
+        return;
       }
+
+      // Check if clicking near the pivot handle → start pivot drag
+      const piv = getActivePivot();
+      const sp  = worldToScreen(piv.x, piv.y);
+      if(Math.hypot(mouseScreen.x-sp.x, mouseScreen.y-sp.y) <= PIVOT_HANDLE_PX+4) {
+        rotateState.draggingPivot = true;
+        rotateState.phase = 0;
+        return;
+      }
+
+      // Phase 0: start angle drag
       if(rotateState.phase===0){
-        rotateState.phase=1;
-        rotateState.pivotX=wp.x; rotateState.pivotY=wp.y;
-        rotateState.startAngle=0;
-        showToast('Pivot set — move cursor and click to confirm rotation');
+        rotateState.phase      = 1;
+        rotateState.startAngle = Math.atan2(-(mouseScreen.y-sp.y), mouseScreen.x-sp.x) * 180/Math.PI;
+        rotateState.previewDelta = 0;
+        showToast('Move cursor and click to confirm rotation · Esc to cancel');
       } else {
-        rotateSelected(rotateState.previewDelta, {x:rotateState.pivotX, y:rotateState.pivotY});
-        rotateState={phase:0,pivotX:0,pivotY:0,startAngle:0,previewDelta:0};
+        // Phase 1: confirm rotation
+        rotateSelected(rotateState.previewDelta, getActivePivot());
+        rotateState.phase        = 0;
+        rotateState.previewDelta = 0;
+        rotateState.startAngle   = 0;
       }
       render(); return;
     }
@@ -1520,8 +1618,8 @@ function onMouseMove(e) {
     cam.panY=camStart.y+(e.clientY-panOY);
   }
 
-  // SELECT tool drag logic: after threshold, switch to sel-box or pan
-  if(activeTool==='select' && selBox.pending) {
+  // SELECT and ROTATE tool drag logic: after threshold, switch to sel-box
+  if((activeTool==='select' || (activeTool==='rotate' && selectedIds.size===0)) && selBox.pending) {
     const dx=mouseScreen.x-selBox.startSX, dy=mouseScreen.y-selBox.startSY;
     if(Math.hypot(dx,dy) > SEL_DRAG_THRESHOLD) {
       selBox.pending=false;
@@ -1537,11 +1635,18 @@ function onMouseMove(e) {
     offsetState.previewPts=buildOffsetLine(ln,side*getOffsetDist());
   }
 
-  // Rotate preview: update live delta as cursor moves
-  if(activeTool==='rotate'&&rotateState.phase===1){
-    const pv=worldToScreen(rotateState.pivotX,rotateState.pivotY);
-    const angleToMouse=Math.atan2(-(mouseScreen.y-pv.y), mouseScreen.x-pv.x)*180/Math.PI;
-    rotateState.previewDelta=normaliseAngle(angleToMouse-rotateState.startAngle);
+  // Rotate preview: update live delta as cursor moves, handle pivot drag
+  if(activeTool==='rotate') {
+    if(rotateState.draggingPivot) {
+      rotateState.pivotX   = mouseWorld.x;
+      rotateState.pivotY   = mouseWorld.y;
+      rotateState.pivotSet = true;
+    } else if(rotateState.phase===1) {
+      const piv = getActivePivot();
+      const sp  = worldToScreen(piv.x, piv.y);
+      const angleToMouse = Math.atan2(-(mouseScreen.y-sp.y), mouseScreen.x-sp.x)*180/Math.PI;
+      rotateState.previewDelta = normaliseAngle(angleToMouse - rotateState.startAngle);
+    }
   }
 
   // Rect preview overlay (CSS div approach for cheap preview)
@@ -1565,15 +1670,29 @@ function onMouseMove(e) {
 function onMouseUp(e) {
   if(isPanning){ isPanning=false; updateCursor(); }
 
-  if(e.button===0 && activeTool==='select') {
+  // Release pivot drag
+  if(e.button===0 && activeTool==='rotate' && rotateState.draggingPivot) {
+    rotateState.draggingPivot = false;
+    render(); return;
+  }
+
+  if(e.button===0 && (activeTool==='select' || activeTool==='rotate')) {
     if(selBox.active) {
-      // Commit selection box — select all lines whose both endpoints are inside
       const wx0=selBox.startWX, wy0=selBox.startWY;
       const wx1=mouseWorld.x,   wy1=mouseWorld.y;
+      const lx=Math.min(wx0,wx1), rx=Math.max(wx0,wx1);
+      const by=Math.min(wy0,wy1), ty=Math.max(wy0,wy1);
+      const leftToRight = mouseScreen.x >= selBox.startSX;
       if(!e.shiftKey) selectedIds.clear();
       for(const o of GeoMemory.objects) {
-        if(selBoxContains(o, wx0, wy0, wx1, wy1)) selectedIds.add(o.id);
+        const hit = leftToRight
+          ? selBoxWindow(o, lx, rx, by, ty)       // window: fully inside
+          : selBoxCrossing(o, lx, rx, by, ty);     // crossing: touches or intersects
+        if(hit) selectedIds.add(o.id);
       }
+      const mode = leftToRight ? 'Window' : 'Crossing';
+      const n = selectedIds.size;
+      if(n>0) showToast(`${mode} select: ${n} object${n>1?'s':''}`);
       updateSelectionProps();
       selBox.active=false;
       canvas.style.cursor='default';
@@ -1656,6 +1775,8 @@ function onKeyDown(e) {
     if(k==='s'||k==='S') setTool('select');
     if(k==='o'||k==='O') setTool('offset');
     if(k==='t'||k==='T') setTool('rotate');
+    if(k==='q'||k==='Q') rotateSelected(-90);  // CCW
+    if(k==='e'||k==='E') rotateSelected(90);   // CW
     if(k==='0')          flattenSelection();
     if(k==='z'||k==='Z') zoomExtents();
     if(k==='g'||k==='G') toggleGrid();
