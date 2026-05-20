@@ -171,6 +171,34 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 /* ── RECT DRAG PREVIEW ── */
 #rect-preview { position:absolute; pointer-events:none; border:1px dashed var(--accent); background:rgba(0,212,255,0.04); display:none; }
 
+/* ── ROTATION BAR ── */
+#rotate-bar {
+  display: none; align-items: center; gap: 6px;
+  padding: 5px 8px; background: var(--bg-panel2);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+  flex-wrap: wrap;
+}
+#rotate-bar.visible { display: flex; }
+#rotate-bar label { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
+#rotate-angle-input {
+  background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:3px;
+  color:var(--accent); font-family:var(--font-mono); font-size:11px;
+  padding:3px 6px; width:62px; outline:none; text-align:right;
+}
+#rotate-angle-input:focus { border-color:var(--accent); }
+.rot-btn {
+  background:var(--bg-panel); border:1px solid var(--border); border-radius:3px;
+  color:var(--text-secondary); font-family:var(--font-mono); font-size:9px;
+  padding:3px 6px; cursor:pointer; transition:all 0.12s; white-space:nowrap;
+  letter-spacing:0.04em;
+}
+.rot-btn:hover { background:var(--bg-hover); border-color:var(--border-bright); color:var(--text-primary); }
+.rot-btn.hi { color:var(--accent); border-color:var(--accent-dim); }
+.rot-btn.hi:hover { background:var(--accent-glow); border-color:var(--accent); }
+/* Angle readout in selection properties */
+#prop-angle-row { display:none; }
+#prop-angle-row.visible { display:flex; }
+
 /* ── UNIT TOGGLE ── */
 #unit-toggle {
   font-family: var(--font-mono);
@@ -245,6 +273,9 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
         <div class="tb-dd-item" onclick="setTool('rect');closeMenus()">Rectangle<span class="dd-key">R</span></div>
         <div class="tb-dd-item" onclick="setTool('polygon');closeMenus()">Polygon<span class="dd-key">P</span></div>
         <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="setTool('rotate');closeMenus()">Rotate<span class="dd-key">T</span></div>
+        <div class="tb-dd-item" onclick="flattenSelection();closeMenus()">Flatten to 0°<span class="dd-key">0</span></div>
+        <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="setTool('offset');closeMenus()">Offset<span class="dd-key">O</span></div>
       </div>
     </div>
@@ -295,6 +326,20 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
       <span class="tool-label">DELETE</span>
     </button>
+    <button class="tool-btn" id="btn-rotate" onclick="setTool('rotate')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></div>
+      <span class="tool-label">ROTATE</span>
+    </button>
+  </div>
+
+  <!-- Rotation controls (shown when rotate tool is active OR objects are selected) -->
+  <div id="rotate-bar">
+    <label>ANGLE</label>
+    <input type="number" id="rotate-angle-input" value="0" step="1" placeholder="0"/>
+    <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);">°</span>
+    <button class="rot-btn hi" onclick="applyRotationInput(false)" title="Rotate by this angle (relative)">+Δ°</button>
+    <button class="rot-btn" onclick="applyRotationInput(true)" title="Set absolute angle">ABS</button>
+    <button class="rot-btn" onclick="flattenSelection()" title="Rotate selection to 0° (horizontal)">→0°</button>
   </div>
 
   <div id="offset-bar">
@@ -348,6 +393,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="prop-row"><span class="prop-key">Objects</span><span class="prop-val accent" id="prop-objects">0</span></div>
     <div class="prop-row"><span class="prop-key">Lines</span><span class="prop-val" id="prop-lines">0</span></div>
     <div class="prop-row"><span class="prop-key">Selected</span><span class="prop-val warn" id="prop-sel">—</span></div>
+    <div class="prop-row" id="prop-angle-row"><span class="prop-key">Angle</span><span class="prop-val accent" id="prop-angle">—</span></div>
     <div class="prop-row"><span class="prop-key">Units</span><span class="prop-val green" id="prop-units">mm</span></div>
     <div class="prop-row"><span class="prop-key">Zoom</span><span class="prop-val" id="prop-zoom">3.00×</span></div>
     <div class="prop-row"><span class="prop-key">Snap</span><span class="prop-val green" id="prop-snap">ON</span></div>
@@ -389,6 +435,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="sb-item"><span>R</span><span class="sb-val">rect</span></div>
     <div class="sb-item"><span>P</span><span class="sb-val">poly</span></div>
     <div class="sb-item"><span>O</span><span class="sb-val">offset</span></div>
+    <div class="sb-item"><span>T</span><span class="sb-val">rotate</span></div>
     <div class="sb-item"><span>Z</span><span class="sb-val">extents</span></div>
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span class="sb-val ok">.KAD v0.3</span></div>
@@ -418,6 +465,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   <button class="ctx-item" onclick="setTool('rect');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>Rectangle<span class="ctx-key">R</span></button>
   <button class="ctx-item" onclick="setTool('polygon');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,3 21,9 17,20 7,20 3,9"/></svg>Polygon<span class="ctx-key">P</span></button>
   <button class="ctx-item" onclick="setTool('offset');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/></svg>Offset<span class="ctx-key">O</span></button>
+  <button class="ctx-item" onclick="setTool('rotate');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg>Rotate<span class="ctx-key">T</span></button>
+  <button class="ctx-item" onclick="flattenSelection();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 7 3 12 8 17"/></svg>Flatten to 0°<span class="ctx-key">0</span></button>
   <div class="ctx-sep"></div>
   <div class="ctx-head">View</div>
   <button class="ctx-item" onclick="zoomExtents();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>Zoom Extents<span class="ctx-key">Z</span></button>
@@ -610,6 +659,9 @@ let polyState = { active:false, cx:0, cy:0 };
 
 // Offset tool
 let offsetState = { active:false, selectedLine:null, previewPts:null };
+
+// Rotate tool
+let rotateState = { phase:0, pivotX:0, pivotY:0, startAngle:0, previewDelta:0 };
 
 // ── TOPBAR MENUS ────────────────────────────────────────
 let menuCloseTimer = null;
@@ -887,8 +939,191 @@ function deleteSelected() {
 }
 
 function updateSelectionProps() {
-  const el=document.getElementById('prop-sel');
-  el.textContent = selectedIds.size>0 ? selectedIds.size+' obj' : '—';
+  const el = document.getElementById('prop-sel');
+  const angleRow = document.getElementById('prop-angle-row');
+  const angleTxt = document.getElementById('prop-angle');
+  el.textContent = selectedIds.size > 0 ? selectedIds.size + ' obj' : '—';
+
+  // Show angle readout when exactly one LINE is selected
+  const selObjs = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'LINE');
+  if (selObjs.length === 1) {
+    const ln = selObjs[0];
+    const deg = lineAngleDeg(ln);
+    angleTxt.textContent = deg.toFixed(4) + '°';
+    angleRow.classList.add('visible');
+    // Pre-fill rotate input with current angle for convenience
+    document.getElementById('rotate-angle-input').value = deg.toFixed(2);
+    // Show rotate bar whenever something is selected
+    document.getElementById('rotate-bar').classList.add('visible');
+  } else if (selObjs.length > 1) {
+    angleTxt.textContent = selObjs.length + ' lines';
+    angleRow.classList.add('visible');
+    document.getElementById('rotate-bar').classList.add('visible');
+  } else {
+    angleRow.classList.remove('visible');
+    // Only hide rotate bar if not in rotate tool mode
+    if (activeTool !== 'rotate') {
+      document.getElementById('rotate-bar').classList.remove('visible');
+    }
+  }
+}
+
+// ── ROTATION ENGINE ─────────────────────────────────────
+
+// Angle of a LINE in degrees, measured from positive X axis, range (-180, 180]
+function lineAngleDeg(ln) {
+  const dx = ln.x2 - ln.x1;
+  const dy = ln.y2 - ln.y1;
+  return Math.atan2(dy, dx) * 180 / Math.PI;
+}
+
+// Normalise angle to (-180, 180]
+function normaliseAngle(deg) {
+  let a = deg % 360;
+  if (a > 180)  a -= 360;
+  if (a <= -180) a += 360;
+  return a;
+}
+
+// Compute centroid of all selected LINE endpoints (bounding-box centre)
+function selectionCentroid() {
+  let x0=Infinity, x1=-Infinity, y0=Infinity, y1=-Infinity;
+  for (const o of GeoMemory.objects) {
+    if (!selectedIds.has(o.id) || o.type !== 'LINE') continue;
+    x0=Math.min(x0,o.x1,o.x2); x1=Math.max(x1,o.x1,o.x2);
+    y0=Math.min(y0,o.y1,o.y2); y1=Math.max(y1,o.y1,o.y2);
+  }
+  if (!isFinite(x0)) return null;
+  return { x:(x0+x1)/2, y:(y0+y1)/2 };
+}
+
+// Rotate a single point around pivot by angleDeg
+function rotatePoint(px, py, pivotX, pivotY, angleDeg) {
+  const r = angleDeg * Math.PI / 180;
+  const cos = Math.cos(r), sin = Math.sin(r);
+  const dx = px - pivotX, dy = py - pivotY;
+  return {
+    x: parseFloat((pivotX + dx*cos - dy*sin).toFixed(6)),
+    y: parseFloat((pivotY + dx*sin + dy*cos).toFixed(6)),
+  };
+}
+
+// Apply rotation to all selected LINE objects in-place
+// deltaRad is in DEGREES already
+function rotateSelected(deltaDeg, pivot) {
+  if (selectedIds.size === 0) { showToast('Nothing selected — select lines first'); return; }
+  const p = pivot || selectionCentroid();
+  if (!p) { showToast('No geometry to rotate'); return; }
+
+  let count = 0;
+  for (const o of GeoMemory.objects) {
+    if (!selectedIds.has(o.id) || o.type !== 'LINE') continue;
+    const newA = rotatePoint(o.x1, o.y1, p.x, p.y, deltaDeg);
+    const newB = rotatePoint(o.x2, o.y2, p.x, p.y, deltaDeg);
+    o.x1 = newA.x; o.y1 = newA.y;
+    o.x2 = newB.x; o.y2 = newB.y;
+    count++;
+  }
+  updateSelectionProps();
+  render();
+  showToast(`Rotated ${count} line(s) by ${deltaDeg > 0 ? '+' : ''}${deltaDeg.toFixed(4)}°`);
+}
+
+// applyRotationInput — called by the +Δ° and ABS buttons
+function applyRotationInput(absolute) {
+  const raw = parseFloat(document.getElementById('rotate-angle-input').value);
+  if (isNaN(raw)) { showToast('Enter a valid angle'); return; }
+
+  if (absolute) {
+    // Absolute: rotate selection so that the primary selected line sits at exactly `raw` degrees
+    // If single line: rotate by (raw - currentAngle)
+    const selLines = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'LINE');
+    if (selLines.length === 0) { showToast('Select at least one line'); return; }
+    const ref = selLines[0];
+    const current = lineAngleDeg(ref);
+    const delta = normaliseAngle(raw - current);
+    rotateSelected(delta);
+  } else {
+    // Relative: rotate by exactly the typed value
+    rotateSelected(raw);
+  }
+}
+
+// Flatten the first selected line to exactly 0° (horizontal), rotating the
+// whole selection group by the same delta so relative geometry is preserved
+function flattenSelection() {
+  const selLines = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'LINE');
+  if (selLines.length === 0) { showToast('Select a line first'); return; }
+  const ref = selLines[0];
+  const current = lineAngleDeg(ref);
+  const delta = -current; // rotate by negative of current angle → lands at 0°
+  rotateSelected(delta);
+  showToast(`Flattened to 0° (rotated ${delta.toFixed(4)}°)`);
+}
+
+// ── ROTATE TOOL (interactive mouse drag) ────────────────
+// The ROTATE tool lets you: click to pick a pivot point on canvas,
+// then drag to set the rotation angle visually.
+
+function drawRotatePreview() {
+  if (activeTool !== 'rotate') return;
+  ctx.save();
+
+  // Draw selection centroid indicator
+  const cen = selectionCentroid();
+  if (cen) {
+    const sc = worldToScreen(cen.x, cen.y);
+    ctx.strokeStyle = 'rgba(255,170,0,0.7)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.arc(sc.x, sc.y, 8, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(255,170,0,0.5)';
+    ctx.beginPath(); ctx.arc(sc.x, sc.y, 2.5, 0, Math.PI*2); ctx.fill();
+  }
+
+  if (rotateState.phase === 1) {
+    // Pivot chosen — show angle guide line to cursor
+    const pv = worldToScreen(rotateState.pivotX, rotateState.pivotY);
+    const cur = mouseScreen;
+    const angleToMouse = Math.atan2(
+      -(cur.y - pv.y), // negate because Y is flipped
+      cur.x - pv.x
+    ) * 180 / Math.PI;
+    const delta = normaliseAngle(angleToMouse - rotateState.startAngle);
+    rotateState.previewDelta = delta;
+
+    // Guide line pivot → cursor
+    ctx.strokeStyle = 'rgba(0,212,255,0.6)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(pv.x, pv.y); ctx.lineTo(cur.x, cur.y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Angle arc
+    const radius = Math.hypot(cur.x - pv.x, cur.y - pv.y);
+    if (radius > 12) {
+      ctx.strokeStyle = 'rgba(0,212,255,0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(pv.x, pv.y, Math.min(radius * 0.5, 30),
+        -rotateState.startAngle * Math.PI / 180,
+        -angleToMouse * Math.PI / 180, delta < 0);
+      ctx.stroke();
+    }
+
+    // Live angle readout near cursor
+    ctx.fillStyle = 'rgba(0,212,255,0.9)';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillText(delta.toFixed(2) + '°', cur.x + 12, cur.y - 8);
+
+    // Pivot marker
+    ctx.strokeStyle = 'var(--green)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(pv.x, pv.y, 5, 0, Math.PI*2); ctx.stroke();
+  }
+
+  ctx.restore();
 }
 
 // ── TOOL MANAGEMENT ─────────────────────────────────────
@@ -897,6 +1132,7 @@ function cancelTool() {
   rectState   = {active:false};
   polyState   = {active:false};
   offsetState = {active:false, selectedLine:null, previewPts:null};
+  rotateState = {phase:0, pivotX:0, pivotY:0, startAngle:0, previewDelta:0};
   document.getElementById('rect-preview').style.display='none';
 }
 
@@ -910,7 +1146,7 @@ function setTool(tool) {
   activeTool = tool;
 
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset'};
+  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate'};
   if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
 
   document.getElementById('sb-mode').textContent=tool.toUpperCase();
@@ -919,13 +1155,18 @@ function setTool(tool) {
   document.getElementById('offset-bar').style.display = tool==='offset'?'flex':'none';
   // Poly bar
   document.getElementById('poly-bar').style.display   = tool==='polygon'?'flex':'none';
+  // Rotate bar — show when rotate tool OR when something is selected
+  const rotateBar = document.getElementById('rotate-bar');
+  if (tool === 'rotate') rotateBar.classList.add('visible');
+  // (selection-based visibility handled by updateSelectionProps)
 
   const hintMap = {
-    select:  'Drag to pan · Left-click line to select · <span>Del</span> to delete',
+    select:  'Drag to pan · Left-click line to select · Shift-click multi · <span>Del</span> delete · <span>T</span> rotate',
     line:    '<span>Click</span> start → <span>click</span> end · Type to enter coords · <span>Enter</span> closes · <span>Esc</span> cancel',
-    rect:    '<span>Click</span> corner → <span>click</span> opposite corner · Or type <b>W,H</b> in input',
+    rect:    '<span>Click</span> corner → <span>click</span> opposite corner',
     polygon: '<span>Click</span> center → <span>click</span> to set radius & rotation',
     offset:  '<span>Click</span> a line → move cursor to side → <span>click</span> to commit',
+    rotate:  'Select objects first · then <span>Click</span> pivot → <span>click</span> to confirm angle · or use sidebar controls',
   };
   document.getElementById('hint').innerHTML = hintMap[tool]||'';
 
@@ -1040,6 +1281,28 @@ function onMouseDown(e) {
       }
       render(); return;
     }
+
+    if(activeTool==='rotate') {
+      if(selectedIds.size===0){
+        // Phase 0: try to pick a line first
+        const hit=pickObject(mouseScreen.x,mouseScreen.y);
+        if(hit){ selectedIds.add(hit.id); updateSelectionProps(); render(); return; }
+        showToast('Select a line first (click it), then click pivot'); return;
+      }
+      if(rotateState.phase===0){
+        // Phase 1: set pivot
+        rotateState.phase=1;
+        rotateState.pivotX=wp.x; rotateState.pivotY=wp.y;
+        // start angle = angle from pivot to cursor when pivot was clicked (same point, so use 0)
+        rotateState.startAngle=0;
+        showToast('Pivot set — move cursor and click to confirm rotation');
+      } else {
+        // Phase 2: confirm — apply the previewDelta
+        rotateSelected(rotateState.previewDelta, {x:rotateState.pivotX, y:rotateState.pivotY});
+        rotateState={phase:0,pivotX:0,pivotY:0,startAngle:0,previewDelta:0};
+      }
+      render(); return;
+    }
   }
 }
 
@@ -1070,6 +1333,13 @@ function onMouseMove(e) {
     const ln=offsetState.selectedLine;
     const side=sideOfLine(ln.x1,ln.y1,ln.x2,ln.y2,mouseWorld.x,mouseWorld.y);
     offsetState.previewPts=buildOffsetLine(ln,side*getOffsetDist());
+  }
+
+  // Rotate preview: update live delta as cursor moves
+  if(activeTool==='rotate'&&rotateState.phase===1){
+    const pv=worldToScreen(rotateState.pivotX,rotateState.pivotY);
+    const angleToMouse=Math.atan2(-(mouseScreen.y-pv.y), mouseScreen.x-pv.x)*180/Math.PI;
+    rotateState.previewDelta=normaliseAngle(angleToMouse-rotateState.startAngle);
   }
 
   // Rect preview overlay (CSS div approach for cheap preview)
@@ -1147,6 +1417,8 @@ function onKeyDown(e) {
     if(k==='p'||k==='P') setTool('polygon');
     if(k==='s'||k==='S') setTool('select');
     if(k==='o'||k==='O') setTool('offset');
+    if(k==='t'||k==='T') setTool('rotate');
+    if(k==='0')          flattenSelection();
     if(k==='z'||k==='Z') zoomExtents();
     if(k==='g'||k==='G') toggleGrid();
     if(k==='F3')         toggleSnap();
@@ -1253,6 +1525,7 @@ function render() {
   drawRubberBand();
   drawOffsetPreview();
   drawPolyPreview();
+  drawRotatePreview();
 }
 
 function drawGrid(W,H) {
