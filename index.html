@@ -246,6 +246,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
         <div class="tb-dd-item" onclick="document.getElementById('load-kad').click();closeMenus()">Open .kad<span class="dd-key">Ctrl+O</span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="exportDXF();closeMenus()">Export .dxf<span class="dd-key">Ctrl+E</span></div>
+        <div class="tb-dd-item" onclick="document.getElementById('load-dxf').click();closeMenus()">Import .dxf<span class="dd-key"></span></div>
       </div>
     </div>
     <div class="tb-menu-item" id="menu-edit" onmouseenter="openMenu('edit')" onmouseleave="scheduleClose()">Edit
@@ -371,6 +372,11 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Export .dxf
     </button>
+    <button class="op-btn dxf" onclick="document.getElementById('load-dxf').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import .dxf
+    </button>
+    <input type="file" id="load-dxf" accept=".dxf,.DXF" onchange="importDXF(event)">
   </div>
 
   <!-- Coordinate Input Help -->
@@ -1612,6 +1618,312 @@ function drawOffsetPreview() {
     ctx.setLineDash([]); ctx.shadowBlur=0;
   }
   ctx.restore();
+}
+
+// ── DXF IMPORT ──────────────────────────────────────────
+// Parses DXF R12–R2018 text files.
+// Handles: LINE, CIRCLE, ARC, LWPOLYLINE, POLYLINE/VERTEX.
+// Reads $INSUNITS from HEADER to auto-convert to mm.
+// All geometry is stored in mm (internal canonical unit).
+
+const DXF_INSUNITS_TO_MM = {
+  0:  1,        // Unitless — assume mm
+  1:  25.4,     // Inches
+  2:  304.8,    // Feet
+  3:  1609344,  // Miles
+  4:  1,        // Millimeters
+  5:  10,       // Centimeters
+  6:  1000,     // Meters
+  7:  1e6,      // Kilometers
+  8:  25.4/1000,// Microinches
+  9:  0.0254,   // Mils
+  10: 914.4,    // Yards
+  11: 1e-7,     // Angstroms
+  12: 1e-6,     // Nanometers
+  13: 1e-3,     // Microns
+  14: 100,      // Decimeters
+  15: 10000,    // Decameters
+  16: 100000,   // Hectometers
+  17: 1e9,      // Gigameters
+  18: 1.496e14, // Astronomical units
+  19: 9.461e18, // Light years
+  20: 3.086e19, // Parsecs
+};
+
+function parseDXF(text) {
+  // ── Tokenise: split into [groupCode, value] pairs ──
+  const rawLines = text.split(/\r?\n/);
+  const tokens = [];
+  for (let i = 0; i + 1 < rawLines.length; i += 2) {
+    const code = parseInt(rawLines[i].trim(), 10);
+    const val  = rawLines[i + 1].trim();
+    if (!isNaN(code)) tokens.push([code, val]);
+  }
+
+  // ── Read HEADER for $INSUNITS ──
+  let scaleMM = 1; // default: assume mm
+  let inHeader = false, nextIsInsUnits = false;
+  for (const [code, val] of tokens) {
+    if (code === 2  && val === 'HEADER')   { inHeader = true; continue; }
+    if (code === 0  && val === 'ENDSEC')   { if (inHeader) { inHeader = false; break; } }
+    if (!inHeader) continue;
+    if (code === 9  && val === '$INSUNITS') { nextIsInsUnits = true; continue; }
+    if (nextIsInsUnits && code === 70) {
+      const u = parseInt(val, 10);
+      scaleMM = DXF_INSUNITS_TO_MM[u] ?? 1;
+      nextIsInsUnits = false;
+    }
+  }
+
+  // ── Find ENTITIES section ──
+  let entStart = -1;
+  for (let i = 0; i < tokens.length; i++) {
+    if (tokens[i][0] === 2 && tokens[i][1] === 'ENTITIES') { entStart = i + 1; break; }
+  }
+  if (entStart < 0) return { lines: [], circles: [], arcs: [], error: 'No ENTITIES section found' };
+
+  // ── Parse entity blocks ──
+  const lines   = [];
+  const circles = [];
+  const arcs    = [];
+  const S = scaleMM; // shorthand
+
+  let i = entStart;
+  while (i < tokens.length) {
+    const [code, val] = tokens[i];
+
+    // Stop at next section boundary
+    if (code === 0 && val === 'ENDSEC') break;
+    if (code === 0 && val === 'EOF')    break;
+
+    // ── LINE ──────────────────────────────────────────
+    if (code === 0 && val === 'LINE') {
+      let layer='Layer_0', x1=0,y1=0,x2=0,y2=0;
+      i++;
+      while (i < tokens.length && tokens[i][0] !== 0) {
+        const [c, v] = tokens[i];
+        if (c === 8)  layer = v;
+        if (c === 10) x1 = parseFloat(v) * S;
+        if (c === 20) y1 = parseFloat(v) * S;
+        if (c === 11) x2 = parseFloat(v) * S;
+        if (c === 21) y2 = parseFloat(v) * S;
+        i++;
+      }
+      lines.push({ type:'LINE', layer, x1, y1, x2, y2 });
+      continue;
+    }
+
+    // ── CIRCLE ────────────────────────────────────────
+    if (code === 0 && val === 'CIRCLE') {
+      let layer='Layer_0', cx=0,cy=0,r=1;
+      i++;
+      while (i < tokens.length && tokens[i][0] !== 0) {
+        const [c, v] = tokens[i];
+        if (c === 8)  layer = v;
+        if (c === 10) cx = parseFloat(v) * S;
+        if (c === 20) cy = parseFloat(v) * S;
+        if (c === 40) r  = parseFloat(v) * S;
+        i++;
+      }
+      circles.push({ type:'CIRCLE', layer, cx, cy, r });
+      continue;
+    }
+
+    // ── ARC ───────────────────────────────────────────
+    if (code === 0 && val === 'ARC') {
+      let layer='Layer_0', cx=0,cy=0,r=1,startA=0,endA=360;
+      i++;
+      while (i < tokens.length && tokens[i][0] !== 0) {
+        const [c, v] = tokens[i];
+        if (c === 8)  layer  = v;
+        if (c === 10) cx     = parseFloat(v) * S;
+        if (c === 20) cy     = parseFloat(v) * S;
+        if (c === 40) r      = parseFloat(v) * S;
+        if (c === 50) startA = parseFloat(v);
+        if (c === 51) endA   = parseFloat(v);
+        i++;
+      }
+      arcs.push({ type:'ARC', layer, cx, cy, r, startA, endA });
+      continue;
+    }
+
+    // ── LWPOLYLINE ────────────────────────────────────
+    // Group 10/20 pairs are vertices; they repeat per vertex
+    if (code === 0 && val === 'LWPOLYLINE') {
+      let layer='Layer_0', closed=false;
+      const verts = [];
+      i++;
+      while (i < tokens.length && tokens[i][0] !== 0) {
+        const [c, v] = tokens[i];
+        if (c === 8)   layer  = v;
+        if (c === 70)  closed = !!(parseInt(v,10) & 1); // bit 0 = closed
+        if (c === 10)  verts.push({ x: parseFloat(v)*S, y: 0 });
+        if (c === 20 && verts.length) verts[verts.length-1].y = parseFloat(v)*S;
+        i++;
+      }
+      // Convert vertex list to line segments
+      for (let vi = 0; vi < verts.length - 1; vi++) {
+        lines.push({ type:'LINE', layer, x1:verts[vi].x, y1:verts[vi].y, x2:verts[vi+1].x, y2:verts[vi+1].y });
+      }
+      if (closed && verts.length > 1) {
+        const last = verts[verts.length-1], first = verts[0];
+        lines.push({ type:'LINE', layer, x1:last.x, y1:last.y, x2:first.x, y2:first.y });
+      }
+      continue;
+    }
+
+    // ── POLYLINE + VERTEX ──────────────────────────────
+    // Classic POLYLINE: entity followed by VERTEX entities, terminated by SEQEND
+    if (code === 0 && val === 'POLYLINE') {
+      let layer='Layer_0', closed=false;
+      i++;
+      while (i < tokens.length && tokens[i][0] !== 0) {
+        const [c, v] = tokens[i];
+        if (c === 8)  layer  = v;
+        if (c === 70) closed = !!(parseInt(v,10) & 1);
+        i++;
+      }
+      const verts = [];
+      while (i < tokens.length) {
+        if (tokens[i][0] === 0 && tokens[i][1] === 'SEQEND') { i++; break; }
+        if (tokens[i][0] === 0 && tokens[i][1] === 'VERTEX') {
+          let vx=0, vy=0;
+          i++;
+          while (i < tokens.length && tokens[i][0] !== 0) {
+            const [c, v] = tokens[i];
+            if (c === 10) vx = parseFloat(v)*S;
+            if (c === 20) vy = parseFloat(v)*S;
+            i++;
+          }
+          verts.push({ x:vx, y:vy });
+          continue;
+        }
+        i++;
+      }
+      for (let vi = 0; vi < verts.length - 1; vi++) {
+        lines.push({ type:'LINE', layer, x1:verts[vi].x, y1:verts[vi].y, x2:verts[vi+1].x, y2:verts[vi+1].y });
+      }
+      if (closed && verts.length > 1) {
+        const last = verts[verts.length-1], first = verts[0];
+        lines.push({ type:'LINE', layer, x1:last.x, y1:last.y, x2:first.x, y2:first.y });
+      }
+      continue;
+    }
+
+    i++;
+  }
+
+  return { lines, circles, arcs, scaleMM };
+}
+
+// Tessellate a CIRCLE into N line segments (stored as LINE entities)
+function tessellateCircle(cx, cy, r, layer, segments=72) {
+  const segs = [];
+  for (let i = 0; i < segments; i++) {
+    const a0 = (i / segments)     * 2 * Math.PI;
+    const a1 = ((i+1) / segments) * 2 * Math.PI;
+    segs.push({ type:'LINE', layer,
+      x1: parseFloat((cx + r*Math.cos(a0)).toFixed(6)),
+      y1: parseFloat((cy + r*Math.sin(a0)).toFixed(6)),
+      x2: parseFloat((cx + r*Math.cos(a1)).toFixed(6)),
+      y2: parseFloat((cy + r*Math.sin(a1)).toFixed(6)),
+    });
+  }
+  return segs;
+}
+
+// Tessellate an ARC into N line segments
+function tessellateArc(cx, cy, r, startDeg, endDeg, layer, segments=72) {
+  // DXF arcs go counter-clockwise from startDeg to endDeg
+  let startR = startDeg * Math.PI / 180;
+  let endR   = endDeg   * Math.PI / 180;
+  if (endR <= startR) endR += 2 * Math.PI; // handle wrap
+  const span = endR - startR;
+  const n = Math.max(1, Math.round(segments * span / (2 * Math.PI)));
+  const segs = [];
+  for (let i = 0; i < n; i++) {
+    const a0 = startR + (i / n)     * span;
+    const a1 = startR + ((i+1) / n) * span;
+    segs.push({ type:'LINE', layer,
+      x1: parseFloat((cx + r*Math.cos(a0)).toFixed(6)),
+      y1: parseFloat((cy + r*Math.sin(a0)).toFixed(6)),
+      x2: parseFloat((cx + r*Math.cos(a1)).toFixed(6)),
+      y2: parseFloat((cy + r*Math.sin(a1)).toFixed(6)),
+    });
+  }
+  return segs;
+}
+
+function importDXF(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    let parsed;
+    try { parsed = parseDXF(text); }
+    catch(err) { showToast('DXF parse error: ' + err.message); event.target.value=''; return; }
+
+    const { lines, circles, arcs, scaleMM, error } = parsed;
+
+    if (error) { showToast('DXF error: ' + error); event.target.value=''; return; }
+
+    // Count what we found
+    const totalCircleSegs = circles.length * 72;
+    const totalArcSegs    = arcs.reduce((n, a) => {
+      let span = a.endA - a.startA; if (span <= 0) span += 360;
+      return n + Math.max(1, Math.round(72 * span / 360));
+    }, 0);
+
+    // Confirm import if canvas has geometry
+    const incoming = lines.length + totalCircleSegs + totalArcSegs;
+    if (incoming === 0) { showToast('DXF contained no supported geometry'); event.target.value=''; return; }
+
+    if (GeoMemory.objects.length > 0) {
+      const choice = confirm(
+        `Import ${incoming} entities from "${file.name}"?\n\n` +
+        `Lines: ${lines.length}  ·  Circles: ${circles.length}  ·  Arcs: ${arcs.length}\n` +
+        `Scale: 1 file-unit = ${scaleMM.toFixed(6)} mm\n\n` +
+        `OK = merge into current drawing\nCancel = clear canvas first`
+      );
+      // Cancel means they want a fresh load
+      if (!choice) GeoMemory.clear();
+    }
+
+    // Push all LINE entities
+    for (const ln of lines) {
+      GeoMemory.addLine(
+        parseFloat(ln.x1.toFixed(6)), parseFloat(ln.y1.toFixed(6)),
+        parseFloat(ln.x2.toFixed(6)), parseFloat(ln.y2.toFixed(6)),
+        ln.layer || 'Layer_0'
+      );
+    }
+
+    // Tessellate and push CIRCLE entities
+    for (const c of circles) {
+      for (const seg of tessellateCircle(c.cx, c.cy, c.r, c.layer)) {
+        GeoMemory.addLine(seg.x1, seg.y1, seg.x2, seg.y2, seg.layer);
+      }
+    }
+
+    // Tessellate and push ARC entities
+    for (const a of arcs) {
+      for (const seg of tessellateArc(a.cx, a.cy, a.r, a.startA, a.endA, a.layer)) {
+        GeoMemory.addLine(seg.x1, seg.y1, seg.x2, seg.y2, seg.layer);
+      }
+    }
+
+    render();
+    zoomExtents();
+
+    const unitNote = scaleMM !== 1 ? ` · scaled from ${scaleMM.toFixed(4)}mm/unit` : '';
+    showToast(
+      `Imported "${file.name}" · ${lines.length} lines · ${circles.length} circles · ${arcs.length} arcs${unitNote}`
+    );
+    event.target.value = '';
+  };
+  reader.onerror = () => { showToast('Could not read file'); event.target.value=''; };
+  reader.readAsText(file);
 }
 
 // ── DXF EXPORT ──────────────────────────────────────────
