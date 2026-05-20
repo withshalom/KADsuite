@@ -170,6 +170,36 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 
 /* ── RECT DRAG PREVIEW ── */
 #rect-preview { position:absolute; pointer-events:none; border:1px dashed var(--accent); background:rgba(0,212,255,0.04); display:none; }
+
+/* ── UNIT TOGGLE ── */
+#unit-toggle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: var(--bg-panel2);
+  border: 1px solid var(--border-bright);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  user-select: none;
+  letter-spacing: 0.05em;
+  transition: border-color 0.2s;
+}
+#unit-toggle:hover { border-color: var(--accent); }
+.unit-seg {
+  padding: 3px 8px;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+.unit-seg.active {
+  background: var(--accent);
+  color: var(--bg-void);
+  font-weight: 700;
+}
+.unit-divider { width:1px; background: var(--border-bright); align-self: stretch; }
 </style>
 </head>
 <body>
@@ -205,6 +235,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="toggleGrid();closeMenus()">Toggle Grid<span class="dd-key">G</span></div>
         <div class="tb-dd-item" onclick="toggleSnap();closeMenus()">Toggle Snap<span class="dd-key">F3</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="toggleUnits();closeMenus()">Toggle mm / in<span class="dd-key">U</span></div>
       </div>
     </div>
     <div class="tb-menu-item" id="menu-draw" onmouseenter="openMenu('draw')" onmouseleave="scheduleClose()">Draw
@@ -226,8 +258,12 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     </div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge">v0.2.0</span>
-    <span class="tb-badge">mm</span>
+    <span class="tb-badge">v0.3.0</span>
+    <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
+      <span class="unit-seg active" id="unit-seg-mm">mm</span>
+      <span class="unit-divider"></span>
+      <span class="unit-seg" id="unit-seg-in">in</span>
+    </button>
   </div>
 </div>
 
@@ -298,11 +334,12 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
       <span>Coord Input</span><span id="coord-chevron">▶</span>
     </div>
     <div id="coord-panel-body">
-      <div class="coord-example">While LINE active, type to open input:</div>
+      <div class="coord-example">While LINE active, type to open input.</div>
+      <div class="coord-example">Values entered in current unit (<span id="coord-cur-unit" style="color:var(--accent)">mm</span>):</div>
       <div class="coord-example"><b>100,50</b> — absolute X,Y</div>
       <div class="coord-example"><i>@50,-20</i> — relative dX,dY</div>
       <div class="coord-example"><em>@100&lt;45</em> — polar dist&lt;angle°</div>
-      <div class="coord-example" style="margin-top:4px;color:var(--text-dim);">Press <b>Enter</b> to commit, <b>Esc</b> to cancel</div>
+      <div class="coord-example" style="margin-top:4px;color:var(--text-dim);">Press <b>Enter</b> to commit · <b>Esc</b> to cancel · <b>U</b> to toggle units</div>
     </div>
   </div>
 
@@ -311,7 +348,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="prop-row"><span class="prop-key">Objects</span><span class="prop-val accent" id="prop-objects">0</span></div>
     <div class="prop-row"><span class="prop-key">Lines</span><span class="prop-val" id="prop-lines">0</span></div>
     <div class="prop-row"><span class="prop-key">Selected</span><span class="prop-val warn" id="prop-sel">—</span></div>
-    <div class="prop-row"><span class="prop-key">Units</span><span class="prop-val green">mm</span></div>
+    <div class="prop-row"><span class="prop-key">Units</span><span class="prop-val green" id="prop-units">mm</span></div>
     <div class="prop-row"><span class="prop-key">Zoom</span><span class="prop-val" id="prop-zoom">3.00×</span></div>
     <div class="prop-row"><span class="prop-key">Snap</span><span class="prop-val green" id="prop-snap">ON</span></div>
     <div class="prop-row"><span class="prop-key">Grid</span><span class="prop-val green" id="prop-grid-st">ON</span></div>
@@ -337,6 +374,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   <div id="coord-overlay">
     <span><span class="coord-label">X </span><span id="cx">0.0000</span></span>
     <span><span class="coord-label">Y </span><span id="cy">0.0000</span></span>
+    <span class="coord-label" id="coord-unit-lbl">mm</span>
   </div>
   <div id="hint">Press <span>L</span> for Line · <span>R</span> for Rect · <span>P</span> for Polygon · Right-click for menu</div>
 </div>
@@ -352,7 +390,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="sb-item"><span>P</span><span class="sb-val">poly</span></div>
     <div class="sb-item"><span>O</span><span class="sb-val">offset</span></div>
     <div class="sb-item"><span>Z</span><span class="sb-val">extents</span></div>
-    <div class="sb-item"><span class="sb-val ok">.KAD v0.2</span></div>
+    <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
+    <div class="sb-item"><span class="sb-val ok">.KAD v0.3</span></div>
   </div>
 </div>
 
@@ -383,6 +422,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   <div class="ctx-head">View</div>
   <button class="ctx-item" onclick="zoomExtents();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>Zoom Extents<span class="ctx-key">Z</span></button>
   <button class="ctx-item" onclick="initCamera();render();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>Reset View<span class="ctx-key">Home</span></button>
+  <button class="ctx-item" onclick="toggleUnits();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span id="ctx-unit-label">Switch to inches</span><span class="ctx-key">U</span></button>
 </div>
 
 <script>
@@ -417,6 +457,83 @@ function initCamera() {
 function worldToScreen(wx, wy) { return { x: wx*cam.zoom+cam.panX, y: -wy*cam.zoom+cam.panY }; }
 function screenToWorld(sx, sy) { return { x:(sx-cam.panX)/cam.zoom, y:-(sy-cam.panY)/cam.zoom }; }
 
+// ── UNIT SYSTEM ─────────────────────────────────────────
+// Internal storage is ALWAYS mm. Units only affect display and input parsing.
+const MM_PER_IN = 25.4;
+let unitMode = 'mm'; // 'mm' or 'in'
+
+// Convert a raw mm world value → display value in current unit
+function toDisplay(mm)   { return unitMode === 'in' ? mm / MM_PER_IN : mm; }
+// Convert a display value typed by the user → mm for storage
+function fromDisplay(v)  { return unitMode === 'in' ? v * MM_PER_IN : v; }
+// Current unit label string
+function unitLabel()     { return unitMode; }
+// Decimal places for display (inches need more to stay precise at small sizes)
+function unitDecimals()  { return unitMode === 'in' ? 5 : 4; }
+// Format a mm world value for display with unit suffix
+function fmtU(mm, suffix=true) {
+  return toDisplay(mm).toFixed(unitDecimals()) + (suffix ? ' '+unitLabel() : '');
+}
+// Format for coord overlay (no suffix, tight)
+function fmtCoord(mm) { return toDisplay(mm).toFixed(unitDecimals()); }
+
+// Grid steps that look nice per unit mode
+const GRID_STEPS_MM = [0.1, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+const GRID_STEPS_IN = [
+  0.0625,  // 1/16"
+  0.125,   // 1/8"
+  0.25,    // 1/4"
+  0.5,     // 1/2"
+  1,       // 1"
+  2,       // 2"
+  6,       // 6"
+  12,      // 1 ft
+  24,      // 2 ft
+  60,      // 5 ft
+  120,     // 10 ft
+];
+
+function getGridStepsForUnit() {
+  // Steps are always in mm (world units)
+  if (unitMode === 'in') return GRID_STEPS_IN.map(s => s * MM_PER_IN);
+  return GRID_STEPS_MM;
+}
+
+function toggleUnits() {
+  unitMode = (unitMode === 'mm') ? 'in' : 'mm';
+  // Update toggle button appearance
+  document.getElementById('unit-seg-mm').classList.toggle('active', unitMode==='mm');
+  document.getElementById('unit-seg-in').classList.toggle('active', unitMode==='in');
+  // Update sidebar props
+  document.getElementById('prop-units').textContent = unitMode;
+  // Update context menu label
+  const ctxLbl = document.getElementById('ctx-unit-label');
+  if(ctxLbl) ctxLbl.textContent = unitMode==='mm' ? 'Switch to inches' : 'Switch to mm';
+  // Update offset distance input: convert current value to new unit
+  const distInput = document.getElementById('offset-dist-input');
+  const oldVal = parseFloat(distInput.value)||10;
+  if(unitMode==='in'){
+    // was mm, now show inches
+    distInput.value = (oldVal / MM_PER_IN).toFixed(4);
+    distInput.step  = '0.0625';
+    document.getElementById('offset-dist-unit').textContent = 'in';
+  } else {
+    // was in, now show mm
+    distInput.value = (oldVal * MM_PER_IN).toFixed(2);
+    distInput.step  = '0.5';
+    document.getElementById('offset-dist-unit').textContent = 'mm';
+  }
+  updateGridLabel();
+  // Update coord overlay unit label
+  const coordLbl = document.getElementById('coord-unit-lbl');
+  if(coordLbl) coordLbl.textContent = unitMode;
+  // Update coord help panel unit label
+  const coordCur = document.getElementById('coord-cur-unit');
+  if(coordCur) coordCur.textContent = unitMode;
+  render();
+  showToast('Units: ' + (unitMode==='mm' ? 'millimeters (mm)' : 'inches (in)') + ' — geometry unchanged');
+}
+
 // ── GEO MEMORY ──────────────────────────────────────────
 const GeoMemory = {
   objects:[], nextId:1,
@@ -442,8 +559,18 @@ const GeoMemory = {
     return pts;
   },
 
-  serialize()   { return JSON.stringify({version:'0.2',units:'mm',nextId:this.nextId,objects:this.objects},null,2); },
-  deserialize(s){ try{ const d=JSON.parse(s); this.objects=d.objects||[]; this.nextId=d.nextId||1; updateProps(); return true; }catch(e){ return false; } },
+  serialize()   { return JSON.stringify({version:'0.3',units:'mm',displayUnits:unitMode,nextId:this.nextId,objects:this.objects},null,2); },
+  deserialize(s){
+    try{
+      const d=JSON.parse(s);
+      this.objects=d.objects||[];
+      this.nextId=d.nextId||1;
+      // Restore display unit preference if present, but geometry is always mm
+      if(d.displayUnits && d.displayUnits!==unitMode) toggleUnits();
+      updateProps();
+      return true;
+    }catch(e){ return false; }
+  },
 };
 
 // ── SNAP ────────────────────────────────────────────────
@@ -595,35 +722,38 @@ function commitDynInput() {
 function parseDynCoord(str) {
   str=str.trim();
   const base = lineState.active ? {x:lineState.x1,y:lineState.y1} : {x:0,y:0};
+  // base is in mm; for relative/polar inputs, the delta is typed in display units
 
-  // @dist<angle  polar
+  // @dist<angle  polar — dist is in display units
   let m = str.match(/^@([+\-]?[\d.eE]+)<([+\-]?[\d.eE]+)$/);
   if(m){
-    const d=parseFloat(m[1]), a=parseFloat(m[2])*Math.PI/180;
+    const d=fromDisplay(parseFloat(m[1])), a=parseFloat(m[2])*Math.PI/180;
     if(isNaN(d)||isNaN(a)) return null;
-    return { x:parseFloat((base.x+d*Math.cos(a)).toFixed(4)), y:parseFloat((base.y+d*Math.sin(a)).toFixed(4)) };
+    return { x:parseFloat((base.x+d*Math.cos(a)).toFixed(6)), y:parseFloat((base.y+d*Math.sin(a)).toFixed(6)) };
   }
-  // @dx,dy  relative
+  // @dx,dy  relative — deltas in display units
   m = str.match(/^@([+\-]?[\d.eE]+)[, ]([+\-]?[\d.eE]+)$/);
   if(m){
-    const dx=parseFloat(m[1]), dy=parseFloat(m[2]);
+    const dx=fromDisplay(parseFloat(m[1])), dy=fromDisplay(parseFloat(m[2]));
     if(isNaN(dx)||isNaN(dy)) return null;
-    return { x:parseFloat((base.x+dx).toFixed(4)), y:parseFloat((base.y+dy).toFixed(4)) };
+    return { x:parseFloat((base.x+dx).toFixed(6)), y:parseFloat((base.y+dy).toFixed(6)) };
   }
-  // x,y  absolute
+  // x,y  absolute — coordinates in display units
   m = str.match(/^([+\-]?[\d.eE]+)[, ]([+\-]?[\d.eE]+)$/);
   if(m){
-    const x=parseFloat(m[1]), y=parseFloat(m[2]);
+    const x=fromDisplay(parseFloat(m[1])), y=fromDisplay(parseFloat(m[2]));
     if(isNaN(x)||isNaN(y)) return null;
-    return { x:parseFloat(x.toFixed(4)), y:parseFloat(y.toFixed(4)) };
+    return { x:parseFloat(x.toFixed(6)), y:parseFloat(y.toFixed(6)) };
   }
   return null;
 }
 
 // ── OFFSET MATH ─────────────────────────────────────────
 function getOffsetDist() {
-  const v=parseFloat(document.getElementById('offset-dist-input').value);
-  return isNaN(v)||v<=0 ? 10 : parseFloat(v.toFixed(4));
+  // The offset input is always expressed in the current display unit
+  const v = parseFloat(document.getElementById('offset-dist-input').value);
+  const displayVal = (isNaN(v) || v <= 0) ? (unitMode==='in' ? 0.3937 : 10) : v;
+  return parseFloat(fromDisplay(displayVal).toFixed(6)); // always returns mm
 }
 function lineNormal(x1,y1,x2,y2) {
   const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
@@ -668,7 +798,7 @@ function commitRect(x1,y1,x2,y2) {
   GeoMemory.addLine(rx,by,rx,ty);
   GeoMemory.addLine(rx,ty,lx,ty);
   GeoMemory.addLine(lx,ty,lx,by);
-  showToast(`Rect ${Math.abs(x2-x1).toFixed(2)}×${Math.abs(y2-y1).toFixed(2)} mm`);
+  showToast(`Rect ${fmtU(Math.abs(x2-x1))} × ${fmtU(Math.abs(y2-y1))}`);
 }
 
 // ── POLYGON TOOL ────────────────────────────────────────
@@ -693,7 +823,7 @@ function commitPolygon(cx,cy,px,py) {
     const a=pts[i], b=pts[(i+1)%n];
     GeoMemory.addLine(a.x,a.y,b.x,b.y);
   }
-  showToast(`${n}-gon r=${r.toFixed(2)}mm`);
+  showToast(`${n}-gon r=${fmtU(r)}`);
 }
 
 function drawPolyPreview() {
@@ -904,7 +1034,7 @@ function onMouseDown(e) {
         if(offsetState.previewPts){
           const p=offsetState.previewPts;
           GeoMemory.addLine(p.x1,p.y1,p.x2,p.y2);
-          showToast('Offset committed · '+getOffsetDist()+'mm');
+          showToast('Offset committed · '+fmtU(getOffsetDist()));
         }
         offsetState={active:false,selectedLine:null,previewPts:null};
       }
@@ -921,8 +1051,8 @@ function onMouseMove(e) {
   snapActive=!!snap; snapPoint=snap;
   mouseWorld=snapActive?snapPoint:raw;
 
-  document.getElementById('cx').textContent=mouseWorld.x.toFixed(4);
-  document.getElementById('cy').textContent=mouseWorld.y.toFixed(4);
+  document.getElementById('cx').textContent=fmtCoord(mouseWorld.x);
+  document.getElementById('cy').textContent=fmtCoord(mouseWorld.y);
 
   const ring=document.getElementById('snap-ring');
   if(snapActive){
@@ -1020,6 +1150,7 @@ function onKeyDown(e) {
     if(k==='z'||k==='Z') zoomExtents();
     if(k==='g'||k==='G') toggleGrid();
     if(k==='F3')         toggleSnap();
+    if(k==='u'||k==='U') toggleUnits();
     if(k==='?')          showCoordHelp();
   }
   if(e.ctrlKey){
@@ -1087,13 +1218,22 @@ function zoomExtents() {
 
 // ── GRID ────────────────────────────────────────────────
 function getGridSpacing() {
-  const steps=[0.1,0.5,1,2,5,10,20,50,100,200,500,1000];
+  const steps = getGridStepsForUnit(); // returns mm values appropriate for current unit
   for(const s of steps){ if(s*cam.zoom>=38) return s; }
-  return 1000;
+  return steps[steps.length-1];
 }
 function updateGridLabel() {
-  const s=getGridSpacing();
-  const txt=s<1?`${s*1000}μm`:s<1000?`${s}mm`:`${s/1000}m`;
+  const s = getGridSpacing(); // always mm world units
+  let txt;
+  if(unitMode==='in'){
+    const inches = s / MM_PER_IN;
+    // Express as fraction if it's a clean one, otherwise decimal
+    const fracs = [[1/16,'1/16"'],[1/8,'1/8"'],[1/4,'1/4"'],[1/2,'1/2"'],[1,'1"'],[2,'2"'],[6,'6"'],[12,'1ft'],[24,'2ft'],[60,'5ft'],[120,'10ft']];
+    const match = fracs.find(([v])=>Math.abs(v-inches)<1e-9);
+    txt = match ? match[1] : inches.toFixed(4)+'"';
+  } else {
+    txt = s<1 ? `${s*1000}μm` : s<1000 ? `${s}mm` : `${s/1000}m`;
+  }
   document.getElementById('sb-grid').textContent=txt;
 }
 
