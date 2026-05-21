@@ -484,6 +484,11 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
         <div class="tb-dd-item" onclick="deleteSelected();closeMenus()">Delete Selected<span class="dd-key">Del</span></div>
         <div class="tb-dd-item" onclick="GeoMemory.clear();render();showToast('Canvas cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
         <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="joinSelected();closeMenus()">Join → Polyline<span class="dd-key">J</span></div>
+        <div class="tb-dd-item" onclick="explodeSelected();closeMenus()">Explode Polyline<span class="dd-key">X</span></div>
+        <div class="tb-dd-item" onclick="closePolyline();closeMenus()">Close Polyline<span class="dd-key"></span></div>
+        <div class="tb-dd-item" onclick="openPolyline();closeMenus()">Open Polyline<span class="dd-key"></span></div>
+        <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="setTool('select');closeMenus()">Select Mode<span class="dd-key">S</span></div>
       </div>
     </div>
@@ -676,6 +681,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="sb-item"><span>T</span><span class="sb-val">rotate</span></div>
     <div class="sb-item"><span>Q/E</span><span class="sb-val">±90°</span></div>
     <div class="sb-item"><span>Z</span><span class="sb-val">extents</span></div>
+    <div class="sb-item"><span>J</span><span class="sb-val">join</span></div>
+    <div class="sb-item"><span>X</span><span class="sb-val">explode</span></div>
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span class="sb-val ok">.KAD v0.3</span></div>
     <div class="sb-cc">
@@ -701,6 +708,18 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     Clear Selection
     <span class="ctx-key">S</span>
+  </button>
+  <div class="ctx-sep"></div>
+  <div class="ctx-head">Polyline</div>
+  <button class="ctx-item" onclick="joinSelected();closeCtxMenu()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16"/><path d="M4 6l4 6-4 6"/><path d="M20 6l-4 6 4 6"/></svg>
+    Join → Polyline
+    <span class="ctx-key">J</span>
+  </button>
+  <button class="ctx-item" onclick="explodeSelected();closeCtxMenu()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+    Explode Polyline
+    <span class="ctx-key">X</span>
   </button>
   <div class="ctx-sep"></div>
   <div class="ctx-head">Draw</div>
@@ -990,6 +1009,13 @@ const GeoMemory = {
     const o={id:this.nextId++,type:'POINT',layer,x,y};
     this.objects.push(o); updateProps(); return o;
   },
+  // POLYLINE: pts = [{x,y}, ...], closed = bool
+  addPolyline(pts, closed=false, layer='Layer_0') {
+    if (pts.length < 2) return null;
+    const o={id:this.nextId++, type:'POLYLINE', layer, closed,
+             pts: pts.map(p=>({x:parseFloat(p.x.toFixed(6)), y:parseFloat(p.y.toFixed(6))}))};
+    this.objects.push(o); updateProps(); return o;
+  },
   remove(id) {
     this.objects = this.objects.filter(o=>o.id!==id); updateProps();
   },
@@ -998,18 +1024,24 @@ const GeoMemory = {
   allEndpoints() {
     const pts=[];
     for(const o of this.objects){
-      if(o.type==='LINE'){ pts.push({x:o.x1,y:o.y1}); pts.push({x:o.x2,y:o.y2}); }
+      if(o.type==='LINE'){
+        pts.push({x:o.x1,y:o.y1});
+        pts.push({x:o.x2,y:o.y2});
+      } else if(o.type==='POLYLINE'){
+        for(const p of o.pts) pts.push({x:p.x, y:p.y});
+      }
     }
     return pts;
   },
 
-  serialize()   { return JSON.stringify({version:'0.3',units:'mm',displayUnits:unitMode,nextId:this.nextId,objects:this.objects},null,2); },
+  serialize() {
+    return JSON.stringify({version:'0.4',units:'mm',displayUnits:unitMode,nextId:this.nextId,objects:this.objects},null,2);
+  },
   deserialize(s){
     try{
       const d=JSON.parse(s);
       this.objects=d.objects||[];
       this.nextId=d.nextId||1;
-      // Restore display unit preference if present, but geometry is always mm
       if(d.displayUnits && d.displayUnits!==unitMode) toggleUnits();
       updateProps();
       return true;
@@ -1025,7 +1057,16 @@ let snapPoint   = null;
 
 function findSnap(wx, wy) {
   if (!snapEnabled) return null;
+
+  // Collect all candidate snap points:
+  // 1. Committed geometry endpoints
   const pts = GeoMemory.allEndpoints();
+  // 2. In-progress line chain vertices (not yet in GeoMemory)
+  //    Only the FIRST vertex gets the chain-close snap ring treatment,
+  //    but ALL chain vertices are valid snap targets so intermediate
+  //    points can be snapped to as well.
+  for(const p of lineChain) pts.push({x:p.x, y:p.y});
+
   let best=null, bestD=Infinity;
   const test = worldToScreen(wx,wy);
   for(const p of pts){
@@ -1045,6 +1086,9 @@ let showGrid     = true;
 
 // Line tool
 let lineState = { active:false, x1:0, y1:0 };
+// Chain accumulates vertices while drawing connected lines
+// When Enter is pressed or the chain closes back to start, it becomes a POLYLINE
+let lineChain = []; // [{x,y}, ...] — vertices in order
 
 // Rect tool
 let rectState = { active:false, x1:0, y1:0 };
@@ -1164,11 +1208,18 @@ function commitDynInput() {
   if(activeTool==='line') {
     if(!lineState.active){
       lineState={active:true, x1:pt.x, y1:pt.y};
-      GeoMemory.addPoint(pt.x,pt.y);
+      lineChain=[{x:pt.x, y:pt.y}];
     } else {
-      if(Math.abs(pt.x-lineState.x1)>1e-9||Math.abs(pt.y-lineState.y1)>1e-9)
-        GeoMemory.addLine(lineState.x1,lineState.y1,pt.x,pt.y);
-      lineState={active:true, x1:pt.x, y1:pt.y};
+      lineChain.push({x:pt.x, y:pt.y});
+      const start=lineChain[0];
+      const snapToStart = lineChain.length>=3 &&
+        Math.hypot(pt.x-start.x, pt.y-start.y)<1e-4;
+      if(snapToStart){
+        lineChain.pop();
+        commitLineChain(true);
+      } else {
+        lineState={active:true, x1:pt.x, y1:pt.y};
+      }
     }
   }
   render();
@@ -1302,36 +1353,191 @@ function ptSegDist(px,py,ax,ay,bx,by) {
 function commitRect(x1,y1,x2,y2) {
   const lx=Math.min(x1,x2), rx=Math.max(x1,x2);
   const by=Math.min(y1,y2), ty=Math.max(y1,y2);
-  GeoMemory.addLine(lx,by,rx,by);
-  GeoMemory.addLine(rx,by,rx,ty);
-  GeoMemory.addLine(rx,ty,lx,ty);
-  GeoMemory.addLine(lx,ty,lx,by);
+  GeoMemory.addPolyline([
+    {x:lx,y:by},{x:rx,y:by},{x:rx,y:ty},{x:lx,y:ty}
+  ], true); // closed
   showToast(`Rect ${fmtU(Math.abs(x2-x1))} × ${fmtU(Math.abs(y2-y1))}`);
 }
 
 // ── POLYGON TOOL ────────────────────────────────────────
-function getPolySides()      { return Math.max(3,parseInt(document.getElementById('poly-sides-input').value)||6); }
-function getPolyInscribed()  { return document.getElementById('poly-inscribed').checked; }
+function getPolySides()     { return Math.max(3,parseInt(document.getElementById('poly-sides-input').value)||6); }
+function getPolyInscribed() { return document.getElementById('poly-inscribed').checked; }
 
 function commitPolygon(cx,cy,px,py) {
   const n = getPolySides();
   const r = Math.hypot(px-cx, py-cy);
   if(r<1e-6){ showToast('Polygon too small'); return; }
-  const inscribed = getPolyInscribed();
-  // inscribed: vertices on circle of radius r
-  // circumscribed: edges tangent to circle (so vertex radius = r/cos(pi/n))
-  const vr = inscribed ? r : r/Math.cos(Math.PI/n);
+  const vr = getPolyInscribed() ? r : r/Math.cos(Math.PI/n);
   const startAngle = Math.atan2(py-cy, px-cx);
   const pts=[];
   for(let i=0;i<n;i++){
     const a=startAngle+i*(2*Math.PI/n);
-    pts.push({x:parseFloat((cx+vr*Math.cos(a)).toFixed(4)), y:parseFloat((cy+vr*Math.sin(a)).toFixed(4))});
+    pts.push({x:parseFloat((cx+vr*Math.cos(a)).toFixed(6)), y:parseFloat((cy+vr*Math.sin(a)).toFixed(6))});
   }
-  for(let i=0;i<n;i++){
-    const a=pts[i], b=pts[(i+1)%n];
-    GeoMemory.addLine(a.x,a.y,b.x,b.y);
-  }
+  GeoMemory.addPolyline(pts, true); // always closed
   showToast(`${n}-gon r=${fmtU(r)}`);
+}
+
+// ── POLYLINE ENGINE ──────────────────────────────────────
+
+const SNAP_TOL = 1e-4; // world-unit tolerance for endpoint matching
+
+// Called when user presses Enter or chain closes back to start
+function commitLineChain(closed) {
+  if(lineChain.length < 2) {
+    // Single point or empty — discard
+    lineState = {active:false};
+    lineChain = [];
+    render(); return;
+  }
+  if(lineChain.length === 2 && !closed) {
+    // Two points = one line segment — store as LINE for simplicity
+    GeoMemory.addLine(lineChain[0].x, lineChain[0].y, lineChain[1].x, lineChain[1].y);
+    showToast('Line segment committed');
+  } else {
+    GeoMemory.addPolyline([...lineChain], closed);
+    showToast(`${closed ? 'Closed' : 'Open'} polyline · ${lineChain.length} pts`);
+  }
+  lineState = {active:false};
+  lineChain = [];
+  render();
+}
+
+// JOIN: take selected LINE entities and chain them into POLYLINE(s)
+// Algorithm: build an adjacency graph by matching endpoints, then walk chains
+function joinSelected() {
+  const selLines = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'LINE');
+  if(selLines.length < 2) { showToast('Select 2+ lines to join'); return; }
+
+  // Build endpoint map: "x,y" → [lineId, ...]
+  function key(x, y) { return `${x.toFixed(6)},${y.toFixed(6)}`; }
+
+  // Each line has two endpoints; find connected sequences
+  const remaining = new Set(selLines.map(l => l.id));
+  const idToLine  = Object.fromEntries(selLines.map(l => [l.id, l]));
+  const chains    = [];
+
+  // Build adjacency: for each endpoint, which lines share it?
+  const adj = {};
+  function addAdj(k, id) { if(!adj[k]) adj[k]=[]; adj[k].push(id); }
+  for(const ln of selLines) {
+    addAdj(key(ln.x1,ln.y1), ln.id);
+    addAdj(key(ln.x2,ln.y2), ln.id);
+  }
+
+  // Walk chains greedily from any unvisited line
+  while(remaining.size > 0) {
+    const startId = [...remaining][0];
+    const startLn = idToLine[startId];
+    remaining.delete(startId);
+
+    // Build this chain: try to extend in both directions
+    const chainPts = [{x:startLn.x1,y:startLn.y1}, {x:startLn.x2,y:startLn.y2}];
+
+    // Extend forward from chainPts[last]
+    let extended = true;
+    while(extended) {
+      extended = false;
+      const tail = chainPts[chainPts.length-1];
+      const neighbors = adj[key(tail.x,tail.y)] || [];
+      for(const nid of neighbors) {
+        if(!remaining.has(nid)) continue;
+        const nl = idToLine[nid];
+        remaining.delete(nid);
+        // Determine which endpoint of nl connects to tail
+        if(Math.hypot(nl.x1-tail.x, nl.y1-tail.y) < SNAP_TOL) {
+          chainPts.push({x:nl.x2, y:nl.y2});
+        } else {
+          chainPts.push({x:nl.x1, y:nl.y1});
+        }
+        extended = true; break;
+      }
+    }
+
+    // Extend backward from chainPts[0]
+    extended = true;
+    while(extended) {
+      extended = false;
+      const head = chainPts[0];
+      const neighbors = adj[key(head.x,head.y)] || [];
+      for(const nid of neighbors) {
+        if(!remaining.has(nid)) continue;
+        const nl = idToLine[nid];
+        remaining.delete(nid);
+        if(Math.hypot(nl.x2-head.x, nl.y2-head.y) < SNAP_TOL) {
+          chainPts.unshift({x:nl.x1, y:nl.y1});
+        } else {
+          chainPts.unshift({x:nl.x2, y:nl.y2});
+        }
+        extended = true; break;
+      }
+    }
+
+    // Check if chain closes back to start
+    const head = chainPts[0], tail2 = chainPts[chainPts.length-1];
+    const closed = Math.hypot(head.x-tail2.x, head.y-tail2.y) < SNAP_TOL;
+    if(closed) chainPts.pop(); // remove duplicate closing point
+
+    chains.push({pts:chainPts, closed});
+  }
+
+  // Remove original lines, add polylines
+  for(const id of selectedIds) GeoMemory.remove(id);
+  selectedIds.clear();
+
+  for(const ch of chains) {
+    if(ch.pts.length < 2) continue;
+    const pl = GeoMemory.addPolyline(ch.pts, ch.closed);
+    selectedIds.add(pl.id);
+  }
+
+  updateSelectionProps();
+  render();
+  showToast(`Joined → ${chains.length} polyline${chains.length>1?'s':''}`);
+}
+
+// EXPLODE: break selected POLYLINE(s) back into individual LINE entities
+function explodeSelected() {
+  const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE');
+  if(selPoly.length === 0) { showToast('Select polylines to explode'); return; }
+
+  let totalLines = 0;
+  selectedIds.clear();
+
+  for(const pl of selPoly) {
+    GeoMemory.remove(pl.id);
+    const n = pl.pts.length;
+    const segs = pl.closed ? n : n-1;
+    for(let i=0; i<segs; i++) {
+      const a = pl.pts[i];
+      const b = pl.pts[(i+1) % n];
+      const ln = GeoMemory.addLine(a.x,a.y,b.x,b.y,pl.layer);
+      selectedIds.add(ln.id);
+      totalLines++;
+    }
+  }
+
+  updateSelectionProps();
+  render();
+  showToast(`Exploded → ${totalLines} line${totalLines>1?'s':''}`);
+}
+
+// CLOSE POLYLINE: add closing segment to selected open polyline
+function closePolyline() {
+  const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE' && !o.closed);
+  if(selPoly.length === 0) { showToast('Select an open polyline to close'); return; }
+  for(const pl of selPoly) pl.closed = true;
+  render();
+  showToast(`Closed ${selPoly.length} polyline${selPoly.length>1?'s':''}`);
+}
+
+// OPEN POLYLINE: remove closing connection
+function openPolyline() {
+  const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE' && o.closed);
+  if(selPoly.length === 0) { showToast('Select a closed polyline to open'); return; }
+  for(const pl of selPoly) pl.closed = false;
+  render();
+  showToast(`Opened ${selPoly.length} polyline${selPoly.length>1?'s':''}`);
 }
 
 function drawPolyPreview() {
@@ -1375,11 +1581,19 @@ function drawPolyPreview() {
 
 // ── SELECTION ───────────────────────────────────────────
 function pickObject(sx,sy) {
-  // Try line hit first
+  // Test in reverse order (last drawn = top)
   for(const o of [...GeoMemory.objects].reverse()){
     if(o.type==='LINE'){
       const a=worldToScreen(o.x1,o.y1), b=worldToScreen(o.x2,o.y2);
       if(ptSegDist(sx,sy,a.x,a.y,b.x,b.y)<HIT_PX) return o;
+    } else if(o.type==='POLYLINE'){
+      const n=o.pts.length;
+      const segs=o.closed?n:n-1;
+      for(let i=0;i<segs;i++){
+        const a=worldToScreen(o.pts[i].x,o.pts[i].y);
+        const b=worldToScreen(o.pts[(i+1)%n].x,o.pts[(i+1)%n].y);
+        if(ptSegDist(sx,sy,a.x,a.y,b.x,b.y)<HIT_PX) return o;
+      }
     }
   }
   return null;
@@ -1471,14 +1685,17 @@ function rotateSelected(deltaDeg, pivot) {
   const p = pivot || selectionCentroid();
   if (!p) { showToast('No geometry to rotate'); return; }
 
-  let count = 0;
+  let count=0;
   for (const o of GeoMemory.objects) {
-    if (!selectedIds.has(o.id) || o.type !== 'LINE') continue;
-    const newA = rotatePoint(o.x1, o.y1, p.x, p.y, deltaDeg);
-    const newB = rotatePoint(o.x2, o.y2, p.x, p.y, deltaDeg);
-    o.x1 = newA.x; o.y1 = newA.y;
-    o.x2 = newB.x; o.y2 = newB.y;
-    count++;
+    if (!selectedIds.has(o.id)) continue;
+    if(o.type==='LINE'){
+      const na=rotatePoint(o.x1,o.y1,p.x,p.y,deltaDeg);
+      const nb=rotatePoint(o.x2,o.y2,p.x,p.y,deltaDeg);
+      o.x1=na.x;o.y1=na.y;o.x2=nb.x;o.y2=nb.y; count++;
+    } else if(o.type==='POLYLINE'){
+      o.pts=o.pts.map(pt=>rotatePoint(pt.x,pt.y,p.x,p.y,deltaDeg));
+      count++;
+    }
   }
   updateSelectionProps();
   render();
@@ -1620,6 +1837,7 @@ function drawRotatePreview() {
 // ── TOOL MANAGEMENT ─────────────────────────────────────
 function cancelTool() {
   lineState   = {active:false};
+  lineChain   = [];
   rectState   = {active:false};
   polyState   = {active:false};
   offsetState = {active:false, selectedLine:null, previewPts:null};
@@ -1694,19 +1912,33 @@ let selBox = {
 //   Left-to-right drag  → WINDOW  (solid blue)  — object fully inside box
 //   Right-to-left drag  → CROSSING (dashed green) — object touches or crosses box
 function selBoxWindow(obj, lx, rx, by, ty) {
-  if (obj.type !== 'LINE') return false;
-  return obj.x1>=lx && obj.x1<=rx && obj.y1>=by && obj.y1<=ty &&
-         obj.x2>=lx && obj.x2<=rx && obj.y2>=by && obj.y2<=ty;
+  if(obj.type==='LINE'){
+    return obj.x1>=lx&&obj.x1<=rx&&obj.y1>=by&&obj.y1<=ty&&
+           obj.x2>=lx&&obj.x2<=rx&&obj.y2>=by&&obj.y2<=ty;
+  }
+  if(obj.type==='POLYLINE'){
+    return obj.pts.every(p=>p.x>=lx&&p.x<=rx&&p.y>=by&&p.y<=ty);
+  }
+  return false;
 }
 
 function selBoxCrossing(obj, lx, rx, by, ty) {
-  // Either endpoint inside, OR segment intersects any edge of the box
-  if (obj.type !== 'LINE') return false;
-  // Endpoint containment check (fast path)
-  if ((obj.x1>=lx&&obj.x1<=rx&&obj.y1>=by&&obj.y1<=ty) ||
-      (obj.x2>=lx&&obj.x2<=rx&&obj.y2>=by&&obj.y2<=ty)) return true;
-  // Segment vs each of the 4 box edges
-  return segIntersectsBox(obj.x1,obj.y1,obj.x2,obj.y2, lx,rx,by,ty);
+  if(obj.type==='LINE'){
+    if((obj.x1>=lx&&obj.x1<=rx&&obj.y1>=by&&obj.y1<=ty)||
+       (obj.x2>=lx&&obj.x2<=rx&&obj.y2>=by&&obj.y2<=ty)) return true;
+    return segIntersectsBox(obj.x1,obj.y1,obj.x2,obj.y2, lx,rx,by,ty);
+  }
+  if(obj.type==='POLYLINE'){
+    const n=obj.pts.length, segs=obj.closed?n:n-1;
+    for(let i=0;i<segs;i++){
+      const a=obj.pts[i], b=obj.pts[(i+1)%n];
+      if(a.x>=lx&&a.x<=rx&&a.y>=by&&a.y<=ty) return true;
+      if(segIntersectsBox(a.x,a.y,b.x,b.y,lx,rx,by,ty)) return true;
+    }
+    if(!obj.closed){const p=obj.pts[n-1];if(p.x>=lx&&p.x<=rx&&p.y>=by&&p.y<=ty) return true;}
+    return false;
+  }
+  return false;
 }
 
 function segIntersectsBox(ax,ay,bx,by, lx,rx,bby,ty) {
@@ -1791,12 +2023,32 @@ function onMouseDown(e) {
     if(activeTool==='line') {
       if(dynVisible) return;
       if(!lineState.active){
-        lineState={active:true, x1:wp.x, y1:wp.y};
-        GeoMemory.addPoint(wp.x,wp.y);
+        // Start a new chain — no GeoMemory write yet, just set state
+        lineState = {active:true, x1:wp.x, y1:wp.y};
+        lineChain = [{x:wp.x, y:wp.y}];
+        // No addPoint — chain is drawn live by drawRubberBand
       } else {
-        if(Math.abs(wp.x-lineState.x1)>1e-9||Math.abs(wp.y-lineState.y1)>1e-9)
-          GeoMemory.addLine(lineState.x1,lineState.y1,wp.x,wp.y);
-        lineState={active:true, x1:wp.x, y1:wp.y};
+        // Ignore clicks exactly on the last point
+        if(Math.abs(wp.x-lineState.x1)<1e-9 && Math.abs(wp.y-lineState.y1)<1e-9) {
+          render(); return;
+        }
+
+        lineChain.push({x:wp.x, y:wp.y});
+
+        // Check if snapping to the chain start — use screen-space distance
+        // so the check is consistent with the snap ring threshold
+        const start = lineChain[0];
+        const startSP = worldToScreen(start.x, start.y);
+        const wpSP    = worldToScreen(wp.x, wp.y);
+        const snapToStart = lineChain.length >= 3 &&
+          Math.hypot(wpSP.x - startSP.x, wpSP.y - startSP.y) < SNAP_PX;
+
+        if(snapToStart) {
+          lineChain.pop(); // remove the duplicate of the start point
+          commitLineChain(true);
+        } else {
+          lineState = {active:true, x1:wp.x, y1:wp.y};
+        }
       }
       render(); return;
     }
@@ -2040,7 +2292,9 @@ function onKeyDown(e) {
     render(); return;
   }
   if(k==='Enter'){
-    if(activeTool==='line'&&lineState.active){ lineState={active:false}; render(); }
+    if(activeTool==='line'&&lineState.active){
+      commitLineChain(false); // open polyline (or single line)
+    }
     if(activeTool==='rect'&&rectState.active){
       const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
       commitRect(rectState.x1,rectState.y1,wp.x,wp.y);
@@ -2065,6 +2319,8 @@ function onKeyDown(e) {
     if(k==='s'||k==='S') setTool('select');
     if(k==='o'||k==='O') setTool('offset');
     if(k==='t'||k==='T') setTool('rotate');
+    if(k==='j'||k==='J') joinSelected();
+    if(k==='x'||k==='X') explodeSelected();
     if(k==='q'||k==='Q') rotateSelected(-90);  // CCW
     if(k==='e'||k==='E') rotateSelected(90);   // CW
     if(k==='0')          flattenSelection();
@@ -2126,6 +2382,11 @@ function zoomExtents() {
     if(o.type==='LINE'){
       x0=Math.min(x0,o.x1,o.x2); x1=Math.max(x1,o.x1,o.x2);
       y0=Math.min(y0,o.y1,o.y2); y1=Math.max(y1,o.y1,o.y2);
+    } else if(o.type==='POLYLINE'){
+      for(const p of o.pts){
+        x0=Math.min(x0,p.x); x1=Math.max(x1,p.x);
+        y0=Math.min(y0,p.y); y1=Math.max(y1,p.y);
+      }
     }
   }
   const rx=(x1-x0)||20, ry=(y1-y0)||20, pad=0.15;
@@ -2216,6 +2477,29 @@ function drawEntities() {
       ctx.shadowBlur=0;
       drawDot(a.x,a.y,sel?C.entitySel:C.entity);
       drawDot(b.x,b.y,sel?C.entitySel:C.entity);
+
+    } else if(o.type==='POLYLINE'){
+      if(o.pts.length < 2) continue;
+      if(sel){ ctx.shadowColor='rgba(255,170,0,0.5)'; ctx.shadowBlur=10; }
+      ctx.strokeStyle=sel?C.entitySel:C.entity;
+      ctx.lineWidth=sel?2:1.2;
+      ctx.beginPath();
+      const p0=worldToScreen(o.pts[0].x, o.pts[0].y);
+      ctx.moveTo(p0.x, p0.y);
+      for(let i=1;i<o.pts.length;i++){
+        const p=worldToScreen(o.pts[i].x, o.pts[i].y);
+        ctx.lineTo(p.x,p.y);
+      }
+      if(o.closed) ctx.closePath();
+      ctx.stroke();
+      ctx.shadowBlur=0;
+      // Draw vertex dots — interior vertices get small dots, endpoints get full dots
+      for(let i=0;i<o.pts.length;i++){
+        const p=worldToScreen(o.pts[i].x,o.pts[i].y);
+        const isEndpoint = !o.closed && (i===0 || i===o.pts.length-1);
+        drawDot(p.x,p.y,sel?C.entitySel:C.entity, isEndpoint?2.5:1.5);
+      }
+
     } else if(o.type==='POINT'){
       const p=worldToScreen(o.x,o.y);
       drawDot(p.x,p.y,C.point);
@@ -2224,20 +2508,78 @@ function drawEntities() {
   ctx.restore();
 }
 
-function drawDot(sx,sy,color) {
-  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(sx,sy,2.5,0,Math.PI*2); ctx.fill();
+function drawDot(sx,sy,color,r=2.5) {
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(sx,sy,r,0,Math.PI*2); ctx.fill();
 }
 
 function drawRubberBand() {
   if(activeTool!=='line'||!lineState.active) return;
-  const start=worldToScreen(lineState.x1,lineState.y1);
-  const ep=snapActive&&snapPoint?snapPoint:mouseWorld;
-  const end=worldToScreen(ep.x,ep.y);
+
   ctx.save();
-  ctx.setLineDash([5,4]); ctx.strokeStyle=C.rubberLine; ctx.lineWidth=1; ctx.globalAlpha=0.85;
-  ctx.beginPath(); ctx.moveTo(start.x,start.y); ctx.lineTo(end.x,end.y); ctx.stroke();
-  ctx.setLineDash([]); ctx.strokeStyle=C.startPt; ctx.lineWidth=1.5; ctx.globalAlpha=1;
-  ctx.beginPath(); ctx.arc(start.x,start.y,5,0,Math.PI*2); ctx.stroke();
+
+  // ── Draw committed chain segments (in-progress, not yet in GeoMemory) ──
+  if(lineChain.length >= 2) {
+    ctx.strokeStyle = C.entity;
+    ctx.lineWidth   = 1.2;
+    ctx.globalAlpha = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    const p0 = worldToScreen(lineChain[0].x, lineChain[0].y);
+    ctx.moveTo(p0.x, p0.y);
+    for(let i=1; i<lineChain.length; i++){
+      const p = worldToScreen(lineChain[i].x, lineChain[i].y);
+      ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke();
+    // Vertex dots along committed chain
+    for(const pt of lineChain){
+      const sp = worldToScreen(pt.x, pt.y);
+      drawDot(sp.x, sp.y, C.entity, 2.5);
+    }
+  }
+
+  // ── Rubber band line from last point to cursor ──
+  const ep  = snapActive&&snapPoint ? snapPoint : mouseWorld;
+  const end = worldToScreen(ep.x, ep.y);
+  const start = worldToScreen(lineState.x1, lineState.y1);
+
+  ctx.setLineDash([5,4]);
+  ctx.strokeStyle = C.rubberLine;
+  ctx.lineWidth   = 1;
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.moveTo(start.x, start.y);
+  ctx.lineTo(end.x, end.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── Start point ring ──
+  const chainStart = worldToScreen(lineChain[0].x, lineChain[0].y);
+  ctx.strokeStyle = C.startPt;
+  ctx.lineWidth   = 1.5;
+  ctx.globalAlpha = 1;
+  ctx.beginPath();
+  ctx.arc(chainStart.x, chainStart.y, 5, 0, Math.PI*2);
+  ctx.stroke();
+
+  // ── Closing indicator: if cursor is near chain start, highlight it ──
+  if(lineChain.length >= 2) {
+    const startScreen = worldToScreen(lineChain[0].x, lineChain[0].y);
+    const endScreen   = worldToScreen(ep.x, ep.y);
+    const screenDist  = Math.hypot(endScreen.x - startScreen.x, endScreen.y - startScreen.y);
+    if(screenDist < SNAP_PX) {
+      ctx.strokeStyle = C.startPt;
+      ctx.lineWidth   = 2;
+      ctx.beginPath();
+      ctx.arc(chainStart.x, chainStart.y, 8, 0, Math.PI*2);
+      ctx.stroke();
+      // Label
+      ctx.fillStyle = C.startPt;
+      ctx.font = '9px JetBrains Mono, monospace';
+      ctx.fillText('close', chainStart.x + 10, chainStart.y - 8);
+    }
+  }
+
   ctx.restore();
 }
 
@@ -2628,12 +2970,23 @@ function commitDxfImport() {
 // ── DXF EXPORT ──────────────────────────────────────────
 function buildDXF(objects) {
   const f=n=>n.toFixed(4), lines=[];
-  lines.push('0','SECTION','2','HEADER','9','$ACADVER','1','AC1009','9','$INSUNITS','70','4','0','ENDSEC');
+  // AC1014 = R14, minimum version that supports LWPOLYLINE
+  lines.push('0','SECTION','2','HEADER','9','$ACADVER','1','AC1014','9','$INSUNITS','70','4','0','ENDSEC');
   lines.push('0','SECTION','2','TABLES','0','TABLE','2','LAYER','70','1','0','LAYER','2','Layer_0','70','0','62','7','6','CONTINUOUS','0','ENDTAB','0','ENDSEC');
   lines.push('0','SECTION','2','ENTITIES');
   for(const o of objects){
-    if(o.type==='LINE') lines.push('0','LINE','8',o.layer,'10',f(o.x1),'20',f(o.y1),'30','0.0000','11',f(o.x2),'21',f(o.y2),'31','0.0000');
-    if(o.type==='POINT') lines.push('0','POINT','8',o.layer,'10',f(o.x),'20',f(o.y),'30','0.0000');
+    if(o.type==='LINE')
+      lines.push('0','LINE','8',o.layer,'10',f(o.x1),'20',f(o.y1),'30','0.0000','11',f(o.x2),'21',f(o.y2),'31','0.0000');
+    if(o.type==='POINT')
+      lines.push('0','POINT','8',o.layer,'10',f(o.x),'20',f(o.y),'30','0.0000');
+    if(o.type==='POLYLINE' && o.pts && o.pts.length>=2){
+      // LWPOLYLINE: group 70 flag: 0=open, 1=closed
+      lines.push('0','LWPOLYLINE','8',o.layer,
+        '90',String(o.pts.length),  // vertex count
+        '70',o.closed?'1':'0',      // closed flag
+        '43','0.0');                 // constant width
+      for(const p of o.pts){ lines.push('10',f(p.x),'20',f(p.y)); }
+    }
   }
   lines.push('0','ENDSEC','0','EOF');
   return lines.join('\n');
@@ -2664,9 +3017,10 @@ function newDocument() {
 
 // ── UI HELPERS ──────────────────────────────────────────
 function updateProps() {
-  const lines=GeoMemory.objects.filter(o=>o.type==='LINE').length;
-  document.getElementById('prop-objects').textContent=GeoMemory.objects.length;
-  document.getElementById('prop-lines').textContent=lines;
+  const lines    = GeoMemory.objects.filter(o=>o.type==='LINE').length;
+  const polys    = GeoMemory.objects.filter(o=>o.type==='POLYLINE').length;
+  document.getElementById('prop-objects').textContent = GeoMemory.objects.length;
+  document.getElementById('prop-lines').textContent   = lines + (polys ? ` (+${polys} poly)` : '');
 }
 
 let toastT;
