@@ -341,6 +341,123 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   box-shadow: 0 0 12px rgba(0,212,255,0.25);
 }
 .dlg-btn.commit:hover { background: #33ddff; box-shadow: 0 0 18px rgba(0,212,255,0.4); }
+/* ── STARTUP UNIT SPLASH ── */
+#splash-overlay {
+  position: fixed; inset: 0;
+  background: rgba(4,6,10,0.92);
+  backdrop-filter: blur(6px);
+  z-index: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+#splash-dialog {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,212,255,0.1);
+  width: 400px; max-width: 95vw;
+  font-family: var(--font-mono);
+  overflow: hidden;
+}
+#splash-dialog .dlg-head {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px 20px 16px;
+  background: var(--bg-panel2);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.splash-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 22px; font-weight: 700; color: var(--accent);
+  letter-spacing: 0.06em; margin-bottom: 6px;
+}
+.splash-brand-dot {
+  width: 10px; height: 10px; background: var(--accent);
+  border-radius: 50%; box-shadow: 0 0 10px var(--accent);
+}
+.splash-sub {
+  font-size: 10px; color: var(--text-dim);
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+#splash-dialog .dlg-body { padding: 20px; }
+.splash-prompt {
+  font-size: 11px; color: var(--text-secondary);
+  text-align: center; margin-bottom: 16px; letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+.splash-prompt strong { color: var(--text-primary); }
+.splash-unit-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 20px;
+}
+.splash-unit-btn {
+  background: var(--bg-panel2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 18px 12px;
+  font-family: var(--font-mono); cursor: pointer;
+  transition: all 0.14s; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.splash-unit-btn:hover {
+  background: var(--bg-hover); border-color: var(--border-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.splash-unit-btn.mm-btn:hover  { border-color: var(--accent); box-shadow: 0 4px 16px rgba(0,212,255,0.15); }
+.splash-unit-btn.in-btn:hover  { border-color: var(--amber);  box-shadow: 0 4px 16px rgba(255,170,0,0.15); }
+.splash-unit-btn .sub-unit {
+  font-size: 28px; font-weight: 700; letter-spacing: 0.02em;
+}
+.splash-unit-btn.mm-btn .sub-unit { color: var(--accent); }
+.splash-unit-btn.in-btn .sub-unit { color: var(--amber); }
+.splash-unit-btn .sub-name { font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.splash-unit-btn .sub-example { font-size: 10px; color: var(--text-secondary); }
+.splash-note {
+  text-align: center; font-size: 9px; color: var(--text-dim);
+  letter-spacing: 0.06em; line-height: 1.5;
+}
+
+/* ── OFFSET DISTANCE POPUP ── */
+#offset-popup-overlay {
+  position: fixed; inset: 0;
+  background: transparent;
+  z-index: 400;
+  display: none;
+}
+#offset-popup-overlay.open { display: block; }
+#offset-popup {
+  position: absolute;
+  background: var(--bg-panel);
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,212,255,0.1);
+  width: 230px;
+  font-family: var(--font-mono);
+  overflow: hidden;
+}
+#offset-popup .op-head {
+  background: var(--bg-panel2);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 12px;
+  font-size: 9px; color: var(--accent);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 6px;
+}
+#offset-popup .op-head svg { width:12px; height:12px; opacity:0.8; }
+#offset-popup .op-body { padding: 12px; }
+.op-input-row {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+}
+#offset-popup-input {
+  flex: 1; background: var(--bg-panel2); border: 1px solid var(--border-bright);
+  border-radius: 3px; color: var(--accent); font-family: var(--font-mono);
+  font-size: 14px; padding: 6px 8px; outline: none; text-align: right;
+  min-width: 0;
+}
+#offset-popup-input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+.op-unit-label { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+.op-hint { font-size: 9px; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 10px; line-height: 1.5; }
+.op-hint b { color: var(--text-secondary); }
+.op-actions { display: flex; gap: 6px; }
+.op-actions .dlg-btn { flex: 1; padding: 6px 8px; font-size: 9px; }
 </style>
 </head>
 <body>
@@ -654,6 +771,60 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   </div>
 </div>
 
+<!-- STARTUP UNIT SPLASH -->
+<div id="splash-overlay">
+  <div id="splash-dialog">
+    <div class="dlg-head">
+      <div class="splash-brand"><div class="splash-brand-dot"></div>.KAD</div>
+      <div class="splash-sub">Kernel-Aided Design · v0.3</div>
+    </div>
+    <div class="dlg-body">
+      <div class="splash-prompt">
+        <strong>Choose your working units.</strong><br>
+        All coordinates, inputs, and dimensions will use this unit.<br>
+        You can switch at any time with the <span style="color:var(--accent)">mm·in</span> toggle in the toolbar.
+      </div>
+      <div class="splash-unit-grid">
+        <button class="splash-unit-btn mm-btn" onclick="splashSelectUnit('mm')">
+          <span class="sub-unit">mm</span>
+          <span class="sub-name">Millimeters</span>
+          <span class="sub-example">ISO · Metric · International</span>
+        </button>
+        <button class="splash-unit-btn in-btn" onclick="splashSelectUnit('in')">
+          <span class="sub-unit">in</span>
+          <span class="sub-name">Inches</span>
+          <span class="sub-example">Imperial · US Customary</span>
+        </button>
+      </div>
+      <div class="splash-note">
+        This preference is saved locally and won't appear again.<br>
+        CC BY 4.0 · © <span id="splash-year"></span> · .KAD Kernel-Aided Design
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OFFSET DISTANCE POPUP -->
+<div id="offset-popup-overlay">
+  <div id="offset-popup">
+    <div class="op-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><path d="M14 11.5l3 2.5-3 2.5" stroke-width="1.2"/></svg>
+      Offset Distance
+    </div>
+    <div class="op-body">
+      <div class="op-input-row">
+        <input type="number" id="offset-popup-input" min="0.0001" step="0.5" placeholder="10"/>
+        <span class="op-unit-label" id="offset-popup-unit">mm</span>
+      </div>
+      <div class="op-hint"><b>Enter</b> to confirm &nbsp;·&nbsp; <b>Esc</b> to cancel</div>
+      <div class="op-actions">
+        <button class="dlg-btn cancel" onclick="cancelOffsetPopup()">Cancel</button>
+        <button class="dlg-btn commit" onclick="confirmOffsetPopup()">Offset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
 // ═══════════════════════════════════════════════════════════
@@ -728,6 +899,49 @@ function getGridStepsForUnit() {
   return GRID_STEPS_MM;
 }
 
+// ── STARTUP SPLASH ───────────────────────────────────────
+const SPLASH_KEY = 'kad_unit_chosen';
+
+function splashSelectUnit(unit) {
+  // Apply the chosen unit
+  if (unit !== unitMode) {
+    // Force unit without toggling UI redundantly
+    unitMode = unit;
+    document.getElementById('unit-seg-mm').classList.toggle('active', unit==='mm');
+    document.getElementById('unit-seg-in').classList.toggle('active', unit==='in');
+    document.getElementById('prop-units').textContent = unit;
+    const ctxLbl = document.getElementById('ctx-unit-label');
+    if(ctxLbl) ctxLbl.textContent = unit==='mm' ? 'Switch to inches' : 'Switch to mm';
+    const coordCur = document.getElementById('coord-cur-unit');
+    if(coordCur) coordCur.textContent = unit;
+    const coordLbl = document.getElementById('coord-unit-lbl');
+    if(coordLbl) coordLbl.textContent = unit;
+    // Offset dist input
+    const distInput = document.getElementById('offset-dist-input');
+    if (unit === 'in') { distInput.value='0.5'; distInput.step='0.0625'; document.getElementById('offset-dist-unit').textContent='in'; }
+    else               { distInput.value='10';  distInput.step='0.5';    document.getElementById('offset-dist-unit').textContent='mm'; }
+    updateGridLabel();
+    render();
+  }
+  // Save and close — never show again this session/browser
+  try { localStorage.setItem(SPLASH_KEY, unit); } catch(e){}
+  document.getElementById('splash-overlay').style.display = 'none';
+  canvas.focus();
+}
+
+function initSplash() {
+  document.getElementById('splash-year').textContent = new Date().getFullYear();
+  let saved = null;
+  try { saved = localStorage.getItem(SPLASH_KEY); } catch(e){}
+  if (saved === 'mm' || saved === 'in') {
+    // Already chosen — apply silently and skip splash
+    document.getElementById('splash-overlay').style.display = 'none';
+    if (saved !== unitMode) splashSelectUnit(saved);
+    else document.getElementById('splash-overlay').style.display = 'none';
+  }
+  // Otherwise splash remains visible — user must choose
+}
+
 function toggleUnits() {
   unitMode = (unitMode === 'mm') ? 'in' : 'mm';
   // Update toggle button appearance
@@ -759,6 +973,7 @@ function toggleUnits() {
   // Update coord help panel unit label
   const coordCur = document.getElementById('coord-cur-unit');
   if(coordCur) coordCur.textContent = unitMode;
+  try { localStorage.setItem(SPLASH_KEY, unitMode); } catch(e){}
   render();
   showToast('Units: ' + (unitMode==='mm' ? 'millimeters (mm)' : 'inches (in)') + ' — geometry unchanged');
 }
@@ -995,6 +1210,59 @@ function getOffsetDist() {
   const displayVal = (isNaN(v) || v <= 0) ? (unitMode==='in' ? 0.3937 : 10) : v;
   return parseFloat(fromDisplay(displayVal).toFixed(6)); // always returns mm
 }
+
+// ── OFFSET DISTANCE POPUP ────────────────────────────────
+const offsetPopupOverlay = document.getElementById('offset-popup-overlay');
+const offsetPopupInput   = document.getElementById('offset-popup-input');
+
+function openOffsetPopup(screenX, screenY) {
+  const lastMM = getOffsetDist();
+  offsetPopupInput.value = parseFloat(toDisplay(lastMM).toFixed(unitDecimals()));
+  document.getElementById('offset-popup-unit').textContent = unitLabel();
+
+  const pop = document.getElementById('offset-popup');
+  const PW = 230, PH = 130;
+  let px = screenX + 16, py = screenY - PH/2;
+  if (px + PW > window.innerWidth)  px = screenX - PW - 8;
+  if (py < 8)                       py = 8;
+  if (py + PH > window.innerHeight) py = window.innerHeight - PH - 8;
+  pop.style.left = px + 'px';
+  pop.style.top  = py + 'px';
+
+  offsetPopupOverlay.classList.add('open');
+  setTimeout(() => { offsetPopupInput.select(); offsetPopupInput.focus(); }, 40);
+}
+
+function closeOffsetPopup() {
+  offsetPopupOverlay.classList.remove('open');
+  canvas.focus();
+}
+
+function cancelOffsetPopup() {
+  closeOffsetPopup();
+  offsetState = { active:false, selectedLine:null, previewPts:null };
+  render();
+}
+
+function confirmOffsetPopup() {
+  const v = parseFloat(offsetPopupInput.value);
+  if (isNaN(v) || v <= 0) { offsetPopupInput.focus(); offsetPopupInput.select(); return; }
+  const mm = fromDisplay(v);
+  document.getElementById('offset-dist-input').value =
+    parseFloat(toDisplay(mm).toFixed(unitDecimals()));
+  closeOffsetPopup();
+  showToast(`Offset ${toDisplay(mm).toFixed(unitDecimals())} ${unitLabel()} — move cursor to side, click to confirm`);
+}
+
+offsetPopupInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter')  { e.stopPropagation(); confirmOffsetPopup(); }
+  if (e.key === 'Escape') { e.stopPropagation(); cancelOffsetPopup(); }
+});
+
+offsetPopupOverlay.addEventListener('mousedown', e => {
+  if (e.target === offsetPopupOverlay) cancelOffsetPopup();
+});
+
 function lineNormal(x1,y1,x2,y2) {
   const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
   if(len<1e-10) return {nx:0,ny:1};
@@ -1558,8 +1826,15 @@ function onMouseDown(e) {
     if(activeTool==='offset') {
       if(!offsetState.active){
         const hit=pickLine(mouseScreen.x,mouseScreen.y);
-        if(hit){ offsetState.active=true; offsetState.selectedLine=hit; showToast('Line selected — click to confirm side'); }
-        else   { showToast('Click closer to a line'); }
+        if(hit){
+          offsetState.active=true;
+          offsetState.selectedLine=hit;
+          // Open distance popup at click position
+          const rect=canvas.getBoundingClientRect();
+          openOffsetPopup(rect.left + mouseScreen.x, rect.top + mouseScreen.y);
+        } else {
+          showToast('Click closer to a line');
+        }
       } else {
         if(offsetState.previewPts){
           const p=offsetState.previewPts;
@@ -2406,6 +2681,7 @@ initCamera();
 setTool('select');
 canvas.focus();
 document.getElementById('cc-year').textContent = new Date().getFullYear();
+initSplash();
 
 setTimeout(()=>{
   GeoMemory.addLine(-15,0,15,0);
