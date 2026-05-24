@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>.KAD — Kernel-Aided Design</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
 
 :root {
-  --bg-void:       #080a0e;
-  --bg-panel:      #0d1117;
-  --bg-panel2:     #111620;
-  --bg-hover:      #1a2030;
+  --void:       #080a0e;
+  --panel:      #0d1117;
+  --panel2:     #111620;
+  --hover:      #1a2030;
   --border:        #1e2a3a;
-  --border-bright: #2a3d55;
+  --border-hi: #2a3d55;
   --accent:        #00d4ff;
   --accent-dim:    #0088aa;
   --accent-glow:   rgba(0,212,255,0.15);
@@ -21,68 +21,68 @@
   --green-dim:     #00aa66;
   --amber:         #ffaa00;
   --red:           #ff4455;
-  --text-primary:  #d0dde8;
-  --text-secondary:#6a8099;
-  --text-dim:      #3a5070;
-  --font-mono:     'JetBrains Mono', monospace;
-  --font-ui:       'Space Grotesk', sans-serif;
+  --t1:  #d0dde8;
+  --t2:#6a8099;
+  --t3:      #3a5070;
+  --fm:     'Fira Code', monospace;
+  --fd:       'Syne', sans-serif;
   --sidebar-w:     228px;
   --toolbar-h:     40px;
   --status-h:      28px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void); color:var(--text-primary); font-family:var(--font-ui); font-size:13px; }
+html, body { width:100%; height:100%; overflow:hidden; background:var(--void); color:var(--t1); font-family:var(--fd); font-size:13px; }
 
 /* ── LAYOUT ── */
 #app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 1fr var(--status-h); width:100vw; height:100vh; }
 
 /* ── TOPBAR ── */
-#topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--bg-panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
-.brand { display:flex; align-items:center; gap:8px; margin-right:20px; font-family:var(--font-mono); font-weight:700; font-size:14px; color:var(--accent); letter-spacing:0.04em; user-select:none; }
+#topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
+.brand { display:flex; align-items:center; gap:8px; margin-right:20px; font-family:var(--fm); font-weight:700; font-size:14px; color:var(--accent); letter-spacing:0.04em; user-select:none; }
 .brand-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); }
-.brand-sub { font-size:9px; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase; font-weight:400; }
+.brand-sub { font-size:9px; color:var(--t3); letter-spacing:0.12em; text-transform:uppercase; font-weight:400; }
 .tb-menu { display:flex; align-items:center; }
-.tb-menu-item { padding:0 12px; height:var(--toolbar-h); display:flex; align-items:center; font-size:12px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s,background 0.15s; letter-spacing:0.02em; position:relative; }
-.tb-menu-item:hover { color:var(--text-primary); background:var(--bg-hover); }
-.tb-menu-item.open { color:var(--text-primary); background:var(--bg-hover); }
+.tb-menu-item { padding:0 12px; height:var(--toolbar-h); display:flex; align-items:center; font-size:12px; color:var(--t2); cursor:pointer; transition:color 0.15s,background 0.15s; letter-spacing:0.02em; position:relative; }
+.tb-menu-item:hover { color:var(--t1); background:var(--hover); }
+.tb-menu-item.open { color:var(--t1); background:var(--hover); }
 .tb-sep { width:1px; height:18px; background:var(--border); margin:0 4px; }
 .tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
-.tb-badge { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); background:var(--bg-panel2); border:1px solid var(--border); padding:2px 7px; border-radius:3px; letter-spacing:0.06em; }
+.tb-badge { font-family:var(--fm); font-size:10px; color:var(--t3); background:var(--panel2); border:1px solid var(--border); padding:2px 7px; border-radius:3px; letter-spacing:0.06em; }
 
 /* Topbar dropdown */
-.tb-dropdown { position:absolute; top:100%; left:0; background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:0 0 4px 4px; min-width:180px; z-index:200; display:none; flex-direction:column; box-shadow:0 8px 24px rgba(0,0,0,0.6); padding:4px 0; }
+.tb-dropdown { position:absolute; top:100%; left:0; background:var(--panel); border:1px solid var(--border-hi); border-radius:0 0 4px 4px; min-width:180px; z-index:200; display:none; flex-direction:column; box-shadow:0 8px 24px rgba(0,0,0,0.6); padding:4px 0; }
 .tb-dropdown.open { display:flex; }
-.tb-dd-item { padding:7px 14px; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:16px; transition:background 0.1s,color 0.1s; }
-.tb-dd-item:hover { background:var(--bg-hover); color:var(--text-primary); }
-.tb-dd-item .dd-key { color:var(--text-dim); font-size:9px; }
+.tb-dd-item { padding:7px 14px; font-family:var(--fm); font-size:11px; color:var(--t2); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:16px; transition:background 0.1s,color 0.1s; }
+.tb-dd-item:hover { background:var(--hover); color:var(--t1); }
+.tb-dd-item .dd-key { color:var(--t3); font-size:9px; }
 .tb-dd-sep { height:1px; background:var(--border); margin:3px 0; }
 
 /* ── SIDEBAR ── */
-#sidebar { background:var(--bg-panel); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; position:relative; z-index:10; }
-.section-head { padding:8px 14px 5px; font-family:var(--font-mono); font-size:9px; font-weight:500; color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase; border-bottom:1px solid var(--border); flex-shrink:0; }
+#sidebar { background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; position:relative; z-index:10; }
+.section-head { padding:8px 14px 5px; font-family:var(--fm); font-size:9px; font-weight:500; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; border-bottom:1px solid var(--border); flex-shrink:0; }
 .tool-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; padding:6px; background:var(--border); border-bottom:1px solid var(--border); flex-shrink:0; }
-.tool-btn { background:var(--bg-panel2); border:none; cursor:pointer; padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:3px; transition:background 0.15s,box-shadow 0.15s; position:relative; overflow:hidden; }
-.tool-btn:hover { background:var(--bg-hover); }
-.tool-btn.active { background:var(--bg-hover); box-shadow:inset 0 0 0 1px var(--accent); }
+.tool-btn { background:var(--panel2); border:none; cursor:pointer; padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:3px; transition:background 0.15s,box-shadow 0.15s; position:relative; overflow:hidden; }
+.tool-btn:hover { background:var(--hover); }
+.tool-btn.active { background:var(--hover); box-shadow:inset 0 0 0 1px var(--accent); }
 .tool-btn.active::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); box-shadow:0 0 8px var(--accent); }
 .tool-icon { width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
 .tool-icon svg { width:16px; height:16px; }
-.tool-label { font-size:8px; font-family:var(--font-mono); color:var(--text-secondary); letter-spacing:0.05em; }
+.tool-label { font-size:8px; font-family:var(--fm); color:var(--t2); letter-spacing:0.05em; }
 .tool-btn.active .tool-label { color:var(--accent); }
 
 /* Offset bar */
-#offset-bar { display:none; align-items:center; gap:6px; padding:5px 8px; background:var(--bg-panel2); border-bottom:1px solid var(--border); flex-shrink:0; }
+#offset-bar { display:none; align-items:center; gap:6px; padding:5px 8px; background:var(--panel2); border-bottom:1px solid var(--border); flex-shrink:0; }
 #offset-bar.visible { display:flex; }
-#offset-bar label { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
-#offset-dist-input { background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:3px; color:var(--accent); font-family:var(--font-mono); font-size:11px; padding:3px 6px; width:60px; outline:none; text-align:right; }
+#offset-bar label { font-family:var(--fm); font-size:9px; color:var(--t3); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
+#offset-dist-input { background:var(--panel); border:1px solid var(--border-hi); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:11px; padding:3px 6px; width:60px; outline:none; text-align:right; }
 #offset-dist-input:focus { border-color:var(--accent); }
-#offset-dist-unit { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); }
+#offset-dist-unit { font-family:var(--fm); font-size:9px; color:var(--t3); }
 
 /* File ops */
 .file-ops { padding:6px; display:flex; flex-direction:column; gap:3px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.op-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; background:var(--bg-panel2); border:1px solid var(--border); border-radius:4px; color:var(--text-secondary); font-size:11px; font-family:var(--font-mono); cursor:pointer; transition:all 0.15s; letter-spacing:0.04em; }
-.op-btn:hover { background:var(--bg-hover); border-color:var(--border-bright); color:var(--text-primary); }
+.op-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; background:var(--panel2); border:1px solid var(--border); border-radius:4px; color:var(--t2); font-size:11px; font-family:var(--fm); cursor:pointer; transition:all 0.15s; letter-spacing:0.04em; }
+.op-btn:hover { background:var(--hover); border-color:var(--border-hi); color:var(--t1); }
 .op-btn.dxf { color:var(--green); border-color:var(--green-dim); }
 .op-btn.dxf:hover { background:rgba(0,255,157,0.06); border-color:var(--green); }
 .op-btn svg { width:12px; height:12px; flex-shrink:0; }
@@ -90,11 +90,11 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 
 /* Coord input panel */
 #coord-panel { flex-shrink:0; border-bottom:1px solid var(--border); }
-#coord-panel-head { padding:6px 14px 5px; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
-#coord-panel-head:hover { color:var(--text-secondary); }
+#coord-panel-head { padding:6px 14px 5px; font-family:var(--fm); font-size:9px; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+#coord-panel-head:hover { color:var(--t2); }
 #coord-panel-body { padding:6px 8px 8px; display:none; }
 #coord-panel-body.open { display:block; }
-.coord-example { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); margin-bottom:4px; line-height:1.6; }
+.coord-example { font-family:var(--fm); font-size:9px; color:var(--t3); margin-bottom:4px; line-height:1.6; }
 .coord-example b { color:var(--accent); }
 .coord-example i { color:var(--amber); font-style:normal; }
 .coord-example em { color:var(--green); font-style:normal; }
@@ -104,38 +104,38 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 .props-panel::-webkit-scrollbar { width:3px; }
 .props-panel::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 .prop-row { display:flex; justify-content:space-between; align-items:center; padding:3px 8px; border-radius:3px; margin-bottom:1px; }
-.prop-row:hover { background:var(--bg-hover); }
-.prop-key { font-size:10px; color:var(--text-dim); font-family:var(--font-mono); }
-.prop-val { font-size:10px; color:var(--text-secondary); font-family:var(--font-mono); }
+.prop-row:hover { background:var(--hover); }
+.prop-key { font-size:10px; color:var(--t3); font-family:var(--fm); }
+.prop-val { font-size:10px; color:var(--t2); font-family:var(--fm); }
 .prop-val.accent { color:var(--accent); }
 .prop-val.green  { color:var(--green); }
 .layer-row { display:flex; align-items:center; gap:8px; padding:4px 8px; cursor:pointer; border-radius:3px; margin-bottom:2px; }
-.layer-row:hover { background:var(--bg-hover); }
+.layer-row:hover { background:var(--hover); }
 .layer-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.layer-name { font-size:11px; font-family:var(--font-mono); color:var(--text-secondary); flex:1; }
-.layer-count { font-size:10px; color:var(--text-dim); font-family:var(--font-mono); }
+.layer-name { font-size:11px; font-family:var(--fm); color:var(--t2); flex:1; }
+.layer-count { font-size:10px; color:var(--t3); font-family:var(--fm); }
 
 /* ── CANVAS AREA ── */
-#canvas-wrap { position:relative; overflow:hidden; background:var(--bg-void); }
+#canvas-wrap { position:relative; overflow:hidden; background:var(--void); }
 #main-canvas { display:block; }
 
 /* ── SNAP INDICATOR ── */
 .snap-ring { position:absolute; pointer-events:none; width:12px; height:12px; border:1.5px solid var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); transform:translate(-50%,-50%); display:none; }
 
 /* ── COORD OVERLAY ── */
-#coord-overlay { position:absolute; bottom:8px; right:8px; background:rgba(8,10,14,0.88); border:1px solid var(--border); backdrop-filter:blur(4px); padding:5px 10px; border-radius:4px; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); pointer-events:none; display:flex; gap:12px; letter-spacing:0.04em; }
+#coord-overlay { position:absolute; bottom:8px; right:8px; background:rgba(8,10,14,0.88); border:1px solid var(--border); backdrop-filter:blur(4px); padding:5px 10px; border-radius:4px; font-family:var(--fm); font-size:11px; color:var(--t2); pointer-events:none; display:flex; gap:12px; letter-spacing:0.04em; }
 #coord-overlay span { color:var(--accent); }
-.coord-label { color:var(--text-dim); }
+.coord-label { color:var(--t3); }
 
 /* ── CONTEXT HINT ── */
-#hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(8,10,14,0.9); border:1px solid var(--border-bright); border-radius:4px; padding:4px 12px; font-size:10px; font-family:var(--font-mono); color:var(--text-secondary); pointer-events:none; white-space:nowrap; letter-spacing:0.05em; }
+#hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(8,10,14,0.9); border:1px solid var(--border-hi); border-radius:4px; padding:4px 12px; font-size:10px; font-family:var(--fm); color:var(--t2); pointer-events:none; white-space:nowrap; letter-spacing:0.05em; }
 #hint span { color:var(--accent); }
 
 /* ── STATUS BAR ── */
-#statusbar { grid-column:1/-1; background:var(--bg-panel); border-top:1px solid var(--border); display:flex; align-items:center; padding:0 12px; font-family:var(--font-mono); font-size:10px; color:var(--text-dim); letter-spacing:0.04em; }
+#statusbar { grid-column:1/-1; background:var(--panel); border-top:1px solid var(--border); display:flex; align-items:center; padding:0 12px; font-family:var(--fm); font-size:10px; color:var(--t3); letter-spacing:0.04em; }
 .sb-item { padding:0 10px; border-right:1px solid var(--border); height:100%; display:flex; align-items:center; gap:5px; }
 .sb-item:first-child { padding-left:0; }
-.sb-val { color:var(--text-secondary); }
+.sb-val { color:var(--t2); }
 .sb-val.ok  { color:var(--green); }
 .sb-val.act { color:var(--accent); }
 .sb-val.warn { color:var(--amber); }
@@ -143,7 +143,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 .sb-cc {
   display: flex; align-items: center; gap: 5px;
   padding: 0 12px; border-left: 1px solid var(--border);
-  font-family: var(--font-mono); font-size: 9px; color: var(--text-dim);
+  font-family: var(--fm); font-size: 9px; color: var(--t3);
   letter-spacing: 0.04em; white-space: nowrap;
 }
 .cc-link {
@@ -153,28 +153,28 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 .cc-link:hover { color: var(--accent); text-decoration: underline; }
 
 /* ── TOAST ── */
-#toast { position:fixed; bottom:46px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--bg-panel2); border:1px solid var(--border-bright); border-radius:4px; padding:6px 14px; font-size:11px; font-family:var(--font-mono); color:var(--text-primary); pointer-events:none; opacity:0; transition:opacity 0.18s,transform 0.18s; z-index:999; }
+#toast { position:fixed; bottom:46px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--panel2); border:1px solid var(--border-hi); border-radius:4px; padding:6px 14px; font-size:11px; font-family:var(--fm); color:var(--t1); pointer-events:none; opacity:0; transition:opacity 0.18s,transform 0.18s; z-index:999; }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* ── DYNAMIC INPUT ── */
 #dyn-input-wrap { position:absolute; display:none; z-index:80; pointer-events:auto; }
-#dyn-input-box { background:var(--bg-panel); border:1px solid var(--accent); border-radius:3px; box-shadow:0 0 12px rgba(0,212,255,0.3),0 2px 8px rgba(0,0,0,0.7); display:flex; align-items:center; min-width:170px; overflow:hidden; }
-#dyn-input-prefix { background:var(--bg-panel2); border-right:1px solid var(--border); padding:5px 7px; font-family:var(--font-mono); font-size:9px; color:var(--accent); letter-spacing:0.05em; white-space:nowrap; flex-shrink:0; min-width:42px; text-align:center; }
-#dyn-input-field { background:transparent; border:none; outline:none; padding:5px 8px; font-family:var(--font-mono); font-size:11px; color:var(--text-primary); width:130px; caret-color:var(--accent); }
-#dyn-input-field::placeholder { color:var(--text-dim); }
-#dyn-input-hint { position:absolute; top:calc(100% + 4px); left:0; background:rgba(8,10,14,0.95); border:1px solid var(--border); border-radius:3px; padding:3px 8px; font-family:var(--font-mono); font-size:9px; color:var(--text-dim); white-space:nowrap; pointer-events:none; }
+#dyn-input-box { background:var(--panel); border:1px solid var(--accent); border-radius:3px; box-shadow:0 0 12px rgba(0,212,255,0.3),0 2px 8px rgba(0,0,0,0.7); display:flex; align-items:center; min-width:170px; overflow:hidden; }
+#dyn-input-prefix { background:var(--panel2); border-right:1px solid var(--border); padding:5px 7px; font-family:var(--fm); font-size:9px; color:var(--accent); letter-spacing:0.05em; white-space:nowrap; flex-shrink:0; min-width:42px; text-align:center; }
+#dyn-input-field { background:transparent; border:none; outline:none; padding:5px 8px; font-family:var(--fm); font-size:11px; color:var(--t1); width:130px; caret-color:var(--accent); }
+#dyn-input-field::placeholder { color:var(--t3); }
+#dyn-input-hint { position:absolute; top:calc(100% + 4px); left:0; background:rgba(8,10,14,0.95); border:1px solid var(--border); border-radius:3px; padding:3px 8px; font-family:var(--fm); font-size:9px; color:var(--t3); white-space:nowrap; pointer-events:none; }
 #dyn-input-hint b { color:var(--accent); }
 #dyn-input-hint i { color:var(--amber); font-style:normal; }
 #dyn-input-hint em { color:var(--green); font-style:normal; }
 
 /* ── CONTEXT MENU ── */
-#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow:hidden; padding:4px 0; }
+#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border-hi); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow:hidden; padding:4px 0; }
 #ctx-menu.open { display:flex; }
-.ctx-head { padding:4px 12px 3px; font-family:var(--font-mono); font-size:8px; color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase; }
-.ctx-item { display:flex; align-items:center; gap:10px; padding:7px 14px; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); cursor:pointer; transition:background 0.1s,color 0.1s; border:none; background:none; width:100%; text-align:left; }
-.ctx-item:hover { background:var(--bg-hover); color:var(--text-primary); }
+.ctx-head { padding:4px 12px 3px; font-family:var(--fm); font-size:8px; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; }
+.ctx-item { display:flex; align-items:center; gap:10px; padding:7px 14px; font-family:var(--fm); font-size:11px; color:var(--t2); cursor:pointer; transition:background 0.1s,color 0.1s; border:none; background:none; width:100%; text-align:left; }
+.ctx-item:hover { background:var(--hover); color:var(--t1); }
 .ctx-item svg { width:13px; height:13px; flex-shrink:0; opacity:0.7; }
-.ctx-item .ctx-key { margin-left:auto; font-size:9px; color:var(--text-dim); }
+.ctx-item .ctx-key { margin-left:auto; font-size:9px; color:var(--t3); }
 .ctx-item.hi { color:var(--accent); }
 .ctx-item.hi:hover { background:rgba(0,212,255,0.08); }
 .ctx-sep { height:1px; background:var(--border); margin:3px 0; }
@@ -185,25 +185,25 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 /* ── ROTATION BAR ── */
 #rotate-bar {
   display: none; align-items: center; gap: 6px;
-  padding: 5px 8px; background: var(--bg-panel2);
+  padding: 5px 8px; background: var(--panel2);
   border-bottom: 1px solid var(--border); flex-shrink: 0;
   flex-wrap: wrap;
 }
 #rotate-bar.visible { display: flex; }
-#rotate-bar label { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
+#rotate-bar label { font-family:var(--fm); font-size:9px; color:var(--t3); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
 #rotate-angle-input {
-  background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:3px;
-  color:var(--accent); font-family:var(--font-mono); font-size:11px;
+  background:var(--panel); border:1px solid var(--border-hi); border-radius:3px;
+  color:var(--accent); font-family:var(--fm); font-size:11px;
   padding:3px 6px; width:62px; outline:none; text-align:right;
 }
 #rotate-angle-input:focus { border-color:var(--accent); }
 .rot-btn {
-  background:var(--bg-panel); border:1px solid var(--border); border-radius:3px;
-  color:var(--text-secondary); font-family:var(--font-mono); font-size:9px;
+  background:var(--panel); border:1px solid var(--border); border-radius:3px;
+  color:var(--t2); font-family:var(--fm); font-size:9px;
   padding:3px 6px; cursor:pointer; transition:all 0.12s; white-space:nowrap;
   letter-spacing:0.04em;
 }
-.rot-btn:hover { background:var(--bg-hover); border-color:var(--border-bright); color:var(--text-primary); }
+.rot-btn:hover { background:var(--hover); border-color:var(--border-hi); color:var(--t1); }
 .rot-btn.hi { color:var(--accent); border-color:var(--accent-dim); }
 .rot-btn.hi:hover { background:var(--accent-glow); border-color:var(--accent); }
 /* Angle readout in selection properties */
@@ -212,12 +212,12 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 
 /* ── UNIT TOGGLE ── */
 #unit-toggle {
-  font-family: var(--font-mono);
+  font-family: var(--fm);
   font-size: 10px;
-  background: var(--bg-panel2);
-  border: 1px solid var(--border-bright);
+  background: var(--panel2);
+  border: 1px solid var(--border-hi);
   border-radius: 3px;
-  color: var(--text-secondary);
+  color: var(--t2);
   cursor: pointer;
   padding: 0;
   display: flex;
@@ -235,10 +235,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 }
 .unit-seg.active {
   background: var(--accent);
-  color: var(--bg-void);
+  color: var(--void);
   font-weight: 700;
 }
-.unit-divider { width:1px; background: var(--border-bright); align-self: stretch; }
+.unit-divider { width:1px; background: var(--border-hi); align-self: stretch; }
 /* ── DXF IMPORT DIALOG ── */
 #dxf-import-overlay {
   position: fixed; inset: 0;
@@ -249,18 +249,18 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 }
 #dxf-import-overlay.open { display: flex; }
 #dxf-import-dialog {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-bright);
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
   border-radius: 6px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,212,255,0.08);
   width: 420px; max-width: 95vw;
-  font-family: var(--font-mono);
+  font-family: var(--fm);
   overflow: hidden;
 }
 #dxf-import-dialog .dlg-head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px;
-  background: var(--bg-panel2);
+  background: var(--panel2);
   border-bottom: 1px solid var(--border);
 }
 #dxf-import-dialog .dlg-title {
@@ -268,29 +268,29 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   letter-spacing: 0.08em; text-transform: uppercase;
 }
 #dxf-import-dialog .dlg-close {
-  background: none; border: none; color: var(--text-dim);
+  background: none; border: none; color: var(--t3);
   cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px;
   transition: color 0.1s;
 }
-#dxf-import-dialog .dlg-close:hover { color: var(--text-primary); }
+#dxf-import-dialog .dlg-close:hover { color: var(--t1); }
 #dxf-import-dialog .dlg-body { padding: 16px; }
 .dlg-file-info {
-  background: var(--bg-panel2); border: 1px solid var(--border);
+  background: var(--panel2); border: 1px solid var(--border);
   border-radius: 4px; padding: 10px 12px; margin-bottom: 14px;
 }
 .dlg-file-info .fi-name {
-  font-size: 11px; color: var(--text-primary); margin-bottom: 6px;
+  font-size: 11px; color: var(--t1); margin-bottom: 6px;
   word-break: break-all; letter-spacing: 0.02em;
 }
 .dlg-file-info .fi-row {
   display: flex; justify-content: space-between;
-  font-size: 10px; color: var(--text-dim); margin-bottom: 2px;
+  font-size: 10px; color: var(--t3); margin-bottom: 2px;
 }
-.dlg-file-info .fi-row span { color: var(--text-secondary); }
+.dlg-file-info .fi-row span { color: var(--t2); }
 .dlg-file-info .fi-row span.ok  { color: var(--green); }
 .dlg-file-info .fi-row span.warn { color: var(--amber); }
 .dlg-section-label {
-  font-size: 9px; color: var(--text-dim); letter-spacing: 0.12em;
+  font-size: 9px; color: var(--t3); letter-spacing: 0.12em;
   text-transform: uppercase; margin-bottom: 8px;
 }
 .dlg-unit-grid {
@@ -298,13 +298,13 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   gap: 6px; margin-bottom: 14px;
 }
 .dlg-unit-btn {
-  background: var(--bg-panel2); border: 1px solid var(--border);
+  background: var(--panel2); border: 1px solid var(--border);
   border-radius: 4px; padding: 8px 6px;
-  font-family: var(--font-mono); font-size: 10px;
-  color: var(--text-secondary); cursor: pointer;
+  font-family: var(--fm); font-size: 10px;
+  color: var(--t2); cursor: pointer;
   transition: all 0.12s; text-align: center; letter-spacing: 0.04em;
 }
-.dlg-unit-btn:hover { background: var(--bg-hover); border-color: var(--border-bright); color: var(--text-primary); }
+.dlg-unit-btn:hover { background: var(--hover); border-color: var(--border-hi); color: var(--t1); }
 .dlg-unit-btn.selected { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
 .dlg-unit-btn .dub-label { font-size: 12px; font-weight: 700; display: block; margin-bottom: 2px; }
 .dlg-unit-btn .dub-sub   { font-size: 8px; color: inherit; opacity: 0.7; display: block; }
@@ -313,13 +313,13 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   gap: 6px; margin-bottom: 16px;
 }
 .dlg-merge-btn {
-  background: var(--bg-panel2); border: 1px solid var(--border);
+  background: var(--panel2); border: 1px solid var(--border);
   border-radius: 4px; padding: 8px 10px;
-  font-family: var(--font-mono); font-size: 10px;
-  color: var(--text-secondary); cursor: pointer;
+  font-family: var(--fm); font-size: 10px;
+  color: var(--t2); cursor: pointer;
   transition: all 0.12s; text-align: left; letter-spacing: 0.03em;
 }
-.dlg-merge-btn:hover { background: var(--bg-hover); border-color: var(--border-bright); color: var(--text-primary); }
+.dlg-merge-btn:hover { background: var(--hover); border-color: var(--border-hi); color: var(--t1); }
 .dlg-merge-btn.selected { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
 .dlg-merge-btn .dmb-title { font-size: 10px; font-weight: 600; display: block; margin-bottom: 2px; }
 .dlg-merge-btn .dmb-sub   { font-size: 8px; opacity: 0.75; display: block; }
@@ -328,16 +328,16 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   border-top: 1px solid var(--border); padding-top: 14px;
 }
 .dlg-btn {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
+  font-family: var(--fm); font-size: 10px; letter-spacing: 0.06em;
   padding: 7px 16px; border-radius: 4px; cursor: pointer;
   transition: all 0.12s; border: 1px solid var(--border);
   text-transform: uppercase;
 }
-.dlg-btn.cancel { background: var(--bg-panel2); color: var(--text-secondary); }
-.dlg-btn.cancel:hover { background: var(--bg-hover); color: var(--text-primary); }
+.dlg-btn.cancel { background: var(--panel2); color: var(--t2); }
+.dlg-btn.cancel:hover { background: var(--hover); color: var(--t1); }
 .dlg-btn.commit {
   background: var(--accent); border-color: var(--accent);
-  color: var(--bg-void); font-weight: 700;
+  color: var(--void); font-weight: 700;
   box-shadow: 0 0 12px rgba(0,212,255,0.25);
 }
 .dlg-btn.commit:hover { background: #33ddff; box-shadow: 0 0 18px rgba(0,212,255,0.4); }
@@ -350,18 +350,18 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   display: flex; align-items: center; justify-content: center;
 }
 #splash-dialog {
-  background: var(--bg-panel);
-  border: 1px solid var(--border-bright);
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
   border-radius: 8px;
   box-shadow: 0 24px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,212,255,0.1);
   width: 400px; max-width: 95vw;
-  font-family: var(--font-mono);
+  font-family: var(--fm);
   overflow: hidden;
 }
 #splash-dialog .dlg-head {
   display: flex; flex-direction: column; align-items: center;
   padding: 24px 20px 16px;
-  background: var(--bg-panel2);
+  background: var(--panel2);
   border-bottom: 1px solid var(--border);
   text-align: center;
 }
@@ -375,29 +375,29 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   border-radius: 50%; box-shadow: 0 0 10px var(--accent);
 }
 .splash-sub {
-  font-size: 10px; color: var(--text-dim);
+  font-size: 10px; color: var(--t3);
   letter-spacing: 0.14em; text-transform: uppercase;
 }
 #splash-dialog .dlg-body { padding: 20px; }
 .splash-prompt {
-  font-size: 11px; color: var(--text-secondary);
+  font-size: 11px; color: var(--t2);
   text-align: center; margin-bottom: 16px; letter-spacing: 0.04em;
   line-height: 1.6;
 }
-.splash-prompt strong { color: var(--text-primary); }
+.splash-prompt strong { color: var(--t1); }
 .splash-unit-grid {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 10px; margin-bottom: 20px;
 }
 .splash-unit-btn {
-  background: var(--bg-panel2); border: 1px solid var(--border);
+  background: var(--panel2); border: 1px solid var(--border);
   border-radius: 6px; padding: 18px 12px;
-  font-family: var(--font-mono); cursor: pointer;
+  font-family: var(--fm); cursor: pointer;
   transition: all 0.14s; text-align: center;
   display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
 .splash-unit-btn:hover {
-  background: var(--bg-hover); border-color: var(--border-bright);
+  background: var(--hover); border-color: var(--border-hi);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
@@ -408,10 +408,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 }
 .splash-unit-btn.mm-btn .sub-unit { color: var(--accent); }
 .splash-unit-btn.in-btn .sub-unit { color: var(--amber); }
-.splash-unit-btn .sub-name { font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
-.splash-unit-btn .sub-example { font-size: 10px; color: var(--text-secondary); }
+.splash-unit-btn .sub-name { font-size: 9px; color: var(--t3); letter-spacing: 0.1em; text-transform: uppercase; }
+.splash-unit-btn .sub-example { font-size: 10px; color: var(--t2); }
 .splash-note {
-  text-align: center; font-size: 9px; color: var(--text-dim);
+  text-align: center; font-size: 9px; color: var(--t3);
   letter-spacing: 0.06em; line-height: 1.5;
 }
 
@@ -425,16 +425,16 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
 #offset-popup-overlay.open { display: block; }
 #offset-popup {
   position: absolute;
-  background: var(--bg-panel);
+  background: var(--panel);
   border: 1px solid var(--accent);
   border-radius: 5px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,212,255,0.1);
   width: 230px;
-  font-family: var(--font-mono);
+  font-family: var(--fm);
   overflow: hidden;
 }
 #offset-popup .op-head {
-  background: var(--bg-panel2);
+  background: var(--panel2);
   border-bottom: 1px solid var(--border);
   padding: 7px 12px;
   font-size: 9px; color: var(--accent);
@@ -447,15 +447,15 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
 }
 #offset-popup-input {
-  flex: 1; background: var(--bg-panel2); border: 1px solid var(--border-bright);
-  border-radius: 3px; color: var(--accent); font-family: var(--font-mono);
+  flex: 1; background: var(--panel2); border: 1px solid var(--border-hi);
+  border-radius: 3px; color: var(--accent); font-family: var(--fm);
   font-size: 14px; padding: 6px 8px; outline: none; text-align: right;
   min-width: 0;
 }
 #offset-popup-input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
-.op-unit-label { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
-.op-hint { font-size: 9px; color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 10px; line-height: 1.5; }
-.op-hint b { color: var(--text-secondary); }
+.op-unit-label { font-size: 11px; color: var(--t3); flex-shrink: 0; }
+.op-hint { font-size: 9px; color: var(--t3); letter-spacing: 0.06em; margin-bottom: 10px; line-height: 1.5; }
+.op-hint b { color: var(--t2); }
 .op-actions { display: flex; gap: 6px; }
 .op-actions .dlg-btn { flex: 1; padding: 6px 8px; font-size: 9px; }
 </style>
@@ -506,6 +506,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="tb-menu-item" id="menu-draw" onmouseenter="openMenu('draw')" onmouseleave="scheduleClose()">Draw
       <div class="tb-dropdown" id="dd-draw" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
         <div class="tb-dd-item" onclick="setTool('line');closeMenus()">Line<span class="dd-key">L</span></div>
+        <div class="tb-dd-item" onclick="setTool('arc');closeMenus()">Arc (3-point)<span class="dd-key">A</span></div>
+        <div class="tb-dd-item" onclick="setTool('circle');closeMenus()">Circle<span class="dd-key">C</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="setTool('fillet');closeMenus()">Fillet<span class="dd-key">F</span></div>
         <div class="tb-dd-item" onclick="setTool('rect');closeMenus()">Rectangle<span class="dd-key">R</span></div>
         <div class="tb-dd-item" onclick="setTool('polygon');closeMenus()">Polygon<span class="dd-key">P</span></div>
         <div class="tb-dd-sep"></div>
@@ -525,7 +529,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     </div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge">v0.3.0</span>
+    <span class="tb-badge">v0.4.0</span>
     <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
       <span class="unit-divider"></span>
@@ -566,6 +570,18 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></div>
       <span class="tool-label">ROTATE</span>
     </button>
+    <button class="tool-btn" id="btn-arc" onclick="setTool('arc')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19a9 9 0 0 1 14 0"/><circle cx="5" cy="19" r="1.5" fill="currentColor"/><circle cx="19" cy="19" r="1.5" fill="currentColor"/></svg></div>
+      <span class="tool-label">ARC</span>
+    </button>
+    <button class="tool-btn" id="btn-circle" onclick="setTool('circle')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg></div>
+      <span class="tool-label">CIRCLE</span>
+    </button>
+    <button class="tool-btn" id="btn-fillet" onclick="setTool('fillet')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19 L5 8 Q5 5 8 5 L19 5"/></svg></div>
+      <span class="tool-label">FILLET</span>
+    </button>
   </div>
 
   <!-- Rotation controls (shown when rotate tool is active OR objects are selected) -->
@@ -574,12 +590,22 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <button class="rot-btn" onclick="rotateSelected(90)"  title="Rotate 90° clockwise (E)">↻90°</button>
     <label style="margin-left:2px;">Δ</label>
     <input type="number" id="rotate-angle-input" value="0" step="1" placeholder="0"/>
-    <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);">°</span>
+    <span style="font-family:var(--fm);font-size:9px;color:var(--t3);">°</span>
     <button class="rot-btn hi" onclick="applyRotationInput(false)" title="Rotate by typed angle (relative)">+Δ</button>
     <button class="rot-btn" onclick="applyRotationInput(true)" title="Set absolute angle">ABS</button>
     <button class="rot-btn" onclick="flattenSelection()" title="Rotate to 0° horizontal">→0°</button>
   </div>
 
+  <div id="arc-bar" style="display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-bottom:1px solid var(--border);flex-shrink:0;">
+    <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;">MODE</label>
+    <button id="arc-btn-3pt" onclick="setArcMode('3pt')" style="background:var(--accent-glow);border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:9px;padding:3px 7px;cursor:pointer;">3-Point</button>
+    <button id="arc-btn-csr" onclick="setArcMode('csr')" style="background:var(--panel);border:1px solid var(--border);border-radius:3px;color:var(--t2);font-family:var(--fm);font-size:9px;padding:3px 7px;cursor:pointer;">Ctr+R</button>
+  </div>
+  <div id="fillet-bar" style="display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-bottom:1px solid var(--border);flex-shrink:0;">
+    <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;">RADIUS</label>
+    <input type="number" id="fillet-r-input" value="5" min="0.0001" step="0.5" style="background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:11px;padding:3px 6px;width:60px;outline:none;text-align:right;"/>
+    <span id="fillet-r-unit" style="font-family:var(--fm);font-size:9px;color:var(--t3);">mm</span>
+  </div>
   <div id="offset-bar">
     <label>DIST</label>
     <input type="number" id="offset-dist-input" value="10" min="0.0001" step="0.5"/>
@@ -587,10 +613,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   </div>
 
   <!-- Polygon sides input (only shown for polygon tool) -->
-  <div id="poly-bar" style="display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--bg-panel2);border-bottom:1px solid var(--border);flex-shrink:0;">
-    <label style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;">SIDES</label>
-    <input type="number" id="poly-sides-input" value="6" min="3" max="64" step="1" style="background:var(--bg-panel);border:1px solid var(--border-bright);border-radius:3px;color:var(--accent);font-family:var(--font-mono);font-size:11px;padding:3px 6px;width:52px;outline:none;text-align:right;"/>
-    <label style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);text-transform:uppercase;">CIRC</label>
+  <div id="poly-bar" style="display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-bottom:1px solid var(--border);flex-shrink:0;">
+    <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;">SIDES</label>
+    <input type="number" id="poly-sides-input" value="6" min="3" max="64" step="1" style="background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:11px;padding:3px 6px;width:52px;outline:none;text-align:right;"/>
+    <label style="font-family:var(--fm);font-size:9px;color:var(--t3);text-transform:uppercase;">CIRC</label>
     <input type="checkbox" id="poly-inscribed" checked title="Inscribed (vertices on circle) vs circumscribed"/>
   </div>
 
@@ -627,7 +653,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
       <div class="coord-example"><b>100,50</b> — absolute X,Y</div>
       <div class="coord-example"><i>@50,-20</i> — relative dX,dY</div>
       <div class="coord-example"><em>@100&lt;45</em> — polar dist&lt;angle°</div>
-      <div class="coord-example" style="margin-top:4px;color:var(--text-dim);">Press <b>Enter</b> to commit · <b>Esc</b> to cancel · <b>U</b> to toggle units</div>
+      <div class="coord-example" style="margin-top:4px;color:var(--t3);">Press <b>Enter</b> to commit · <b>Esc</b> to cancel · <b>U</b> to toggle units</div>
     </div>
   </div>
 
@@ -665,7 +691,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <span><span class="coord-label">Y </span><span id="cy">0.0000</span></span>
     <span class="coord-label" id="coord-unit-lbl">mm</span>
   </div>
-  <div id="hint">Press <span>L</span> for Line · <span>R</span> for Rect · <span>P</span> for Polygon · Right-click for menu</div>
+  <div id="hint">Press <span>L</span> Line · <span>A</span> Arc · <span>C</span> Circle · <span>R</span> Rect · <span>P</span> Poly · <span>F</span> Fillet · Right-click</div>
 </div>
 
 <!-- STATUS BAR -->
@@ -675,6 +701,9 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   <div class="sb-item"><span>GRID</span><span class="sb-val" id="sb-grid">10mm</span></div>
   <div class="sb-right">
     <div class="sb-item"><span>L</span><span class="sb-val">line</span></div>
+    <div class="sb-item"><span>A</span><span class="sb-val">arc</span></div>
+    <div class="sb-item"><span>C</span><span class="sb-val">circle</span></div>
+    <div class="sb-item"><span>F</span><span class="sb-val">fillet</span></div>
     <div class="sb-item"><span>R</span><span class="sb-val">rect</span></div>
     <div class="sb-item"><span>P</span><span class="sb-val">poly</span></div>
     <div class="sb-item"><span>O</span><span class="sb-val">offset</span></div>
@@ -684,7 +713,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
     <div class="sb-item"><span>J</span><span class="sb-val">join</span></div>
     <div class="sb-item"><span>X</span><span class="sb-val">explode</span></div>
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
-    <div class="sb-item"><span class="sb-val ok">.KAD v0.3</span></div>
+    <div class="sb-item"><span class="sb-val ok">.KAD v0.4</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
       <span>© <span id="cc-year"></span> · Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" class="cc-link">CC BY-SA 4.0</a> · .KAD Kernel-Aided Design</span>
@@ -723,7 +752,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   </button>
   <div class="ctx-sep"></div>
   <div class="ctx-head">Draw</div>
-  <button class="ctx-item" onclick="setTool('line');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="4"/></svg>Line Tool<span class="ctx-key">L</span></button>
+  <button class="ctx-item" onclick="setTool('line');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="4"/></svg>Line<span class="ctx-key">L</span></button>
+  <button class="ctx-item" onclick="setTool('arc');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19a9 9 0 0 1 14 0"/></svg>Arc<span class="ctx-key">A</span></button>
+  <button class="ctx-item" onclick="setTool('circle');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg>Circle<span class="ctx-key">C</span></button>
+  <button class="ctx-item" onclick="setTool('fillet');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19 L5 8 Q5 5 8 5 L19 5"/></svg>Fillet<span class="ctx-key">F</span></button>
   <button class="ctx-item" onclick="setTool('rect');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>Rectangle<span class="ctx-key">R</span></button>
   <button class="ctx-item" onclick="setTool('polygon');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,3 21,9 17,20 7,20 3,9"/></svg>Polygon<span class="ctx-key">P</span></button>
   <button class="ctx-item" onclick="setTool('offset');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/></svg>Offset<span class="ctx-key">O</span></button>
@@ -795,7 +827,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-void)
   <div id="splash-dialog">
     <div class="dlg-head">
       <div class="splash-brand"><div class="splash-brand-dot"></div>.KAD</div>
-      <div class="splash-sub">Kernel-Aided Design · v0.3</div>
+      <div class="splash-sub">Kernel-Aided Design · v0.4</div>
     </div>
     <div class="dlg-body">
       <div class="splash-prompt">
@@ -997,6 +1029,92 @@ function toggleUnits() {
   showToast('Units: ' + (unitMode==='mm' ? 'millimeters (mm)' : 'inches (in)') + ' — geometry unchanged');
 }
 
+
+// ── ARC MATH HELPERS ────────────────────────────────────
+function normAngle(a){a=a%(2*Math.PI);return a<0?a+2*Math.PI:a;}
+function angleOnArc(a,startA,endA,ccw){
+  a=normAngle(a);startA=normAngle(startA);endA=normAngle(endA);
+  if(ccw){if(startA<=endA)return a>=startA&&a<=endA;return a>=startA||a<=endA;}
+  else{if(endA<=startA)return a>=endA&&a<=startA;return a>=endA||a<=startA;}
+}
+function arcBBox(cx,cy,r,startA,endA,ccw){
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  const pts=[{x:cx+r*Math.cos(startA),y:cy+r*Math.sin(startA)},{x:cx+r*Math.cos(endA),y:cy+r*Math.sin(endA)}];
+  for(const qa of[0,Math.PI/2,Math.PI,3*Math.PI/2]){if(angleOnArc(qa,startA,endA,ccw))pts.push({x:cx+r*Math.cos(qa),y:cy+r*Math.sin(qa)});}
+  for(const p of pts){minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);}
+  return{minX,maxX,minY,maxY};
+}
+function circumscribedCircle(p1,p2,p3){
+  const ax=p1.x,ay=p1.y,bx=p2.x,by=p2.y,cx=p3.x,cy=p3.y;
+  const D=2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));
+  if(Math.abs(D)<1e-10)return null;
+  const ux=((ax*ax+ay*ay)*(by-cy)+(bx*bx+by*by)*(cy-ay)+(cx*cx+cy*cy)*(ay-by))/D;
+  const uy=((ax*ax+ay*ay)*(cx-bx)+(bx*bx+by*by)*(ax-cx)+(cx*cx+cy*cy)*(bx-ax))/D;
+  const r=Math.hypot(ax-ux,ay-uy);
+  return{cx:parseFloat(ux.toFixed(6)),cy:parseFloat(uy.toFixed(6)),r:parseFloat(r.toFixed(6))};
+}
+function lineIntersectPt(l1,l2){
+  const dx1=l1.x2-l1.x1,dy1=l1.y2-l1.y1,dx2=l2.x2-l2.x1,dy2=l2.y2-l2.y1;
+  const denom=dx1*dy2-dy1*dx2;if(Math.abs(denom)<1e-10)return null;
+  const t=((l2.x1-l1.x1)*dy2-(l2.y1-l1.y1)*dx2)/denom;
+  return{x:l1.x1+t*dx1,y:l1.y1+t*dy1};
+}
+
+// ── ARC / CIRCLE / FILLET STATE ─────────────────────────
+let arcMode='3pt';
+let arcState={active:false,phase:0,p1:null,p2:null};
+let circleState={active:false,cx:0,cy:0};
+let filletState={active:false,firstLine:null};
+
+function setArcMode(m){
+  arcMode=m;
+  const btn3=document.getElementById('arc-btn-3pt');
+  const btnC=document.getElementById('arc-btn-csr');
+  btn3.style.background=m==='3pt'?'var(--accent-glow)':'var(--panel)';
+  btn3.style.borderColor=m==='3pt'?'var(--accent)':'var(--border)';
+  btn3.style.color=m==='3pt'?'var(--accent)':'var(--t2)';
+  btnC.style.background=m==='csr'?'var(--accent-glow)':'var(--panel)';
+  btnC.style.borderColor=m==='csr'?'var(--accent)':'var(--border)';
+  btnC.style.color=m==='csr'?'var(--accent)':'var(--t2)';
+  arcState={active:false,phase:0,p1:null,p2:null};render();
+}
+
+// ── FILLET ENGINE ────────────────────────────────────────
+function getFillet(){const r=parseFloat(document.getElementById('fillet-r-input').value)||5;return parseFloat(fromDisplay(r).toFixed(6));}
+function commitFillet(l1,l2){
+  const r=getFillet();if(r<=0){showToast('Enter a fillet radius > 0');return;}
+  const inter=lineIntersectPt(l1,l2);if(!inter){showToast('Lines are parallel');return;}
+  const len1=Math.hypot(l1.x2-l1.x1,l1.y2-l1.y1),len2=Math.hypot(l2.x2-l2.x1,l2.y2-l2.y1);
+  if(len1<1e-10||len2<1e-10){showToast('Degenerate line');return;}
+  const iv=inter;
+  const mid1x=(l1.x1+l1.x2)/2,mid1y=(l1.y1+l1.y2)/2,mid2x=(l2.x1+l2.x2)/2,mid2y=(l2.y1+l2.y2)/2;
+  let u1x=mid1x-iv.x,u1y=mid1y-iv.y,u2x=mid2x-iv.x,u2y=mid2y-iv.y;
+  const ul1=Math.hypot(u1x,u1y)||1;u1x/=ul1;u1y/=ul1;
+  const ul2=Math.hypot(u2x,u2y)||1;u2x/=ul2;u2y/=ul2;
+  const bx_=u1x+u2x,by_=u1y+u2y,bl=Math.hypot(bx_,by_);
+  if(bl<1e-10){showToast('Cannot compute bisector');return;}
+  const bnx=bx_/bl,bny=by_/bl;
+  const halfAngle=Math.acos(Math.max(-1,Math.min(1,u1x*u2x+u1y*u2y)))/2;
+  if(Math.abs(halfAngle)<1e-6){showToast('Lines are collinear');return;}
+  const dist=r/Math.sin(halfAngle);
+  const fcx=iv.x+bnx*dist,fcy=iv.y+bny*dist;
+  const tp1d=u1x*(fcx-iv.x)+u1y*(fcy-iv.y),tp1={x:iv.x+u1x*tp1d,y:iv.y+u1y*tp1d};
+  const tp2d=u2x*(fcx-iv.x)+u2y*(fcy-iv.y),tp2={x:iv.x+u2x*tp2d,y:iv.y+u2y*tp2d};
+  const startA=Math.atan2(tp1.y-fcy,tp1.x-fcx),endA=Math.atan2(tp2.y-fcy,tp2.x-fcx);
+  const midAng=(startA+endA)/2;
+  const testPt={x:fcx+r*Math.cos(midAng),y:fcy+r*Math.sin(midAng)};
+  const ccw=Math.hypot(testPt.x-iv.x,testPt.y-iv.y)<dist;
+  const l1ks=Math.hypot(l1.x1-iv.x,l1.y1-iv.y)>Math.hypot(l1.x2-iv.x,l1.y2-iv.y);
+  const l1a=l1ks?{x:l1.x1,y:l1.y1}:{x:l1.x2,y:l1.y2};
+  const l2ks=Math.hypot(l2.x1-iv.x,l2.y1-iv.y)>Math.hypot(l2.x2-iv.x,l2.y2-iv.y);
+  const l2a=l2ks?{x:l2.x1,y:l2.y1}:{x:l2.x2,y:l2.y2};
+  GeoMemory.remove(l1.id);GeoMemory.remove(l2.id);
+  GeoMemory.addLine(l1a.x,l1a.y,tp1.x,tp1.y,l1.layer);
+  GeoMemory.addLine(l2a.x,l2a.y,tp2.x,tp2.y,l2.layer);
+  GeoMemory.addArc(fcx,fcy,r,startA,endA,ccw,l1.layer);
+  showToast('Fillet r='+fmtU(r)+' committed');render();
+}
+
 // ── GEO MEMORY ──────────────────────────────────────────
 const GeoMemory = {
   objects:[], nextId:1,
@@ -1016,6 +1134,8 @@ const GeoMemory = {
              pts: pts.map(p=>({x:parseFloat(p.x.toFixed(6)), y:parseFloat(p.y.toFixed(6))}))};
     this.objects.push(o); updateProps(); return o;
   },
+  addCircle(cx,cy,r,layer='Layer_0'){const o={id:this.nextId++,type:'CIRCLE',layer,cx:parseFloat(cx.toFixed(6)),cy:parseFloat(cy.toFixed(6)),r:parseFloat(r.toFixed(6))};this.objects.push(o);updateProps();return o;},
+  addArc(cx,cy,r,startA,endA,ccw=true,layer='Layer_0'){const o={id:this.nextId++,type:'ARC',layer,cx:parseFloat(cx.toFixed(6)),cy:parseFloat(cy.toFixed(6)),r:parseFloat(r.toFixed(6)),startA:parseFloat(startA.toFixed(8)),endA:parseFloat(endA.toFixed(8)),ccw};this.objects.push(o);updateProps();return o;},
   remove(id) {
     this.objects = this.objects.filter(o=>o.id!==id); updateProps();
   },
@@ -1029,6 +1149,13 @@ const GeoMemory = {
         pts.push({x:o.x2,y:o.y2});
       } else if(o.type==='POLYLINE'){
         for(const p of o.pts) pts.push({x:p.x, y:p.y});
+      } else if(o.type==='CIRCLE'){
+        pts.push({x:o.cx,y:o.cy});pts.push({x:o.cx+o.r,y:o.cy});pts.push({x:o.cx-o.r,y:o.cy});
+        pts.push({x:o.cx,y:o.cy+o.r});pts.push({x:o.cx,y:o.cy-o.r});
+      } else if(o.type==='ARC'){
+        pts.push({x:o.cx+o.r*Math.cos(o.startA),y:o.cy+o.r*Math.sin(o.startA)});
+        pts.push({x:o.cx+o.r*Math.cos(o.endA),  y:o.cy+o.r*Math.sin(o.endA)});
+        pts.push({x:o.cx,y:o.cy});
       }
     }
     return pts;
@@ -1747,6 +1874,45 @@ function getActivePivot() {
   return selectionCentroid() || { x: 0, y: 0 };
 }
 
+function drawCirclePreview(){
+  if(activeTool!=='circle'||!circleState.active)return;
+  const sc=worldToScreen(circleState.cx,circleState.cy);
+  const ep=snapActive&&snapPoint?snapPoint:mouseWorld;
+  const r=Math.hypot(ep.x-circleState.cx,ep.y-circleState.cy)*cam.zoom;
+  ctx.save();ctx.strokeStyle='rgba(0,212,255,0.6)';ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.arc(sc.x,sc.y,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  const sep=worldToScreen(ep.x,ep.y);ctx.strokeStyle='rgba(0,212,255,0.3)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(sc.x,sc.y);ctx.lineTo(sep.x,sep.y);ctx.stroke();
+  drawDot(sc.x,sc.y,C.entity,3);ctx.restore();
+}
+
+function drawArcPreview(){
+  if(activeTool!=='arc'||arcState.phase===0)return;
+  const ep=snapActive&&snapPoint?snapPoint:mouseWorld;
+  ctx.save();ctx.strokeStyle='rgba(0,212,255,0.6)';ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
+  if(arcState.phase===1){
+    const sp1=worldToScreen(arcState.p1.x,arcState.p1.y);
+    const sep=worldToScreen(ep.x,ep.y);
+    ctx.beginPath();ctx.moveTo(sp1.x,sp1.y);ctx.lineTo(sep.x,sep.y);ctx.stroke();
+    drawDot(sp1.x,sp1.y,C.entity,3);
+  }else if(arcState.phase===2){
+    const circ=circumscribedCircle(arcState.p1,arcState.p2,ep);
+    if(circ){
+      const{cx,cy,r}=circ;const sc=worldToScreen(cx,cy);const sr=r*cam.zoom;
+      const startA=Math.atan2(arcState.p1.y-cy,arcState.p1.x-cx);
+      const midA=Math.atan2(arcState.p2.y-cy,arcState.p2.x-cx);
+      const endA=Math.atan2(ep.y-cy,ep.x-cx);
+      const ccw=angleOnArc(normAngle(midA),normAngle(startA),normAngle(endA),true);
+      ctx.beginPath();ctx.arc(sc.x,sc.y,sr,-endA,-startA,!ccw);ctx.stroke();
+      const sp1=worldToScreen(arcState.p1.x,arcState.p1.y);
+      const sp2=worldToScreen(arcState.p2.x,arcState.p2.y);
+      const sep=worldToScreen(ep.x,ep.y);
+      drawDot(sp1.x,sp1.y,C.entity,3);drawDot(sp2.x,sp2.y,C.entity,2);drawDot(sep.x,sep.y,C.entity,3);
+    }
+  }
+  ctx.setLineDash([]);ctx.restore();
+}
+
 function drawRotatePreview() {
   if (activeTool !== 'rotate') return;
   ctx.save();
@@ -1776,7 +1942,7 @@ function drawRotatePreview() {
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(sp.x+12, sp.y-16, 76, 16);
     ctx.fillStyle = 'rgba(255,170,0,0.9)';
-    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.font = '9px Fira Code, monospace';
     ctx.fillText('drag to move pivot', sp.x+15, sp.y-4);
   }
 
@@ -1807,7 +1973,7 @@ function drawRotatePreview() {
 
     // Live angle readout
     ctx.fillStyle = 'rgba(0,212,255,0.95)';
-    ctx.font      = '10px JetBrains Mono, monospace';
+    ctx.font      = '10px Fira Code, monospace';
     ctx.fillText(delta.toFixed(2) + '°', cur.x + 14, cur.y - 8);
   }
 
@@ -1841,6 +2007,9 @@ function cancelTool() {
   rectState   = {active:false};
   polyState   = {active:false};
   offsetState = {active:false, selectedLine:null, previewPts:null};
+  circleState = {active:false};
+  arcState = {active:false,phase:0,p1:null,p2:null};
+  filletState = {active:false,firstLine:null};
   rotateState = {phase:0,pivotX:0,pivotY:0,pivotSet:false,draggingPivot:false,startAngle:0,previewDelta:0};
   selBox      = {active:false, pending:false, startSX:0, startSY:0, startWX:0, startWY:0};
   document.getElementById('rect-preview').style.display='none';
@@ -1860,15 +2029,15 @@ function setTool(tool) {
   activeTool = tool;
 
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate'};
+  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet'};
   if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
 
   document.getElementById('sb-mode').textContent=tool.toUpperCase();
 
-  // Offset bar
-  document.getElementById('offset-bar').style.display = tool==='offset'?'flex':'none';
-  // Poly bar
-  document.getElementById('poly-bar').style.display   = tool==='polygon'?'flex':'none';
+  document.getElementById('offset-bar').style.display  = tool==='offset'?'flex':'none';
+  document.getElementById('poly-bar').style.display    = tool==='polygon'?'flex':'none';
+  document.getElementById('arc-bar').style.display     = tool==='arc'?'flex':'none';
+  document.getElementById('fillet-bar').style.display  = tool==='fillet'?'flex':'none';
   // Rotate bar — show when rotate tool OR when something is selected
   const rotateBar = document.getElementById('rotate-bar');
   if (tool === 'rotate') rotateBar.classList.add('visible');
@@ -1876,7 +2045,10 @@ function setTool(tool) {
 
   const hintMap = {
     select:  'Click line to select · Shift+click multi · <span>Drag</span> selection box · Middle-drag to pan · <span>Del</span> delete',
-    line:    '<span>Click</span> start → <span>click</span> end · Type to enter coords · <span>Enter</span> closes · <span>Esc</span> cancel',
+    line:    '<span>Click</span> start → end · Type coords · <span>Enter</span> commits · <span>Esc</span> cancel',
+    arc:     '<span>Click</span> pt1 → pt2 → pt3 for 3-point arc · <span>Esc</span> cancel',
+    circle:  '<span>Click</span> center → <span>click</span> radius',
+    fillet:  '<span>Click</span> first line → <span>click</span> second line · Radius in sidebar',
     rect:    '<span>Click</span> corner → <span>click</span> opposite corner',
     polygon: '<span>Click</span> center → <span>click</span> to set radius & rotation',
     offset:  '<span>Click</span> a line → move cursor to side → <span>click</span> to commit',
@@ -2098,6 +2270,46 @@ function onMouseDown(e) {
       render(); return;
     }
 
+    if(activeTool==='arc') {
+      if(dynVisible)return;
+      const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
+      if(arcState.phase===0){arcState={active:true,phase:1,p1:{x:wp.x,y:wp.y},p2:null};}
+      else if(arcState.phase===1){arcState.phase=2;arcState.p2={x:wp.x,y:wp.y};}
+      else{
+        const circ=circumscribedCircle(arcState.p1,arcState.p2,{x:wp.x,y:wp.y});
+        if(!circ){showToast('Points collinear — cannot form arc');arcState={active:false,phase:0};render();return;}
+        const{cx,cy,r}=circ;
+        const startA=Math.atan2(arcState.p1.y-cy,arcState.p1.x-cx);
+        const midA  =Math.atan2(arcState.p2.y-cy,arcState.p2.x-cx);
+        const endA  =Math.atan2(wp.y-cy,wp.x-cx);
+        const ccw=angleOnArc(normAngle(midA),normAngle(startA),normAngle(endA),true);
+        GeoMemory.addArc(cx,cy,r,startA,endA,ccw);
+        showToast('Arc r='+fmtU(r));arcState={active:false,phase:0,p1:null,p2:null};
+      }
+      render();return;
+    }
+
+    if(activeTool==='circle') {
+      if(dynVisible)return;
+      const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
+      if(!circleState.active){circleState={active:true,cx:wp.x,cy:wp.y};}
+      else{
+        const r=Math.hypot(wp.x-circleState.cx,wp.y-circleState.cy);
+        if(r<1e-6){showToast('Circle too small');return;}
+        GeoMemory.addCircle(circleState.cx,circleState.cy,r);
+        showToast('Circle r='+fmtU(r));circleState={active:false};
+      }
+      render();return;
+    }
+
+    if(activeTool==='fillet') {
+      const hit=pickLine(mouseScreen.x,mouseScreen.y);
+      if(!hit){showToast('Click closer to a line');return;}
+      if(!filletState.firstLine){filletState={active:true,firstLine:hit};showToast('First line selected — click second line');}
+      else{if(hit.id===filletState.firstLine.id){showToast('Click a different line');return;}commitFillet(filletState.firstLine,hit);filletState={active:false,firstLine:null};}
+      render();return;
+    }
+
     if(activeTool==='rotate') {
       // If nothing selected, allow point-pick or box-select first
       if(selectedIds.size===0){
@@ -2314,6 +2526,9 @@ function onKeyDown(e) {
 
   if(!e.ctrlKey&&!e.metaKey&&!e.altKey){
     if(k==='l'||k==='L') setTool('line');
+    if(k==='a'||k==='A') setTool('arc');
+    if(k==='c'||k==='C') setTool('circle');
+    if(k==='f'||k==='F') setTool('fillet');
     if(k==='r'||k==='R') setTool('rect');
     if(k==='p'||k==='P') setTool('polygon');
     if(k==='s'||k==='S') setTool('select');
@@ -2387,6 +2602,13 @@ function zoomExtents() {
         x0=Math.min(x0,p.x); x1=Math.max(x1,p.x);
         y0=Math.min(y0,p.y); y1=Math.max(y1,p.y);
       }
+    } else if(o.type==='CIRCLE'){
+      x0=Math.min(x0,o.cx-o.r);x1=Math.max(x1,o.cx+o.r);
+      y0=Math.min(y0,o.cy-o.r);y1=Math.max(y1,o.cy+o.r);
+    } else if(o.type==='ARC'){
+      const bb=arcBBox(o.cx,o.cy,o.r,o.startA,o.endA,o.ccw);
+      x0=Math.min(x0,bb.minX);x1=Math.max(x1,bb.maxX);
+      y0=Math.min(y0,bb.minY);y1=Math.max(y1,bb.maxY);
     }
   }
   const rx=(x1-x0)||20, ry=(y1-y0)||20, pad=0.15;
@@ -2435,6 +2657,8 @@ function render() {
   drawRubberBand();
   drawOffsetPreview();
   drawPolyPreview();
+  drawCirclePreview();
+  drawArcPreview();
   drawRotatePreview();
   drawSelBox();
 }
@@ -2503,6 +2727,22 @@ function drawEntities() {
     } else if(o.type==='POINT'){
       const p=worldToScreen(o.x,o.y);
       drawDot(p.x,p.y,C.point);
+    } else if(o.type==='CIRCLE'){
+      const sc=worldToScreen(o.cx,o.cy);const sr=o.r*cam.zoom;
+      if(sel){ctx.shadowColor='rgba(255,170,0,0.5)';ctx.shadowBlur=10;}
+      ctx.strokeStyle=sel?C.entitySel:C.entity;ctx.lineWidth=sel?2:1.2;
+      ctx.beginPath();ctx.arc(sc.x,sc.y,sr,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
+      ctx.lineWidth=0.5;ctx.strokeStyle=sel?C.entitySel:'rgba(0,212,255,0.3)';
+      ctx.beginPath();ctx.moveTo(sc.x-6,sc.y);ctx.lineTo(sc.x+6,sc.y);ctx.moveTo(sc.x,sc.y-6);ctx.lineTo(sc.x,sc.y+6);ctx.stroke();
+      drawDot(sc.x,sc.y,sel?C.entitySel:C.entity,1.5);
+    } else if(o.type==='ARC'){
+      const sc=worldToScreen(o.cx,o.cy);const sr=o.r*cam.zoom;
+      if(sel){ctx.shadowColor='rgba(255,170,0,0.5)';ctx.shadowBlur=10;}
+      ctx.strokeStyle=sel?C.entitySel:C.entity;ctx.lineWidth=sel?2:1.2;
+      ctx.beginPath();ctx.arc(sc.x,sc.y,sr,-o.endA,-o.startA,!o.ccw);ctx.stroke();ctx.shadowBlur=0;
+      const sp1=worldToScreen(o.cx+o.r*Math.cos(o.startA),o.cy+o.r*Math.sin(o.startA));
+      const sp2=worldToScreen(o.cx+o.r*Math.cos(o.endA),  o.cy+o.r*Math.sin(o.endA));
+      drawDot(sp1.x,sp1.y,sel?C.entitySel:C.entity);drawDot(sp2.x,sp2.y,sel?C.entitySel:C.entity);
     }
   }
   ctx.restore();
@@ -2575,7 +2815,7 @@ function drawRubberBand() {
       ctx.stroke();
       // Label
       ctx.fillStyle = C.startPt;
-      ctx.font = '9px JetBrains Mono, monospace';
+      ctx.font = '9px Fira Code, monospace';
       ctx.fillText('close', chainStart.x + 10, chainStart.y - 8);
     }
   }
@@ -2959,6 +3199,10 @@ function commitDxfImport() {
   }
 
   render();
+  for(const o of _dxfParsed.arcs){
+    const startA=o.startA*Math.PI/180,endA=o.endA*Math.PI/180;
+    GeoMemory.addArc(o.cx*S,o.cy*S,o.r*S,startA,endA,true,o.layer);
+  }
   zoomExtents();
 
   const unitLabel = unitSel==='auto'
@@ -3019,8 +3263,9 @@ function newDocument() {
 function updateProps() {
   const lines    = GeoMemory.objects.filter(o=>o.type==='LINE').length;
   const polys    = GeoMemory.objects.filter(o=>o.type==='POLYLINE').length;
+  const arcs2=GeoMemory.objects.filter(o=>o.type==='ARC'||o.type==='CIRCLE').length;
   document.getElementById('prop-objects').textContent = GeoMemory.objects.length;
-  document.getElementById('prop-lines').textContent   = lines + (polys ? ` (+${polys} poly)` : '');
+  document.getElementById('prop-lines').textContent   = lines + (polys?` +${polys}pl`:'') + (arcs2?` +${arcs2}arc`:'');
 }
 
 let toastT;
@@ -3030,19 +3275,22 @@ function showToast(msg) {
 }
 
 // ── INIT ────────────────────────────────────────────────
-resizeCanvas();
-initCamera();
-setTool('select');
-canvas.focus();
-document.getElementById('cc-year').textContent = new Date().getFullYear();
-initSplash();
-
-setTimeout(()=>{
-  GeoMemory.addLine(-15,0,15,0);
-  GeoMemory.addLine(0,-15,0,15);
-  render();
-  showToast('Demo loaded · origin cross ±15mm · Right-click for menu · Press L/R/P to draw');
-}, 250);
+requestAnimationFrame(()=>{
+  requestAnimationFrame(()=>{
+    resizeCanvas();
+    initCamera();
+    setTool('select');
+    canvas.focus();
+    document.getElementById('cc-year').textContent = new Date().getFullYear();
+    initSplash();
+    setTimeout(()=>{
+      GeoMemory.addLine(-15,0,15,0);
+      GeoMemory.addLine(0,-15,0,15);
+      render();
+      showToast('Demo loaded · Press L/A/C/R/P/F to draw');
+    },100);
+  });
+});
 </script>
 </body>
 </html>
