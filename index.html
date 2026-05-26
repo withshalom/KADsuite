@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>.KAD — Kernel-Aided Design</title>
+<title>KAD — Kernel-Aided Design</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
 
@@ -35,7 +35,7 @@
 html, body { width:100%; height:100%; overflow:hidden; background:var(--void); color:var(--t1); font-family:var(--fd); font-size:13px; }
 
 /* ── LAYOUT ── */
-#app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 1fr var(--status-h); width:100vw; height:100vh; }
+#app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr var(--status-h); width:100vw; height:100vh; }
 
 /* ── TOPBAR ── */
 #topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
@@ -347,9 +347,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
   background: rgba(4,6,10,0.92);
   backdrop-filter: blur(6px);
   z-index: 900;
-  display: none; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
 }
-#splash-overlay.visible { display: flex; }
 #splash-dialog {
   background: var(--panel);
   border: 1px solid var(--border-hi);
@@ -459,14 +458,242 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
 .op-hint b { color: var(--t2); }
 .op-actions { display: flex; gap: 6px; }
 .op-actions .dlg-btn { flex: 1; padding: 6px 8px; font-size: 9px; }
+/* ── SCAD EXPORT DIALOG ── */
+#scad-export-overlay {
+  position: fixed; inset: 0;
+  background: rgba(4,6,10,0.82);
+  backdrop-filter: blur(3px);
+  z-index: 800;
+  display: none; align-items: center; justify-content: center;
+}
+#scad-export-overlay.open { display: flex; }
+#scad-export-dialog {
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,170,0,0.1);
+  width: 420px; max-width: 95vw;
+  font-family: var(--fm);
+  overflow: hidden;
+}
+#scad-export-dialog .dlg-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+}
+#scad-export-dialog .dlg-title {
+  font-size: 11px; font-weight: 500; color: var(--amber);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+#scad-export-dialog .dlg-close {
+  background: none; border: none; color: var(--t3);
+  cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px;
+  transition: color 0.1s;
+}
+#scad-export-dialog .dlg-close:hover { color: var(--t1); }
+#scad-export-dialog .dlg-body { padding: 14px 16px; }
+.scad-section-label {
+  font-size: 9px; color: var(--t3); letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 8px; margin-top: 12px;
+}
+.scad-section-label:first-child { margin-top: 0; }
+.scad-mode-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 4px;
+}
+.scad-mode-btn {
+  background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 8px 6px;
+  cursor: pointer; text-align: center;
+  transition: all 0.15s; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+}
+.scad-mode-btn:hover { border-color: var(--border-hi); background: var(--hover); }
+.scad-mode-btn.selected {
+  border-color: var(--amber); background: rgba(255,170,0,0.08);
+}
+.scad-mode-btn .smb-title {
+  font-size: 10px; color: var(--t1); font-weight: 500; letter-spacing: 0.04em;
+}
+.scad-mode-btn.selected .smb-title { color: var(--amber); }
+.scad-mode-btn .smb-sub {
+  font-size: 8px; color: var(--t3); line-height: 1.3; letter-spacing: 0.03em;
+}
+.scad-extrude-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0 4px; border-top: 1px solid var(--border); margin-top: 10px;
+}
+.scad-extrude-row label {
+  font-size: 9px; color: var(--t3); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+}
+#scad-extrude-h {
+  background: var(--panel); border: 1px solid var(--border-hi); border-radius: 3px;
+  color: var(--amber); font-family: var(--fm); font-size: 11px;
+  padding: 4px 8px; width: 70px; outline: none; text-align: right;
+}
+#scad-extrude-h:focus { border-color: var(--amber); }
+.scad-hint {
+  font-size: 9px; color: var(--t3); line-height: 1.6; margin-top: 10px;
+  padding: 8px 10px; background: var(--panel2); border-radius: 4px;
+  border: 1px solid var(--border);
+}
+.scad-hint code { color: var(--accent); font-family: var(--fm); }
+.scad-hint b { color: var(--amber); }
+
+/* ── KERFsuite suite tokens (override/align) ── */
+:root {
+  --fm: 'Fira Code', monospace;
+  --fd: 'Syne', sans-serif;
+}
+
+/* ── KANVAS tab system ── */
+.tab-bar {
+  display: flex; align-items: stretch;
+  background: var(--panel); border-bottom: 1px solid var(--border);
+  padding: 0 8px; gap: 2px; flex-shrink: 0;
+  font-family: var(--fm); height: 32px;
+  grid-column: 1 / -1;
+}
+.tab-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 14px; cursor: pointer; font-size: 10px;
+  color: var(--t2); letter-spacing: 0.1em; text-transform: uppercase;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.tab-item:hover { color: var(--t1); }
+.tab-item.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-item.kanvas-tab.active { color: #00d4c8; border-bottom-color: #00d4c8; }
+.tab-item.kanvas-tab.active .tab-mark { background: linear-gradient(135deg,#00d4c8,#00a89e); }
+.tab-mark {
+  width: 14px; height: 14px; border-radius: 3px;
+  background: var(--t3); display: flex; align-items: center; justify-content: center;
+  font-size: 6px; color: #000; font-weight: 700; flex-shrink: 0;
+}
+
+/* ── Model / KANVAS pane wrappers ── */
+#model-pane  { display: flex; flex: 1; overflow: hidden; grid-column: 1 / -1; }
+#kanvas-pane { display: none; flex: 1; overflow: hidden; position: relative; grid-column: 1 / -1; }
+body.kanvas-mode #kanvas-pane { display: flex; }
+body.kanvas-mode #model-pane  { display: none; }
+
+/* ── KANVAS sidebar ── */
+#kanvas-sidebar {
+  width: var(--sidebar-w); background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ── KV tool buttons ── */
+.kv-tool-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px;
+}
+.kv-tbtn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px; background: rgba(255,255,255,0.03);
+  border: 1px solid transparent; border-radius: 6px;
+  cursor: pointer; transition: all 0.13s;
+}
+.kv-tbtn:hover { background: rgba(255,255,255,0.07); }
+.kv-tbtn.act { background: rgba(0,212,200,0.08); border-color: rgba(0,212,200,0.35); }
+.kv-tbtn .kv-ti { width: 18px; height: 18px; }
+.kv-tbtn .kv-ti svg { width: 100%; height: 100%; stroke: var(--t2); fill: none; stroke-width: 1.5; }
+.kv-tbtn.act .kv-ti svg { stroke: #00d4c8; }
+.kv-tbtn .kv-tl { font-family: var(--fm); font-size: 7px; color: var(--t3); letter-spacing: 0.12em; }
+.kv-tbtn.act .kv-tl { color: #00d4c8; }
+
+/* ── Dimensioning standard buttons ── */
+.kv-dim-row {
+  display: none; gap: 3px; padding: 4px 8px; flex-wrap: wrap;
+}
+.kv-dim-btn {
+  font-family: var(--fm); font-size: 8px; padding: 3px 7px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--t2); cursor: pointer; letter-spacing: 0.06em;
+}
+.kv-dim-btn.act { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: var(--accent); }
+
+/* ── Weld symbol controls ── */
+.kv-weld-row { display: none; flex-direction: column; gap: 4px; padding: 4px 8px; }
+.kv-weld-select {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--t2); font-family: var(--fm); font-size: 9px;
+  padding: 3px 6px; outline: none;
+}
+
+/* ── KV brush controls ── */
+.kv-brush-panel { padding: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
+.kv-sl-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.kv-sl-lbl { font-family: var(--fm); font-size: 8px; color: var(--t3);
+  letter-spacing: 0.1em; width: 36px; flex-shrink: 0; text-transform: uppercase; }
+.kv-sl { flex: 1; height: 2px; accent-color: #00d4c8; cursor: pointer; }
+.kv-sl-val { font-family: var(--fm); font-size: 8px; color: var(--t2); min-width: 26px; text-align: right; }
+
+/* ── KV color ── */
+.kv-color-row { display: flex; align-items: center; gap: 6px; padding: 6px 8px; }
+.kv-color-chip { width: 26px; height: 26px; border-radius: 5px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+.kv-swatches { display: flex; flex-wrap: wrap; gap: 3px; padding: 0 8px 8px; }
+.kv-swatch { width: 16px; height: 16px; border-radius: 3px; cursor: pointer;
+  border: 1px solid transparent; transition: all 0.1s; }
+.kv-swatch:hover { transform: scale(1.2); border-color: rgba(255,255,255,0.3); }
+
+/* ── KV page size ── */
+.kv-page-sel {
+  width: calc(100% - 16px); margin: 0 8px 8px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--t2); font-family: var(--fm); font-size: 9px;
+  padding: 4px 6px; outline: none;
+}
+
+/* ── KV layers ── */
+.kv-layer-item {
+  display: flex; align-items: center; gap: 6px; padding: 5px 8px;
+  font-family: var(--fm); font-size: 9px; color: var(--t2);
+  cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background 0.1s;
+}
+.kv-layer-item:hover { background: rgba(255,255,255,0.04); }
+.kv-layer-item.active { color: #00d4c8; background: rgba(0,212,200,0.05); }
+.kv-layer-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── KV export buttons ── */
+.kv-export-row { display: flex; flex-direction: column; gap: 3px; padding: 8px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); }
+.kv-export-btn {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px;
+  font-family: var(--fm); font-size: 9px; letter-spacing: 0.06em;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 5px; cursor: pointer; color: var(--t2); transition: all 0.13s;
+}
+.kv-export-btn:hover { color: var(--t1); border-color: rgba(255,255,255,0.18); }
+.kv-export-btn.vad { color: #00d4c8; border-color: rgba(0,212,200,0.25); }
+.kv-export-btn.svg { color: var(--green); border-color: rgba(0,255,157,0.2); }
+.kv-export-btn.pdf { color: var(--t2); }
+.kv-export-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; }
+
+/* ── KANVAS canvas area ── */
+#kanvas-canvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+
+/* ── Sidebar reorganize: DELETE always at bottom ── */
+.tool-grid-bottom { margin-top: auto; padding: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
+
+/* ── KANVAS mode accent ── */
+body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba(0,212,200,0.15); }
+
+/* ── Print ── */
+@media print {
+  #topbar, #sidebar, #status-bar { display: none !important; }
+  #kanvas-pane { display: flex !important; }
+  body { background: white; }
+}
+
 </style>
-</head>
 <body>
 <div id="app">
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div class="brand"><div class="brand-dot"></div><span>.KAD</span><div class="brand-sub">Kernel-Aided Design</div></div>
+  <div class="brand"><div class="brand-dot"></div><span>.KAD</span><div class="brand-sub" id="brand-sub">Kernel-Aided Design</div></div>
   <div class="tb-sep"></div>
   <div class="tb-menu">
     <div class="tb-menu-item" id="menu-file" onmouseenter="openMenu('file')" onmouseleave="scheduleClose()">File
@@ -477,13 +704,14 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
         <div class="tb-dd-item" onclick="document.getElementById('load-kad').click();closeMenus()">Open .kad<span class="dd-key">Ctrl+O</span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="exportDXF();closeMenus()">Export .dxf<span class="dd-key">Ctrl+E</span></div>
+        <div class="tb-dd-item" onclick="exportSCAD();closeMenus()">Export .scad<span class="dd-key">Ctrl+Shift+E</span></div>
         <div class="tb-dd-item" onclick="document.getElementById('load-dxf').click();closeMenus()">Import .dxf<span class="dd-key"></span></div>
       </div>
     </div>
     <div class="tb-menu-item" id="menu-edit" onmouseenter="openMenu('edit')" onmouseleave="scheduleClose()">Edit
       <div class="tb-dropdown" id="dd-edit" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
         <div class="tb-dd-item" onclick="deleteSelected();closeMenus()">Delete Selected<span class="dd-key">Del</span></div>
-        <div class="tb-dd-item" onclick="GeoMemory.clear();render();showToast('Canvas cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
+        <div class="tb-dd-item" onclick="GeoMemory.clear();render();showToast('KANVAS cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="joinSelected();closeMenus()">Join → Polyline<span class="dd-key">J</span></div>
         <div class="tb-dd-item" onclick="explodeSelected();closeMenus()">Explode Polyline<span class="dd-key">X</span></div>
@@ -518,19 +746,23 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
         <div class="tb-dd-item" onclick="flattenSelection();closeMenus()">Flatten to 0°<span class="dd-key">0</span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="setTool('offset');closeMenus()">Offset<span class="dd-key">O</span></div>
+        <div class="tb-dd-item" onclick="setTool('mirror');closeMenus()">Mirror<span class="dd-key">M</span></div>
+        <div class="tb-dd-item" onclick="setTool('measure');closeMenus()">Measure<span class="dd-key">D</span></div>
       </div>
     </div>
     <div class="tb-menu-item" id="menu-tools" onmouseenter="openMenu('tools')" onmouseleave="scheduleClose()">Tools
       <div class="tb-dropdown" id="dd-tools" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
         <div class="tb-dd-item" onclick="zoomExtents();closeMenus()">Zoom Extents<span class="dd-key">Z</span></div>
         <div class="tb-dd-item" onclick="setTool('offset');closeMenus()">Offset Tool<span class="dd-key">O</span></div>
+        <div class="tb-dd-item" onclick="setTool('mirror');closeMenus()">Mirror Tool<span class="dd-key">M</span></div>
+        <div class="tb-dd-item" onclick="setTool('measure');closeMenus()">Measure Tool<span class="dd-key">D</span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="showCoordHelp();closeMenus()">Coordinate Help<span class="dd-key">?</span></div>
       </div>
     </div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge">v0.4.0</span>
+    <span class="tb-badge">v0.6.0-gamma</span>
     <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
       <span class="unit-divider"></span>
@@ -538,6 +770,20 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
     </button>
   </div>
 </div>
+
+
+<!-- ── MODEL / KANVAS TAB BAR ── -->
+<div class="tab-bar">
+  <div class="tab-item active" id="kad-tab-model" onclick="kadSwitchTab('model')">
+    <div class="tab-mark">KD</div>Model Space
+  </div>
+  <div class="tab-item kanvas-tab" id="kad-tab-kanvas" onclick="kadSwitchTab('kanvas')">
+    <div class="tab-mark" style="background:linear-gradient(135deg,#00d4c8,#00a89e);color:#000;">KV</div>KANVAS
+  </div>
+</div>
+
+<!-- ── PANE WRAPPERS ── -->
+<div id="model-pane">
 
 <!-- SIDEBAR -->
 <div id="sidebar">
@@ -583,6 +829,31 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19 L5 8 Q5 5 8 5 L19 5"/></svg></div>
       <span class="tool-label">FILLET</span>
     </button>
+    <button class="tool-btn" id="btn-mirror" onclick="setTool('mirror')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="2 2"/><polyline points="3,7 9,12 3,17"/><polyline points="21,7 15,12 21,17"/></svg></div>
+      <span class="tool-label">MIRROR</span>
+    </button>
+    <button class="tool-btn" id="btn-measure" onclick="setTool('measure')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="9" x2="4" y2="15"/><line x1="20" y1="9" x2="20" y2="15"/><line x1="12" y1="10" x2="12" y2="14"/></svg></div>
+      <span class="tool-label">MEASURE</span>
+    </button>
+  </div>
+
+  <!-- Mirror axis bar -->
+  <div id="mirror-bar" style="display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;">
+    <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;">AXIS</label>
+    <button id="mirror-btn-h" onclick="setMirrorAxis('h')" style="background:var(--accent-glow);border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:9px;padding:3px 7px;cursor:pointer;">Horiz</button>
+    <button id="mirror-btn-v" onclick="setMirrorAxis('v')" style="background:var(--panel);border:1px solid var(--border);border-radius:3px;color:var(--t2);font-family:var(--fm);font-size:9px;padding:3px 7px;cursor:pointer;">Vert</button>
+    <button id="mirror-btn-l" onclick="setMirrorAxis('line')" style="background:var(--panel);border:1px solid var(--border);border-radius:3px;color:var(--t2);font-family:var(--fm);font-size:9px;padding:3px 7px;cursor:pointer;">2-Pt Line</button>
+    <button onclick="mirrorSelected()" style="background:rgba(0,212,255,0.1);border:1px solid var(--accent-dim);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:9px;padding:3px 9px;cursor:pointer;margin-left:auto;">Apply</button>
+  </div>
+
+  <!-- Measure readout bar -->
+  <div id="measure-bar" style="display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;">
+    <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;">DIST</label>
+    <span id="measure-dist" style="font-family:var(--fm);font-size:11px;color:var(--amber);min-width:80px;">—</span>
+    <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;">ANG</label>
+    <span id="measure-angle" style="font-family:var(--fm);font-size:11px;color:var(--green);min-width:50px;">—</span>
   </div>
 
   <!-- Rotation controls (shown when rotate tool is active OR objects are selected) -->
@@ -635,6 +906,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
     <button class="op-btn dxf" onclick="exportDXF()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Export .dxf
+    </button>
+    <button class="op-btn" style="color:var(--amber);border-color:#664400;" onclick="exportSCAD()" title="Export OpenSCAD file for 3D modeling">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8M8 17h5"/></svg>
+      Export .scad
     </button>
     <button class="op-btn dxf" onclick="document.getElementById('load-dxf').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -695,6 +970,171 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
   <div id="hint">Press <span>L</span> Line · <span>A</span> Arc · <span>C</span> Circle · <span>R</span> Rect · <span>P</span> Poly · <span>F</span> Fillet · Right-click</div>
 </div>
 
+</div><!-- end model-pane -->
+
+<!-- ── KANVAS PANE ── -->
+<div id="kanvas-pane">
+
+<!-- ── KANVAS SIDEBAR ── -->
+<div id="kanvas-sidebar">
+  <div class="section-head" style="color:#00d4c8;letter-spacing:0.16em;">KV KANVAS</div>
+
+  <!-- Tools -->
+  <div class="kv-tool-grid">
+    <button class="kv-tbtn act" id="kv-tb-brush" onclick="kvSetTool('brush')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><path d="M12 19c0 1.1.9 2 2 2h.5a2 2 0 0 0 0-4H14c-1.1 0-2 .9-2 2z"/><path d="M5.5 4.5L18 17"/></svg></div>
+      <span class="kv-tl">BRUSH</span>
+    </button>
+    <button class="kv-tbtn" id="kv-tb-text" onclick="kvSetTool('text')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3" stroke-width="1.6"/><path d="M9 20h6" stroke-width="1.6"/><line x1="12" y1="4" x2="12" y2="20" stroke-width="1.6"/></svg></div>
+      <span class="kv-tl">TEXT</span>
+    </button>
+    <button class="kv-tbtn" id="kv-tb-dim-linear" onclick="kvSetTool('dim-linear')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><line x1="3" y1="18" x2="21" y2="18"/><line x1="7" y1="6" x2="7" y2="18"/><line x1="17" y1="6" x2="17" y2="18"/><line x1="3" y1="12" x2="21" y2="12"/></svg></div>
+      <span class="kv-tl">LINEAR</span>
+    </button>
+    <button class="kv-tbtn" id="kv-tb-dim-radial" onclick="kvSetTool('dim-radial')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="12" y1="12" x2="18" y2="6"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></div>
+      <span class="kv-tl">RADIUS</span>
+    </button>
+    <button class="kv-tbtn" id="kv-tb-dim-angle" onclick="kvSetTool('dim-angle')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><path d="M5 19 L19 19 L12 7 Z"/><path d="M12 19 A7 7 0 0 0 17 14" fill="none"/></svg></div>
+      <span class="kv-tl">ANGLE</span>
+    </button>
+    <button class="kv-tbtn" id="kv-tb-weld" onclick="kvSetTool('weld')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><path d="M3 18 L8 18 L12 8 L16 18 L21 18"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+      <span class="kv-tl">WELD</span>
+    </button>
+    <button class="kv-tbtn" id="kv-tb-erase" onclick="kvSetTool('erase')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><path d="M20 20H7L3 16l11-11 7 7-1 8z"/><path d="M6 11l7 7"/></svg></div>
+      <span class="kv-tl">ERASE</span>
+    </button>
+    <button class="kv-tbtn" id="kv-tb-select" onclick="kvSetTool('select')">
+      <div class="kv-ti"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-7 1-4 7z"/></svg></div>
+      <span class="kv-tl">SELECT</span>
+    </button>
+  </div>
+
+  <!-- Dimension standard selector -->
+  <div class="kv-dim-row" id="kv-dim-row">
+    <button class="kv-dim-btn act" id="kv-dim-asme" onclick="kvSetDimStd('asme')">ASME</button>
+    <button class="kv-dim-btn" id="kv-dim-ansi"     onclick="kvSetDimStd('ansi')">ANSI</button>
+    <button class="kv-dim-btn" id="kv-dim-aws"      onclick="kvSetDimStd('aws')">AWS</button>
+    <button class="kv-dim-btn" id="kv-dim-arch"     onclick="kvSetDimStd('arch')">ARCH</button>
+  </div>
+
+  <!-- Weld symbol controls -->
+  <div class="kv-weld-row" id="kv-weld-row">
+    <select class="kv-weld-select" onchange="kvWeldType=this.value">
+      <option value="fillet">Fillet</option>
+      <option value="groove_v">V-Groove</option>
+      <option value="groove_bevel">Bevel Groove</option>
+      <option value="groove_u">U-Groove</option>
+      <option value="groove_j">J-Groove</option>
+      <option value="plug">Plug/Slot</option>
+      <option value="spot">Spot</option>
+      <option value="seam">Seam</option>
+      <option value="back">Back/Backing</option>
+      <option value="surfacing">Surfacing</option>
+    </select>
+    <div style="display:flex;gap:4px;">
+      <button class="kv-dim-btn act" onclick="kvWeldArrow='arrow'">Arrow Side</button>
+      <button class="kv-dim-btn"     onclick="kvWeldArrow='other'">Other Side</button>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <input placeholder="Size" id="kv-weld-size" oninput="kvWeldSize=this.value"
+        style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--fm);font-size:9px;padding:3px 6px;outline:none;">
+      <input placeholder="Length" id="kv-weld-length" oninput="kvWeldLength=this.value"
+        style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--fm);font-size:9px;padding:3px 6px;outline:none;">
+    </div>
+  </div>
+
+  <!-- Color -->
+  <div class="kv-color-row">
+    <div class="kv-color-chip" id="kv-color-chip" style="background:#ff3cac"
+         onclick="document.getElementById('kv-cp').click()"></div>
+    <input type="color" id="kv-cp" value="#ff3cac" oninput="kvSetColor(this.value)" style="display:none">
+    <span style="font-family:var(--fm);font-size:9px;color:var(--t3);">Annotation color</span>
+  </div>
+  <div class="kv-swatches" id="kv-swatches"></div>
+
+  <!-- Brush size -->
+  <div class="kv-brush-panel">
+    <div class="kv-sl-row">
+      <span class="kv-sl-lbl">Size</span>
+      <input type="range" class="kv-sl" id="kv-sl-size" min="2" max="60" value="10"
+             oninput="B.size=+this.value;document.getElementById('kv-v-size').textContent=this.value+'px'">
+      <span class="kv-sl-val" id="kv-v-size">10px</span>
+    </div>
+    <div class="kv-sl-row">
+      <span class="kv-sl-lbl">Opacity</span>
+      <input type="range" class="kv-sl" id="kv-sl-op" min="10" max="100" value="90"
+             oninput="B.opacity=+this.value/100;document.getElementById('kv-v-op').textContent=this.value+'%'">
+      <span class="kv-sl-val" id="kv-v-op">90%</span>
+    </div>
+  </div>
+
+  <!-- Page size -->
+  <div class="section-head" style="font-size:7.5px;border:none;padding:6px 8px 3px;">PAGE</div>
+  <select class="kv-page-sel" onchange="kvSetPageSize(this.value)">
+    <optgroup label="ISO">
+      <option value="a4p">A4 Portrait</option>
+      <option value="a4l">A4 Landscape</option>
+      <option value="a3p" selected>A3 Portrait</option>
+      <option value="a3l">A3 Landscape</option>
+      <option value="a2p">A2 Portrait</option>
+      <option value="a2l">A2 Landscape</option>
+      <option value="a1p">A1 Portrait</option>
+      <option value="a1l">A1 Landscape</option>
+    </optgroup>
+    <optgroup label="ANSI Engineering">
+      <option value="ansi_a_p">ANSI A 8.5×11</option>
+      <option value="ansi_a_l">ANSI A 11×8.5</option>
+      <option value="ansi_b">ANSI B 11×17</option>
+      <option value="ansi_c">ANSI C 17×22</option>
+      <option value="ansi_d">ANSI D 22×34</option>
+      <option value="ansi_e">ANSI E 34×44</option>
+    </optgroup>
+    <optgroup label="Architectural">
+      <option value="arch_b">Arch B 12×18</option>
+      <option value="arch_c">Arch C 18×24</option>
+      <option value="arch_d">Arch D 24×36</option>
+      <option value="arch_e">Arch E 36×48</option>
+    </optgroup>
+    <optgroup label="AWS D1 Structural">
+      <option value="aws_d1">AWS D1 22×34</option>
+    </optgroup>
+  </select>
+
+  <!-- Layers -->
+  <div class="section-head" style="font-size:7.5px;border:none;padding:6px 8px 3px;">LAYERS</div>
+  <div id="kv-layers"></div>
+
+  <!-- Export (always at bottom) -->
+  <div class="kv-export-row">
+    <div class="section-head" style="font-size:7.5px;border:none;padding:4px 0 3px;">EXPORT</div>
+    <button class="kv-export-btn vad" onclick="kvExportVAD()">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+      Save .vad
+    </button>
+    <button class="kv-export-btn svg" onclick="kvExportSVG()">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Export .svg
+    </button>
+    <button class="kv-export-btn pdf" onclick="kvPrintPDF()">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><rect x="2" y="14" width="20" height="8" rx="1"/></svg>
+      Print PDF
+    </button>
+  </div>
+</div>
+
+<!-- ── KANVAS CANVAS ── -->
+<div style="flex:1;overflow:hidden;position:relative;">
+  <canvas id="kanvas-canvas"></canvas>
+</div>
+
+</div>
+
 <!-- STATUS BAR -->
 <div id="statusbar">
   <div class="sb-item"><span>MODE</span><span class="sb-val act" id="sb-mode">SELECT</span></div>
@@ -714,7 +1154,9 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
     <div class="sb-item"><span>J</span><span class="sb-val">join</span></div>
     <div class="sb-item"><span>X</span><span class="sb-val">explode</span></div>
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
-    <div class="sb-item"><span class="sb-val ok">.KAD v0.4</span></div>
+    <div class="sb-item"><span>M</span><span class="sb-val">mirror</span></div>
+    <div class="sb-item"><span>D</span><span class="sb-val">measure</span></div>
+    <div class="sb-item"><span class="sb-val ok">.KAD Gamma v0.6</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
       <span>© <span id="cc-year"></span> · Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" class="cc-link">CC BY-SA 4.0</a> · .KAD Kernel-Aided Design</span>
@@ -828,7 +1270,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
   <div id="splash-dialog">
     <div class="dlg-head">
       <div class="splash-brand"><div class="splash-brand-dot"></div>.KAD</div>
-      <div class="splash-sub">Kernel-Aided Design · v0.4</div>
+      <div class="splash-sub">Kernel-Aided Design · v0.6 Gamma</div>
     </div>
     <div class="dlg-body">
       <div class="splash-prompt">
@@ -877,10 +1319,55 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
   </div>
 </div>
 
+<!-- SCAD EXPORT DIALOG -->
+<div id="scad-export-overlay">
+  <div id="scad-export-dialog">
+    <div class="dlg-head">
+      <div class="dlg-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13" style="vertical-align:-2px;margin-right:5px;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Export OpenSCAD (.scad)
+      </div>
+      <button class="dlg-close" onclick="closeSCADDialog()">✕</button>
+    </div>
+    <div class="dlg-body">
+      <div class="scad-section-label">Export Mode —</div>
+      <div class="scad-mode-grid">
+        <button class="scad-mode-btn selected" id="scad-mode-extrude" onclick="selectScadMode('extrude')">
+          <span class="smb-title">Extrude</span>
+          <span class="smb-sub">2D → 3D solid with height</span>
+        </button>
+        <button class="scad-mode-btn" id="scad-mode-flat" onclick="selectScadMode('flat')">
+          <span class="smb-title">Flat 2D</span>
+          <span class="smb-sub">2D union(), no extrusion</span>
+        </button>
+        <button class="scad-mode-btn" id="scad-mode-raw" onclick="selectScadMode('raw')">
+          <span class="smb-title">Raw</span>
+          <span class="smb-sub">Bare shapes, no wrapper</span>
+        </button>
+      </div>
+      <div class="scad-extrude-row" id="scad-extrude-row">
+        <label>Extrude Height</label>
+        <input type="number" id="scad-extrude-h" value="5" min="0.01" step="0.5"/>
+        <span style="font-family:var(--fm);font-size:9px;color:var(--t3);">mm</span>
+      </div>
+      <div class="scad-hint">
+        <b>Extrude</b> → ready-to-render 3D part in OpenSCAD.<br>
+        <b>Flat 2D</b> → use with <code>linear_extrude()</code> in your own SCAD file.<br>
+        <b>Raw</b> → individual shapes; compose manually.<br>
+        <span style="color:var(--t3);">Closed polylines become filled polygons · Circles/arcs are native SCAD primitives.</span>
+      </div>
+      <div class="dlg-actions" style="display:flex;gap:6px;margin-top:12px;">
+        <button class="dlg-btn cancel" onclick="closeSCADDialog()" style="flex:1">Cancel</button>
+        <button class="dlg-btn commit" onclick="commitSCADExport()" style="flex:2;background:rgba(255,170,0,0.12);border-color:var(--amber);color:var(--amber);">Export .scad</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
 // ═══════════════════════════════════════════════════════════
-//  .KAD  v0.2  — Kernel-Aided Design
+//  .KAD Gamma  v0.6  — Kernel-Aided Design + OpenSCAD Export
 // ═══════════════════════════════════════════════════════════
 
 // ── CANVAS ──────────────────────────────────────────────
@@ -2030,7 +2517,7 @@ function setTool(tool) {
   activeTool = tool;
 
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet'};
+  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',mirror:'btn-mirror',measure:'btn-measure'};
   if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
 
   document.getElementById('sb-mode').textContent=tool.toUpperCase();
@@ -2039,6 +2526,9 @@ function setTool(tool) {
   document.getElementById('poly-bar').style.display    = tool==='polygon'?'flex':'none';
   document.getElementById('arc-bar').style.display     = tool==='arc'?'flex':'none';
   document.getElementById('fillet-bar').style.display  = tool==='fillet'?'flex':'none';
+  document.getElementById('mirror-bar').style.display  = tool==='mirror'?'flex':'none';
+  document.getElementById('measure-bar').style.display = tool==='measure'?'flex':'none';
+  if (tool !== 'measure') { measureState = {active:false,p1:null}; }
   // Rotate bar — show when rotate tool OR when something is selected
   const rotateBar = document.getElementById('rotate-bar');
   if (tool === 'rotate') rotateBar.classList.add('visible');
@@ -2054,6 +2544,8 @@ function setTool(tool) {
     polygon: '<span>Click</span> center → <span>click</span> to set radius & rotation',
     offset:  '<span>Click</span> a line → move cursor to side → <span>click</span> to commit',
     rotate:  'Drag box to select · <span>Click</span> canvas to set angle · Drag <span>pivot ⊕</span> to reposition it · <span>Q/E</span> ±90° · sidebar for precision',
+    mirror:  'Select objects first (<span>S</span>) · Choose axis in sidebar · <span>Apply</span> to mirror. For 2-Pt axis: click two points on canvas.',
+    measure: '<span>Click</span> first point → <span>click</span> second point — distance and angle shown in sidebar',
   };
   document.getElementById('hint').innerHTML = hintMap[tool]||'';
 
@@ -2134,6 +2626,64 @@ function segIntersects(ax,ay,bx,by, cx,cy,dx,dy) {
   return t>=0&&t<=1&&u>=0&&u<=1;
 }
 
+function drawMirrorPreview() {
+  if (activeTool !== 'mirror') return;
+  ctx.save();
+  ctx.setLineDash([6, 4]);
+  ctx.strokeStyle = 'rgba(0,212,255,0.5)';
+  ctx.lineWidth = 1;
+  const W = canvas.width, H = canvas.height;
+  if (mirrorAxis === 'h') {
+    // horizontal axis through selection center or canvas center
+    const cy = worldToScreen(0, 0).y;
+    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+  } else if (mirrorAxis === 'v') {
+    const cx = worldToScreen(0, 0).x;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+  } else if (mirrorAxis === 'line') {
+    if (mirrorLineState.p1) {
+      const sp1 = worldToScreen(mirrorLineState.p1.x, mirrorLineState.p1.y);
+      const ep = mirrorLineState.p2 ? worldToScreen(mirrorLineState.p2.x, mirrorLineState.p2.y)
+                                     : worldToScreen(mouseWorld.x, mouseWorld.y);
+      ctx.beginPath(); ctx.moveTo(sp1.x, sp1.y); ctx.lineTo(ep.x, ep.y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#00d4ff';
+      ctx.beginPath(); ctx.arc(sp1.x, sp1.y, 4, 0, Math.PI*2); ctx.fill();
+      if (mirrorLineState.p2) {
+        ctx.beginPath(); ctx.arc(ep.x, ep.y, 4, 0, Math.PI*2); ctx.fill();
+      }
+    }
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+function drawMeasurePreview() {
+  if (activeTool !== 'measure' || !measureState.active || !measureState.p1) return;
+  const sp1 = worldToScreen(measureState.p1.x, measureState.p1.y);
+  const sp2 = worldToScreen(mouseWorld.x, mouseWorld.y);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,170,0,0.85)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(sp1.x, sp1.y); ctx.lineTo(sp2.x, sp2.y); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#ffaa00';
+  ctx.beginPath(); ctx.arc(sp1.x, sp1.y, 4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(sp2.x, sp2.y, 4, 0, Math.PI*2); ctx.fill();
+  // Live distance label
+  const dx = mouseWorld.x - measureState.p1.x, dy = mouseWorld.y - measureState.p1.y;
+  const dist = Math.hypot(dx, dy);
+  const angle = (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1);
+  const mid = { x: (sp1.x+sp2.x)/2, y: (sp1.y+sp2.y)/2 };
+  ctx.font = '10px "Fira Code", monospace';
+  ctx.fillStyle = '#ffaa00';
+  ctx.fillText(`${fmtU(dist)}  ${angle}°`, mid.x + 6, mid.y - 6);
+  ctx.restore();
+  // Update sidebar readout live
+  if (dist > 0) updateMeasureDisplay(measureState.p1, mouseWorld);
+}
+
 function drawSelBox() {
   if (!selBox.active) return;
   const sa = worldToScreen(selBox.startWX, selBox.startWY);
@@ -2141,7 +2691,7 @@ function drawSelBox() {
   const lx=Math.min(sa.x,sb.x), ly=Math.min(sa.y,sb.y);
   const w=Math.abs(sb.x-sa.x), h=Math.abs(sb.y-sa.y);
   ctx.save();
-  // Blue = left-to-right (crossing), green = right-to-left (window) — standard CAD convention
+  // Blue = left-to-right (crossing), green = right-to-left (window) — standard KAD convention
   const leftToRight = sb.x >= sa.x;
   ctx.strokeStyle = leftToRight ? 'rgba(0,212,255,0.9)' : 'rgba(0,255,157,0.9)';
   ctx.fillStyle   = leftToRight ? 'rgba(0,212,255,0.06)' : 'rgba(0,255,157,0.06)';
@@ -2348,6 +2898,30 @@ function onMouseDown(e) {
       }
       render(); return;
     }
+
+    if (activeTool === 'mirror' && mirrorAxis === 'line') {
+      const wp = snapActive && snapPoint ? snapPoint : mouseWorld;
+      if (!mirrorLineState.p1) {
+        mirrorLineState = { active: true, p1: { x: wp.x, y: wp.y }, p2: null };
+        showToast('Mirror axis: click second point');
+      } else {
+        mirrorLineState.p2 = { x: wp.x, y: wp.y };
+        showToast('Mirror axis set — click Apply in sidebar');
+      }
+      render(); return;
+    }
+
+    if (activeTool === 'measure') {
+      const wp = snapActive && snapPoint ? snapPoint : mouseWorld;
+      if (!measureState.active) {
+        measureState = { active: true, p1: { x: wp.x, y: wp.y } };
+        showToast('Measure: click second point');
+      } else {
+        updateMeasureDisplay(measureState.p1, wp);
+        measureState = { active: false, p1: wp }; // second click becomes new p1
+      }
+      render(); return;
+    }
   }
 }
 
@@ -2535,6 +3109,8 @@ function onKeyDown(e) {
     if(k==='s'||k==='S') setTool('select');
     if(k==='o'||k==='O') setTool('offset');
     if(k==='t'||k==='T') setTool('rotate');
+    if(k==='m'||k==='M') setTool('mirror');
+    if(k==='d'||k==='D') setTool('measure');
     if(k==='j'||k==='J') joinSelected();
     if(k==='x'||k==='X') explodeSelected();
     if(k==='q'||k==='Q') rotateSelected(-90);  // CCW
@@ -2549,6 +3125,8 @@ function onKeyDown(e) {
   if(e.ctrlKey){
     if(k==='s'){ e.preventDefault(); saveKAD(); }
     if(k==='n'){ e.preventDefault(); newDocument(); }
+    if(k==='e' && e.shiftKey){ e.preventDefault(); exportSCAD(); }
+    else if(k==='e'){ e.preventDefault(); exportDXF(); }
   }
 }
 
@@ -2661,6 +3239,8 @@ function render() {
   drawCirclePreview();
   drawArcPreview();
   drawRotatePreview();
+  drawMirrorPreview();
+  drawMeasurePreview();
   drawSelBox();
 }
 
@@ -3237,6 +3817,111 @@ function buildDXF(objects) {
   return lines.join('\n');
 }
 
+// ── MIRROR TOOL ─────────────────────────────────────────
+let mirrorAxis = 'h'; // 'h' | 'v' | 'line'
+let mirrorLineState = { active: false, p1: null };
+
+function setMirrorAxis(axis) {
+  mirrorAxis = axis;
+  ['h','v','line'].forEach(a => {
+    const btn = document.getElementById('mirror-btn-'+a);
+    if (!btn) return;
+    btn.style.background = a === axis ? 'var(--accent-glow)' : 'var(--panel)';
+    btn.style.borderColor = a === axis ? 'var(--accent)' : 'var(--border)';
+    btn.style.color = a === axis ? 'var(--accent)' : 'var(--t2)';
+  });
+  mirrorLineState = { active: false, p1: null };
+  render();
+}
+
+function mirrorPoint(x, y, axis, axisData) {
+  if (axis === 'h') {
+    // Mirror horizontally across bounding-box centerY
+    const cy = axisData.cy;
+    return { x, y: 2 * cy - y };
+  } else if (axis === 'v') {
+    const cx = axisData.cx;
+    return { x: 2 * cx - x, y };
+  } else if (axis === 'line') {
+    // Mirror across line defined by p1, p2
+    const { p1, p2 } = axisData;
+    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+    const len2 = dx*dx + dy*dy;
+    if (len2 < 1e-10) return { x, y };
+    const t = ((x - p1.x)*dx + (y - p1.y)*dy) / len2;
+    const fx = p1.x + t*dx, fy = p1.y + t*dy;
+    return { x: 2*fx - x, y: 2*fy - y };
+  }
+  return { x, y };
+}
+
+function mirrorSelected() {
+  const ids = [...selectedIds];
+  if (!ids.length) { showToast('Select objects first (S)'); return; }
+
+  // Compute bounding box of selected objects for h/v axis center
+  let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
+  for (const o of GeoMemory.objects.filter(o => selectedIds.has(o.id))) {
+    if (o.type === 'LINE') {
+      minX=Math.min(minX,o.x1,o.x2); maxX=Math.max(maxX,o.x1,o.x2);
+      minY=Math.min(minY,o.y1,o.y2); maxY=Math.max(maxY,o.y1,o.y2);
+    } else if (o.type === 'CIRCLE') {
+      minX=Math.min(minX,o.cx-o.r); maxX=Math.max(maxX,o.cx+o.r);
+      minY=Math.min(minY,o.cy-o.r); maxY=Math.max(maxY,o.cy+o.r);
+    } else if (o.type === 'ARC') {
+      const bb = arcBBox(o.cx,o.cy,o.r,o.startA,o.endA,o.ccw);
+      minX=Math.min(minX,bb.minX); maxX=Math.max(maxX,bb.maxX);
+      minY=Math.min(minY,bb.minY); maxY=Math.max(maxY,bb.maxY);
+    } else if (o.type === 'POLYLINE') {
+      for (const p of o.pts) { minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y); }
+    }
+  }
+
+  const axisData = mirrorAxis === 'line' && mirrorLineState.p1 && mirrorLineState.p2
+    ? { p1: mirrorLineState.p1, p2: mirrorLineState.p2 }
+    : { cx: (minX+maxX)/2, cy: (minY+maxY)/2 };
+
+  if (mirrorAxis === 'line' && (!mirrorLineState.p1 || !mirrorLineState.p2)) {
+    showToast('Click two points on canvas to define mirror line'); return;
+  }
+
+  const mp = (x,y) => mirrorPoint(x, y, mirrorAxis, axisData);
+  let added = 0;
+  for (const o of GeoMemory.objects.filter(o => selectedIds.has(o.id))) {
+    if (o.type === 'LINE') {
+      const a = mp(o.x1,o.y1), b = mp(o.x2,o.y2);
+      GeoMemory.addLine(a.x,a.y,b.x,b.y,o.layer); added++;
+    } else if (o.type === 'POLYLINE') {
+      const newPts = o.pts.map(p => mp(p.x,p.y));
+      GeoMemory.addPolyline(newPts, o.closed, o.layer); added++;
+    } else if (o.type === 'CIRCLE') {
+      const c = mp(o.cx,o.cy);
+      GeoMemory.addCircle(c.x,c.y,o.r,o.layer); added++;
+    } else if (o.type === 'ARC') {
+      const c = mp(o.cx,o.cy);
+      // Mirror arc: flip angles depending on axis
+      let sa = o.startA, ea = o.endA;
+      if (mirrorAxis === 'h') { sa = -o.startA; ea = -o.endA; }
+      else if (mirrorAxis === 'v') { sa = Math.PI - o.startA; ea = Math.PI - o.endA; }
+      else { /* line mirror — approximate by swapping and negating */ sa = Math.PI - o.startA; ea = Math.PI - o.endA; }
+      GeoMemory.addArc(c.x,c.y,o.r,sa,ea,!o.ccw,o.layer); added++;
+    }
+  }
+  showToast(`Mirrored ${added} object${added!==1?'s':''}`);
+  render();
+}
+
+// ── MEASURE TOOL ────────────────────────────────────────
+let measureState = { active: false, p1: null };
+
+function updateMeasureDisplay(p1, p2) {
+  const dx = p2.x - p1.x, dy = p2.y - p1.y;
+  const dist = Math.hypot(dx, dy);
+  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+  document.getElementById('measure-dist').textContent = fmtU(dist);
+  document.getElementById('measure-angle').textContent = angle.toFixed(2) + '°';
+}
+
 // ── FILE I/O ────────────────────────────────────────────
 function saveKAD() { downloadText(GeoMemory.serialize(),'drawing.kad','application/json'); showToast('Saved drawing.kad'); }
 function loadKAD(event) {
@@ -3251,6 +3936,161 @@ function exportDXF() {
   downloadText(buildDXF(objs),'drawing.dxf','text/plain');
   showToast(`Exported ${objs.length} entities`);
 }
+
+// ── SCAD EXPORT ─────────────────────────────────────────
+function buildSCAD(objects, extrudeH, joinMode) {
+  const f = n => parseFloat(n.toFixed(6));
+  const RAD2DEG = 180 / Math.PI;
+  const lines = [];
+
+  lines.push('// Generated by .KAD Gamma — Kernel-Aided Design');
+  lines.push('// https://kad.design | OpenSCAD 2D→3D export');
+  lines.push(`// Extrude height: ${extrudeH} mm | Mode: ${joinMode}`);
+  lines.push('// All coordinates in mm');
+  lines.push('');
+
+  // Group objects by layer
+  const byLayer = {};
+  for (const o of objects) {
+    const ly = o.layer || 'Layer_0';
+    if (!byLayer[ly]) byLayer[ly] = [];
+    byLayer[ly].push(o);
+  }
+
+  // ARC tessellation helper (for SCAD arc approximation)
+  function arcToPolygonPts(cx, cy, r, startA, endA, ccw, segments=64) {
+    const pts = [];
+    let a0 = startA, a1 = endA;
+    if (ccw) {
+      // go from a0 → a1 counter-clockwise (increasing angle)
+      if (a1 < a0) a1 += 2*Math.PI;
+    } else {
+      // go from a0 → a1 clockwise (decreasing angle)
+      if (a1 > a0) a1 -= 2*Math.PI;
+    }
+    const span = a1 - a0;
+    const steps = Math.max(4, Math.ceil(Math.abs(span) / (2*Math.PI) * segments));
+    for (let i = 0; i <= steps; i++) {
+      const a = a0 + (span * i / steps);
+      pts.push([f(cx + r * Math.cos(a)), f(cy + r * Math.sin(a))]);
+    }
+    return pts;
+  }
+
+  function ptsToStr(pts) {
+    return '[' + pts.map(p=>`[${p[0]},${p[1]}]`).join(', ') + ']';
+  }
+
+  // Collect all 2D shapes as SCAD module calls
+  const shapeBlocks = [];
+
+  for (const [layer, objs] of Object.entries(byLayer)) {
+    shapeBlocks.push(`  // Layer: ${layer}`);
+    for (const o of objs) {
+      if (o.type === 'LINE') {
+        // Lines become thin stroke hulls (0.2mm wide) — useful for wireframe extrusions
+        const dx = o.x2 - o.x1, dy = o.y2 - o.y1;
+        const len = Math.hypot(dx, dy);
+        if (len < 1e-10) continue;
+        const angle = f(Math.atan2(dy, dx) * RAD2DEG);
+        shapeBlocks.push(
+          `  translate([${f(o.x1)}, ${f(o.y1)}, 0])\n` +
+          `    rotate([0, 0, ${angle}])\n` +
+          `      square([${f(len)}, 0.2], center=false); // LINE`
+        );
+      } else if (o.type === 'POLYLINE' && o.pts && o.pts.length >= 2) {
+        if (o.closed && o.pts.length >= 3) {
+          // Closed polyline → filled polygon
+          const pts = o.pts.map(p => [f(p.x), f(p.y)]);
+          shapeBlocks.push(`  polygon(points=${ptsToStr(pts)}); // POLYLINE closed`);
+        } else {
+          // Open polyline → chain of thin stroke segments
+          for (let i = 0; i < o.pts.length - 1; i++) {
+            const p1 = o.pts[i], p2 = o.pts[i+1];
+            const dx = p2.x-p1.x, dy = p2.y-p1.y;
+            const len = Math.hypot(dx, dy);
+            if (len < 1e-10) continue;
+            const angle = f(Math.atan2(dy, dx) * RAD2DEG);
+            shapeBlocks.push(
+              `  translate([${f(p1.x)}, ${f(p1.y)}, 0])\n` +
+              `    rotate([0, 0, ${angle}])\n` +
+              `      square([${f(len)}, 0.2], center=false); // POLYLINE seg`
+            );
+          }
+        }
+      } else if (o.type === 'CIRCLE') {
+        shapeBlocks.push(
+          `  translate([${f(o.cx)}, ${f(o.cy)}, 0])\n` +
+          `    circle(r=${f(o.r)}, $fn=64); // CIRCLE`
+        );
+      } else if (o.type === 'ARC') {
+        // Arc → tessellated polygon outline (thin)
+        const pts = arcToPolygonPts(o.cx, o.cy, o.r, o.startA, o.endA, o.ccw, 64);
+        if (pts.length >= 2) {
+          // Build a thin stroke polygon along the arc
+          const innerPts = arcToPolygonPts(o.cx, o.cy, o.r - 0.15, o.startA, o.endA, o.ccw, 64);
+          const allPts = [...pts, ...[...innerPts].reverse()];
+          shapeBlocks.push(`  polygon(points=${ptsToStr(allPts)}); // ARC`);
+        }
+      }
+    }
+  }
+
+  // Compose final SCAD based on join mode
+  if (joinMode === 'extrude') {
+    lines.push(`linear_extrude(height=${f(extrudeH)}, center=false, convexity=10) {`);
+    lines.push('  union() {');
+    for (const b of shapeBlocks) {
+      lines.push('  ' + b.split('\n').join('\n  '));
+    }
+    lines.push('  }');
+    lines.push('}');
+  } else if (joinMode === 'flat') {
+    lines.push('// 2D profile only (no extrusion)');
+    lines.push('union() {');
+    for (const b of shapeBlocks) lines.push(b);
+    lines.push('}');
+  } else {
+    // 'raw' — output each shape separately with a comment
+    lines.push('// Raw shapes — no union wrapper');
+    lines.push('// Tip: wrap in linear_extrude(height=5) { ... } to make 3D');
+    for (const b of shapeBlocks) lines.push(b);
+  }
+
+  lines.push('');
+  lines.push('// End of .KAD Beta export');
+  return lines.join('\n');
+}
+
+// SCAD Export Dialog state
+const scadDialog = { extrudeH: 5, mode: 'extrude' };
+
+function openSCADDialog() {
+  if (!GeoMemory.objects.length) { showToast('No geometry to export'); return; }
+  document.getElementById('scad-extrude-h').value = scadDialog.extrudeH;
+  selectScadMode(scadDialog.mode);
+  document.getElementById('scad-export-overlay').classList.add('open');
+}
+function closeSCADDialog() {
+  document.getElementById('scad-export-overlay').classList.remove('open');
+}
+function selectScadMode(m) {
+  scadDialog.mode = m;
+  ['extrude','flat','raw'].forEach(id => {
+    const btn = document.getElementById('scad-mode-'+id);
+    btn.classList.toggle('selected', id === m);
+  });
+  document.getElementById('scad-extrude-row').style.display = m === 'extrude' ? 'flex' : 'none';
+}
+function commitSCADExport() {
+  const h = parseFloat(document.getElementById('scad-extrude-h').value) || 5;
+  scadDialog.extrudeH = h;
+  closeSCADDialog();
+  const scad = buildSCAD(GeoMemory.objects, h, scadDialog.mode);
+  downloadText(scad, 'drawing.scad', 'text/plain');
+  showToast(`Exported .scad · ${GeoMemory.objects.length} entities · ${scadDialog.mode} mode`);
+}
+function exportSCAD() { openSCADDialog(); }
 function downloadText(content,filename,mime) {
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([content],{type:mime})),download:filename});
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
@@ -3292,6 +4132,958 @@ requestAnimationFrame(()=>{
     },100);
   });
 });
+
+
+
+// ── CHAMFER ───────────────────────────────────────────────────────────────────
+let chamferState = {active:false, line1:null, line2:null};
+let chamferDist  = 5;
+
+function commitChamfer(line1Id, line2Id) {
+  const o1 = GeoMemory.objects.find(o=>o.id===line1Id);
+  const o2 = GeoMemory.objects.find(o=>o.id===line2Id);
+  if (!o1||!o2||o1.type!=='LINE'||o2.type!=='LINE') { showToast('Select two lines for chamfer'); return; }
+
+  // Find intersection
+  const ip = lineIntersectPt(
+    {x:o1.x1,y:o1.y1},{x:o1.x2,y:o1.y2},
+    {x:o2.x1,y:o2.y1},{x:o2.x2,y:o2.y2}
+  );
+  if (!ip) { showToast('Lines do not intersect'); return; }
+
+  const d = chamferDist;
+  // Find points at distance d from intersection along each line
+  function ptAtDist(lineObj, fromPt, dist) {
+    const dx1 = lineObj.x1 - fromPt.x, dy1 = lineObj.y1 - fromPt.y;
+    const dx2 = lineObj.x2 - fromPt.x, dy2 = lineObj.y2 - fromPt.y;
+    const len1 = Math.sqrt(dx1*dx1+dy1*dy1), len2 = Math.sqrt(dx2*dx2+dy2*dy2);
+    if (len1 < 1e-6 && len2 < 1e-6) return null;
+    if (len1 > len2) {
+      const t = dist/len1; return {x:fromPt.x+dx1*t, y:fromPt.y+dy1*t};
+    } else {
+      const t = dist/len2; return {x:fromPt.x+dx2*t, y:fromPt.y+dy2*t};
+    }
+  }
+  const cp1 = ptAtDist(o1, ip, d);
+  const cp2 = ptAtDist(o2, ip, d);
+  if (!cp1||!cp2) return;
+
+  // Trim line1 to cp1 and line2 to cp2, add chamfer line
+  // Determine which end to trim
+  function trimLine(obj, trimPt, intPt) {
+    const d1 = Math.hypot(obj.x1-intPt.x, obj.y1-intPt.y);
+    const d2 = Math.hypot(obj.x2-intPt.x, obj.y2-intPt.y);
+    if (d1 < d2) { obj.x1=trimPt.x; obj.y1=trimPt.y; }
+    else          { obj.x2=trimPt.x; obj.y2=trimPt.y; }
+  }
+  trimLine(o1, cp1, ip);
+  trimLine(o2, cp2, ip);
+  GeoMemory.addLine(cp1.x, cp1.y, cp2.x, cp2.y);
+  render();
+  showToast(`Chamfer ${fmtU(d)} applied`);
+}
+
+function drawChamferPreview() {
+  if (activeTool !== 'chamfer' || !chamferState.line1) return;
+  // Highlight selected lines
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,170,0,0.6)';
+  ctx.lineWidth = 2;
+  const o = GeoMemory.objects.find(o=>o.id===chamferState.line1);
+  if (o) {
+    const a = worldToScreen(o.x1,o.y1), b = worldToScreen(o.x2,o.y2);
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ── COPY / DUPLICATE ──────────────────────────────────────────────────────────
+let copyOffset = {x:10, y:-10}; // default offset in mm
+
+function copySelected() {
+  const ids = [...selectedIds];
+  if (!ids.length) { showToast('Select objects first'); return; }
+  const copies = [];
+  for (const id of ids) {
+    const o = GeoMemory.objects.find(x=>x.id===id);
+    if (!o) continue;
+    if (o.type==='LINE') {
+      copies.push({type:'LINE',x1:o.x1+copyOffset.x,y1:o.y1+copyOffset.y,
+                                x2:o.x2+copyOffset.x,y2:o.y2+copyOffset.y});
+    } else if (o.type==='CIRCLE') {
+      copies.push({type:'CIRCLE',cx:o.cx+copyOffset.x,cy:o.cy+copyOffset.y,r:o.r});
+    } else if (o.type==='ARC') {
+      copies.push({type:'ARC',cx:o.cx+copyOffset.x,cy:o.cy+copyOffset.y,
+                   r:o.r,startAngle:o.startAngle,endAngle:o.endAngle,ccw:o.ccw});
+    } else if (o.type==='POLYLINE') {
+      copies.push({type:'POLYLINE',pts:o.pts.map(p=>({x:p.x+copyOffset.x,y:p.y+copyOffset.y})),
+                   closed:o.closed});
+    }
+  }
+  for (const c of copies) {
+    if (c.type==='LINE') GeoMemory.addLine(c.x1,c.y1,c.x2,c.y2);
+    else if (c.type==='CIRCLE') GeoMemory.addCircle(c.cx,c.cy,c.r);
+    else if (c.type==='ARC') GeoMemory.addArc(c.cx,c.cy,c.r,c.startAngle,c.endAngle,c.ccw);
+    else if (c.type==='POLYLINE') {
+      const id = GeoMemory.nextId++;
+      GeoMemory.objects.push({...c, id});
+    }
+  }
+  render();
+  showToast(`Copied ${copies.length} object${copies.length>1?'s':''}`);
+}
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  KANVAS — Paperspace tab for KAD
+//  Completely isolated from KAD model space.
+//  KAD geometry is read-only reference. KANVAS annotations are separate.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── KANVAS STATE ──────────────────────────────────────────────────────────────
+let kvActive      = false;
+let kvTool        = 'select';
+let kvRafId       = null;
+let kvCanvas      = null;
+let kvCtx         = null;
+let kvEraseC      = null;
+let kvEraseCtx    = null;
+let kvSnapEnabled = true;
+let kvSelectedId  = null;
+let kvDimStd      = 'asme';   // 'ansi'|'asme'|'aws'|'arch'
+let kvDimState    = {active:false, p1:null, p2:null, offset:0};
+let kvWeldState   = {active:false, p1:null, p2:null};
+
+// ── KV PAGE SYSTEM ───────────────────────────────────────────────────────────
+const KV_PAGE_SIZES = {
+  // ISO
+  a4p:{w:210,h:297,label:'A4 Portrait',dim:'210×297 mm',unit:'mm'},
+  a4l:{w:297,h:210,label:'A4 Landscape',dim:'297×210 mm',unit:'mm'},
+  a3p:{w:297,h:420,label:'A3 Portrait',dim:'297×420 mm',unit:'mm'},
+  a3l:{w:420,h:297,label:'A3 Landscape',dim:'420×297 mm',unit:'mm'},
+  a2p:{w:420,h:594,label:'A2 Portrait',dim:'420×594 mm',unit:'mm'},
+  a2l:{w:594,h:420,label:'A2 Landscape',dim:'594×420 mm',unit:'mm'},
+  a1p:{w:594,h:841,label:'A1 Portrait',dim:'594×841 mm',unit:'mm'},
+  a1l:{w:841,h:594,label:'A1 Landscape',dim:'841×594 mm',unit:'mm'},
+  // ANSI/US Engineering
+  ansi_a_p:{w:215.9,h:279.4,label:'ANSI A 8.5×11',dim:'8.5×11 in',unit:'in'},
+  ansi_a_l:{w:279.4,h:215.9,label:'ANSI A 11×8.5',dim:'11×8.5 in',unit:'in'},
+  ansi_b:  {w:279.4,h:431.8,label:'ANSI B 11×17', dim:'11×17 in', unit:'in'},
+  ansi_c:  {w:431.8,h:558.8,label:'ANSI C 17×22', dim:'17×22 in', unit:'in'},
+  ansi_d:  {w:558.8,h:863.6,label:'ANSI D 22×34', dim:'22×34 in', unit:'in'},
+  ansi_e:  {w:863.6,h:1117.6,label:'ANSI E 34×44',dim:'34×44 in', unit:'in'},
+  // Architectural
+  arch_b:  {w:304.8,h:457.2,label:'Arch B 12×18', dim:'12×18 in', unit:'in'},
+  arch_c:  {w:457.2,h:609.6,label:'Arch C 18×24', dim:'18×24 in', unit:'in'},
+  arch_d:  {w:609.6,h:914.4,label:'Arch D 24×36', dim:'24×36 in', unit:'in'},
+  arch_e:  {w:914.4,h:1219.2,label:'Arch E 36×48',dim:'36×48 in', unit:'in'},
+  // AWS D1 Structural
+  aws_d1:  {w:558.8,h:863.6,label:'AWS D1 22×34', dim:'22×34 in', unit:'in'},
+};
+let KV_PAGE = KV_PAGE_SIZES.a3p;
+
+// Scale: how many pixels per mm in KANVAS (separate from KAD cam.zoom)
+let kvZoom = 2.5;
+let kvPanX = 0, kvPanY = 0;
+let kvSpaceDown = false;
+let kvIsPanning = false;
+let kvPanOX = 0, kvPanOY = 0;
+
+// Page-mm → KANVAS screen px
+function kvW2S(px, py) {
+  return {
+    x: kvPanX + px * kvZoom,
+    y: kvPanY + (KV_PAGE.h - py) * kvZoom
+  };
+}
+function kvS2W(sx, sy) {
+  return {
+    x: (sx - kvPanX) / kvZoom,
+    y: KV_PAGE.h - (sy - kvPanY) / kvZoom
+  };
+}
+function kvSpt(e) {
+  const r = kvCanvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - r.left) * (kvCanvas.width / r.width),
+    y: (e.clientY - r.top)  * (kvCanvas.height / r.height)
+  };
+}
+function kvSnapPt(wx, wy) {
+  if (!kvSnapEnabled) return {x:wx, y:wy};
+  const sp = 1; // 1mm grid snap in KANVAS
+  return {x: Math.round(wx/sp)*sp, y: Math.round(wy/sp)*sp};
+}
+function kvZoomFit() {
+  if (!kvCanvas) return;
+  const W = kvCanvas.width / (window.devicePixelRatio || 1);
+  const H = kvCanvas.height / (window.devicePixelRatio || 1);
+  const margin = 40;
+  kvZoom = Math.min((W - margin*2) / KV_PAGE.w, (H - margin*2) / KV_PAGE.h);
+  kvPanX = (W - KV_PAGE.w * kvZoom) / 2;
+  kvPanY = (H - KV_PAGE.h * kvZoom) / 2;
+}
+
+// ── KANVASMemory (annotation store) ──────────────────────────────────────────
+const KVM = {
+  strokes: [],
+  dims:    [],
+  welds:   [],
+  layers:  [{name:'Annotations',color:'#ff3cac',visible:true},
+            {name:'Dimensions', color:'#00d4ff',visible:true},
+            {name:'Weld Symbols',color:'#ffaa00',visible:true},
+            {name:'Notes',       color:'#00ff9d',visible:true}],
+  activeLayer: 'Annotations',
+  nextId: 1,
+  push(obj){ this.strokes.push(obj); },
+  undo(){ this.strokes.pop(); },
+  visibleStrokes(){ return this.strokes.filter(s=>{
+    const L = this.layers.find(l=>l.name===s.layer);
+    return !L || L.visible;
+  }); }
+};
+
+// ── BRUSH STATE (shared with VAD engine) ─────────────────────────────────────
+const B = {
+  color:'#ff3cac', opacity:0.9, size:10, alpha:0.72, taper:0.7, glow:false,
+  blend:'source-over', type:'brush'
+};
+const ER = { size:24, mode:'pixel', opacity:1 };
+const SH = { type:'rect', fill:false, fillColor:'rgba(255,60,172,0.12)', color:'#ff3cac' };
+
+// ── DIMENSIONING ENGINE ───────────────────────────────────────────────────────
+const DIM_STYLES = {
+  ansi: {
+    arrowLen: 3.5, arrowAngle: 15, textHeight: 3.5,
+    extOffset: 2, extGap: 1, lineWidth: 0.5,
+    color: '#00d4ff', font: "'Fira Code', monospace",
+    label: 'ANSI Y14.5'
+  },
+  asme: {
+    arrowLen: 3.5, arrowAngle: 15, textHeight: 3.5,
+    extOffset: 2, extGap: 1, lineWidth: 0.5,
+    color: '#00d4ff', font: "'Fira Code', monospace",
+    label: 'ASME Y14.5'
+  },
+  aws: {
+    arrowLen: 4, arrowAngle: 30, textHeight: 3.5,
+    extOffset: 2.5, extGap: 1.5, lineWidth: 0.6,
+    color: '#ffaa00', font: "'Fira Code', monospace",
+    label: 'AWS D1.1'
+  },
+  arch: {
+    arrowLen: 0, arrowAngle: 45, textHeight: 4,  // arch uses tick marks not arrows
+    extOffset: 3, extGap: 1, lineWidth: 0.4,
+    color: '#00d4ff', font: "'Syne', sans-serif",
+    label: 'Architectural'
+  }
+};
+
+function kvDrawLinearDim(ctx, p1w, p2w, offsetMM, label) {
+  const style = DIM_STYLES[kvDimStd];
+  const p1s = kvW2S(p1w.x, p1w.y);
+  const p2s = kvW2S(p2w.x, p2w.y);
+  const dx = p2w.x - p1w.x, dy = p2w.y - p1w.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const measuredLen = unitMode === 'in'
+    ? (dist / 25.4).toFixed(3) + '"'
+    : dist.toFixed(2) + ' mm';
+  const displayLabel = label || measuredLen;
+
+  // Angle of dimension line
+  const ang = Math.atan2(p2w.y - p1w.y, p2w.x - p1w.x);
+  const perpAng = ang + Math.PI/2;
+
+  // Offset the dimension line
+  const offPx = offsetMM * kvZoom;
+  const ox = Math.cos(perpAng) * offPx;
+  const oy = -Math.sin(perpAng) * offPx;
+
+  const d1s = {x: p1s.x + ox, y: p1s.y - oy};
+  const d2s = {x: p2s.x + ox, y: p2s.y - oy};
+
+  ctx.save();
+  ctx.strokeStyle = style.color;
+  ctx.fillStyle   = style.color;
+  ctx.lineWidth   = style.lineWidth * kvZoom * 0.5;
+
+  // Extension lines
+  const extOff = style.extOffset * kvZoom * 0.5;
+  const extGap = style.extGap   * kvZoom * 0.5;
+  ctx.beginPath();
+  ctx.moveTo(p1s.x + Math.cos(perpAng)*extGap, p1s.y - Math.sin(perpAng)*extGap);
+  ctx.lineTo(d1s.x + Math.cos(perpAng)*extOff, d1s.y - Math.sin(perpAng)*extOff);
+  ctx.moveTo(p2s.x + Math.cos(perpAng)*extGap, p2s.y - Math.sin(perpAng)*extGap);
+  ctx.lineTo(d2s.x + Math.cos(perpAng)*extOff, d2s.y - Math.sin(perpAng)*extOff);
+  ctx.stroke();
+
+  // Dimension line
+  ctx.beginPath();
+  ctx.moveTo(d1s.x, d1s.y);
+  ctx.lineTo(d2s.x, d2s.y);
+  ctx.stroke();
+
+  // Arrows or ticks
+  if (kvDimStd === 'arch') {
+    // Architectural tick marks (45° slashes)
+    const tickLen = style.arrowLen * kvZoom * 0.4;
+    [[d1s.x,d1s.y],[d2s.x,d2s.y]].forEach(([tx,ty]) => {
+      ctx.beginPath();
+      ctx.moveTo(tx - tickLen * Math.cos(ang + Math.PI*0.25),
+                 ty - tickLen * Math.sin(ang + Math.PI*0.25));
+      ctx.lineTo(tx + tickLen * Math.cos(ang + Math.PI*0.25),
+                 ty + tickLen * Math.sin(ang + Math.PI*0.25));
+      ctx.stroke();
+    });
+  } else {
+    // Closed filled arrows
+    const aLen = style.arrowLen * kvZoom * 0.5;
+    const aAng = style.arrowAngle * Math.PI / 180;
+    [[d1s, ang + Math.PI],[d2s, ang]].forEach(([p, a]) => {
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + aLen*Math.cos(a-aAng), p.y + aLen*Math.sin(a-aAng));
+      ctx.lineTo(p.x + aLen*Math.cos(a+aAng), p.y + aLen*Math.sin(a+aAng));
+      ctx.closePath();
+      ctx.fill();
+    });
+  }
+
+  // Dimension text
+  const midX = (d1s.x + d2s.x)/2;
+  const midY = (d1s.y + d2s.y)/2;
+  const textH = style.textHeight * kvZoom * 0.5;
+  ctx.font = `${textH}px ${style.font}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.save();
+  ctx.translate(midX, midY);
+  // Keep text upright
+  let textAng = ang;
+  if (textAng > Math.PI/2 || textAng < -Math.PI/2) textAng += Math.PI;
+  ctx.rotate(textAng);
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+  ctx.lineWidth = 2;
+  ctx.strokeText(displayLabel, 0, -(style.lineWidth * kvZoom * 0.5 + 2));
+  ctx.fillStyle = style.color;
+  ctx.fillText(displayLabel, 0, -(style.lineWidth * kvZoom * 0.5 + 2));
+  ctx.restore();
+  ctx.restore();
+}
+
+function kvDrawRadialDim(ctx, center, radius, label) {
+  const style = DIM_STYLES[kvDimStd];
+  const cs    = kvW2S(center.x, center.y);
+  const rPx   = radius * kvZoom;
+  const measuredLen = unitMode === 'in'
+    ? 'R' + (radius/25.4).toFixed(3) + '"'
+    : 'R' + radius.toFixed(2) + ' mm';
+  const displayLabel = label || measuredLen;
+
+  const ang = Math.PI / 4;
+  const ep  = {x: cs.x + rPx*Math.cos(ang), y: cs.y - rPx*Math.sin(ang)};
+
+  ctx.save();
+  ctx.strokeStyle = style.color;
+  ctx.fillStyle   = style.color;
+  ctx.lineWidth   = style.lineWidth * kvZoom * 0.5;
+
+  // Leader line
+  ctx.beginPath();
+  ctx.moveTo(cs.x, cs.y);
+  ctx.lineTo(ep.x, ep.y);
+  ctx.stroke();
+
+  // Arrow at circle edge
+  const aLen = style.arrowLen * kvZoom * 0.5;
+  const aAng = style.arrowAngle * Math.PI / 180;
+  ctx.beginPath();
+  ctx.moveTo(ep.x, ep.y);
+  ctx.lineTo(ep.x - aLen*Math.cos(ang-aAng), ep.y + aLen*Math.sin(ang-aAng));
+  ctx.lineTo(ep.x - aLen*Math.cos(ang+aAng), ep.y + aLen*Math.sin(ang+aAng));
+  ctx.closePath(); ctx.fill();
+
+  // Label
+  const textH = style.textHeight * kvZoom * 0.5;
+  ctx.font = `${textH}px ${style.font}`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 2;
+  ctx.strokeText(displayLabel, ep.x + 3, ep.y - 3);
+  ctx.fillStyle = style.color;
+  ctx.fillText(displayLabel, ep.x + 3, ep.y - 3);
+  ctx.restore();
+}
+
+// ── AWS WELDING SYMBOLS ───────────────────────────────────────────────────────
+// Based on AWS A2.4 standard
+const WELD_TYPES = {
+  fillet:      { label:'Fillet',       code:'▷' },
+  groove_v:    { label:'V-Groove',     code:'V'  },
+  groove_bevel:{ label:'Bevel Groove', code:'⌒'  },
+  groove_u:    { label:'U-Groove',     code:'U'  },
+  groove_j:    { label:'J-Groove',     code:'J'  },
+  plug:        { label:'Plug/Slot',    code:'○'  },
+  spot:        { label:'Spot',         code:'⊙'  },
+  seam:        { label:'Seam',         code:'⊖'  },
+  back:        { label:'Back/Backing', code:')'  },
+  surfacing:   { label:'Surfacing',    code:'⌶'  },
+};
+let kvWeldType = 'fillet';
+let kvWeldArrow = 'arrow';  // 'arrow' | 'other' (arrow side vs other side of joint)
+let kvWeldSize = '';
+let kvWeldLength = '';
+
+function kvDrawWeldSymbol(ctx, p1s, p2s, type, arrowSide, size, length, note) {
+  // AWS A2.4 weld symbol: reference line + leader arrow + symbol
+  const dx = p2s.x - p1s.x, dy = p2s.y - p1s.y;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  if (len < 4) return;
+
+  ctx.save();
+  ctx.strokeStyle = '#ffaa00';
+  ctx.fillStyle   = '#ffaa00';
+  ctx.lineWidth   = 1.2;
+
+  // Leader line to weld joint
+  ctx.beginPath();
+  ctx.moveTo(p1s.x, p1s.y);
+  ctx.lineTo(p2s.x, p2s.y);
+  ctx.stroke();
+
+  // Arrow at p1
+  const ang = Math.atan2(dy, dx);
+  ctx.beginPath();
+  ctx.moveTo(p1s.x, p1s.y);
+  ctx.lineTo(p1s.x + 8*Math.cos(ang+0.4), p1s.y + 8*Math.sin(ang+0.4));
+  ctx.moveTo(p1s.x, p1s.y);
+  ctx.lineTo(p1s.x + 8*Math.cos(ang-0.4), p1s.y + 8*Math.sin(ang-0.4));
+  ctx.stroke();
+
+  // Reference line (horizontal at p2)
+  const refLen = Math.max(30, len * 0.6);
+  const refY = p2s.y;
+  const refX1 = p2s.x;
+  const refX2 = p2s.x + refLen;
+  ctx.beginPath();
+  ctx.moveTo(refX1, refY);
+  ctx.lineTo(refX2, refY);
+  ctx.stroke();
+
+  // Weld symbol: below line = arrow side, above = other side
+  const sym = WELD_TYPES[type] ? WELD_TYPES[type].code : '▷';
+  const midX = refX1 + refLen/2;
+  ctx.font = 'bold 11px Fira Code, monospace';
+  ctx.textAlign = 'center';
+  if (arrowSide === 'arrow') {
+    ctx.textBaseline = 'top';
+    ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 2;
+    ctx.strokeText(sym, midX, refY + 2);
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillText(sym, midX, refY + 2);
+    if (size) {
+      ctx.font = '8px Fira Code, monospace';
+      ctx.fillText(size, refX1 + 4, refY + 2);
+    }
+    if (length) {
+      ctx.font = '8px Fira Code, monospace';
+      ctx.fillText(length, refX2 - 4, refY + 2);
+    }
+  } else {
+    ctx.textBaseline = 'bottom';
+    ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 2;
+    ctx.strokeText(sym, midX, refY - 2);
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillText(sym, midX, refY - 2);
+    // Dashed reference line for other side
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();
+    ctx.moveTo(refX1, refY - 5);
+    ctx.lineTo(refX2, refY - 5);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Note/tail
+  if (note) {
+    ctx.font = '8px Fira Code, monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffaa00';
+    // Open tail at end of reference line
+    ctx.beginPath();
+    ctx.moveTo(refX2, refY - 5);
+    ctx.lineTo(refX2 + 8, refY);
+    ctx.moveTo(refX2, refY + 5);
+    ctx.lineTo(refX2 + 8, refY);
+    ctx.stroke();
+    ctx.fillText(note, refX2 + 10, refY);
+  }
+  ctx.restore();
+}
+
+// ── KANVAS RENDER ─────────────────────────────────────────────────────────────
+function kvRender() {
+  if (!kvActive || !kvCanvas || !kvCtx) return;
+  const W = kvCanvas.width, H = kvCanvas.height;
+  const ctx = kvCtx;
+  ctx.clearRect(0, 0, W, H);
+
+  // 1. Dark surround
+  ctx.fillStyle = '#080a0e';
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. White artboard
+  const o  = kvGetPageOrigin();
+  const pW = KV_PAGE.w * kvZoom;
+  const pH = KV_PAGE.h * kvZoom;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur  = 20;
+  ctx.fillStyle   = '#ffffff';
+  ctx.fillRect(o.x, o.y, pW, pH);
+  ctx.restore();
+
+  // 3. KAD geometry reference layer (read-only, dimmed blue)
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.strokeStyle = '#00d4ff';
+  ctx.lineWidth   = 0.8;
+  for (const obj of GeoMemory.objects) {
+    if (obj.type === 'LINE') {
+      const a = kvW2S(obj.x1, obj.y1), b = kvW2S(obj.x2, obj.y2);
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    } else if (obj.type === 'CIRCLE') {
+      const c = kvW2S(obj.cx, obj.cy);
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, obj.r * kvZoom, 0, Math.PI*2);
+      ctx.stroke();
+    } else if (obj.type === 'ARC') {
+      const c = kvW2S(obj.cx, obj.cy);
+      const sa = obj.startAngle * Math.PI/180;
+      const ea = obj.endAngle   * Math.PI/180;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, obj.r * kvZoom, -ea, -sa);
+      ctx.stroke();
+    } else if (obj.type === 'POLYLINE' && obj.pts) {
+      const pts = obj.pts.map(p => kvW2S(p.x, p.y));
+      ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+      if (obj.closed) ctx.closePath();
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // 4. Page grid (1mm dots)
+  ctx.save();
+  ctx.globalAlpha = 0.15;
+  ctx.fillStyle = '#00d4ff';
+  const gs = Math.max(5, 10) * kvZoom; // 10mm grid
+  for (let gx = 0; gx <= KV_PAGE.w; gx += 10) {
+    for (let gy = 0; gy <= KV_PAGE.h; gy += 10) {
+      const sp = kvW2S(gx, gy);
+      ctx.beginPath();
+      ctx.arc(sp.x, sp.y, 0.8, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+
+  // 5. Annotation strokes (erase-composited)
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(o.x, o.y, pW, pH);
+  ctx.clip();
+  if (kvEraseC && kvEraseC.width === W && kvEraseC.height === H) {
+    ctx.drawImage(kvEraseC, 0, 0, W, H);
+  }
+  ctx.restore();
+
+  // 6. Dimension annotations
+  for (const d of KVM.dims) {
+    if (d.type === 'linear') {
+      kvDrawLinearDim(ctx, d.p1, d.p2, d.offset || 10, d.label);
+    } else if (d.type === 'radial') {
+      kvDrawRadialDim(ctx, d.center, d.radius, d.label);
+    }
+  }
+
+  // 7. Weld symbols
+  for (const w of KVM.welds) {
+    const s1 = kvW2S(w.p1.x, w.p1.y);
+    const s2 = kvW2S(w.p2.x, w.p2.y);
+    kvDrawWeldSymbol(ctx, s1, s2, w.weldType, w.arrowSide, w.size, w.length, w.note);
+  }
+
+  // 8. Live tool previews
+  kvDrawToolPreview(ctx);
+
+  // 9. Page label
+  ctx.save();
+  ctx.font = `500 9px 'Fira Code', monospace`;
+  ctx.fillStyle = 'rgba(0,212,255,0.5)';
+  ctx.fillText(`${KV_PAGE.label} · ${KV_PAGE.dim} · ${DIM_STYLES[kvDimStd].label}`, o.x + 4, o.y - 6);
+  ctx.restore();
+}
+
+function kvGetPageOrigin() {
+  return { x: kvPanX, y: kvPanY };
+}
+
+function kvDrawToolPreview(ctx) {
+  // Dimension preview
+  if (kvTool === 'dim-linear' && kvDimState.active && kvDimState.p1) {
+    kvDrawLinearDim(ctx, kvDimState.p1, kvMouseWorld, 10, null);
+  }
+  if (kvTool === 'dim-radial' && kvDimState.active && kvDimState.p1) {
+    const dx = kvMouseWorld.x - kvDimState.p1.x;
+    const dy = kvMouseWorld.y - kvDimState.p1.y;
+    kvDrawRadialDim(ctx, kvDimState.p1, Math.sqrt(dx*dx+dy*dy), null);
+  }
+  // Weld symbol preview
+  if (kvTool === 'weld' && kvWeldState.active && kvWeldState.p1) {
+    const s1 = kvW2S(kvWeldState.p1.x, kvWeldState.p1.y);
+    const s2 = kvW2S(kvMouseWorld.x, kvMouseWorld.y);
+    kvDrawWeldSymbol(ctx, s1, s2, kvWeldType, kvWeldArrow, kvWeldSize, kvWeldLength, '');
+  }
+}
+
+function kvScheduleDraw() {
+  if (!kvRafId) kvRafId = requestAnimationFrame(() => { kvRafId=null; kvRender(); });
+}
+
+// ── KANVAS TOOL SETTER ────────────────────────────────────────────────────────
+let kvMouseWorld = {x:0, y:0};
+
+function kvSetTool(t) {
+  kvTool = t;
+  document.querySelectorAll('.kv-tbtn').forEach(b => b.classList.remove('act'));
+  const btn = document.getElementById(`kv-tb-${t}`);
+  if (btn) btn.classList.add('act');
+  // Dim standard selector
+  const dimRow = document.getElementById('kv-dim-row');
+  const weldRow = document.getElementById('kv-weld-row');
+  if (dimRow)  dimRow.style.display  = t.startsWith('dim') ? 'flex' : 'none';
+  if (weldRow) weldRow.style.display = t === 'weld'        ? 'flex' : 'none';
+  kvDimState  = {active:false, p1:null, p2:null, offset:10};
+  kvWeldState = {active:false, p1:null, p2:null};
+  showToast({
+    'select':       'SELECT — click to pick, drag to pan',
+    'brush':        'BRUSH — freehand annotation',
+    'text':         'TEXT — click to place note',
+    'dim-linear':   'LINEAR DIM — click p1, click p2',
+    'dim-radial':   'RADIAL DIM — click centre, drag radius',
+    'dim-angle':    'ANGLE DIM — click vertex, p1, p2',
+    'weld':         'WELD SYMBOL — click joint start, drag to end',
+    'erase':        'ERASE — paint to erase',
+  }[t] || t.toUpperCase());
+  kvScheduleDraw();
+}
+
+// ── KANVAS POINTER EVENTS ─────────────────────────────────────────────────────
+function kvOnDown(e) {
+  e.preventDefault();
+  kvInitDrawing();
+  const s = kvSpt(e);
+  const w = kvS2W(s.x, s.y);
+  kvMouseWorld = kvSnapPt(w.x, w.y);
+
+  if (e.button === 1 || (e.button === 0 && kvSpaceDown)) {
+    kvIsPanning = true;
+    kvPanOX = s.x - kvPanX;
+    kvPanOY = s.y - kvPanY;
+    return;
+  }
+
+  if (kvTool === 'dim-linear') {
+    if (!kvDimState.active) {
+      kvDimState = {active:true, p1:{...kvMouseWorld}, p2:null, offset:10};
+    } else {
+      KVM.dims.push({type:'linear', p1:kvDimState.p1, p2:{...kvMouseWorld}, offset:10, label:null});
+      kvDimState = {active:false, p1:null, p2:null, offset:10};
+      kvScheduleDraw();
+    }
+  } else if (kvTool === 'dim-radial') {
+    if (!kvDimState.active) {
+      kvDimState.active = true;
+      kvDimState.p1 = {...kvMouseWorld};
+    } else {
+      const dx = kvMouseWorld.x - kvDimState.p1.x;
+      const dy = kvMouseWorld.y - kvDimState.p1.y;
+      KVM.dims.push({type:'radial', center:kvDimState.p1, radius:Math.sqrt(dx*dx+dy*dy), label:null});
+      kvDimState.active = false;
+      kvScheduleDraw();
+    }
+  } else if (kvTool === 'weld') {
+    if (!kvWeldState.active) {
+      kvWeldState = {active:true, p1:{...kvMouseWorld}, p2:null};
+    } else {
+      KVM.welds.push({
+        p1:kvWeldState.p1, p2:{...kvMouseWorld},
+        weldType:kvWeldType, arrowSide:kvWeldArrow,
+        size:kvWeldSize, length:kvWeldLength, note:''
+      });
+      kvWeldState = {active:false, p1:null, p2:null};
+      kvScheduleDraw();
+    }
+  } else if (kvTool === 'text') {
+    const txt = prompt('Annotation text:', '');
+    if (txt) {
+      KVM.strokes.push({
+        id:KVM.nextId++, type:'text', layer:KVM.activeLayer,
+        x:kvMouseWorld.x, y:kvMouseWorld.y, text:txt,
+        color:B.color, size:B.size
+      });
+      kvRebuildEraseCanvas();
+      kvScheduleDraw();
+    }
+  }
+}
+
+function kvOnMove(e) {
+  const s = kvSpt(e);
+  const w = kvS2W(s.x, s.y);
+  kvMouseWorld = {x:w.x, y:w.y};
+  if (kvIsPanning) {
+    kvPanX = s.x - kvPanOX;
+    kvPanY = s.y - kvPanOY;
+  }
+  kvScheduleDraw();
+}
+
+function kvOnUp(e) {
+  kvIsPanning = false;
+}
+
+// ── KANVAS ERASE CANVAS ───────────────────────────────────────────────────────
+let kvEma = null;
+let kvVel = null;
+
+function kvInitDrawing() {
+  // Deferred — EMAStab/VelTrack may not exist in base KAD (those are VAD classes)
+  // For KAD KANVAS, we use simple freehand without EMA stabilization
+}
+
+function kvRebuildEraseCanvas() {
+  if (!kvCanvas || !kvEraseC) return;
+  kvEraseC.width  = kvCanvas.width;
+  kvEraseC.height = kvCanvas.height;
+  kvEraseCtx.clearRect(0, 0, kvEraseC.width, kvEraseC.height);
+  for (const s of KVM.visibleStrokes()) {
+    kvRenderStroke(kvEraseCtx, s);
+  }
+}
+
+function kvRenderStroke(ctx, s) {
+  if (!s) return;
+  if (s.type === 'text') {
+    const sp = kvW2S(s.x, s.y);
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.font = `bold ${Math.round((s.size||10) * kvZoom * 0.5)}px 'Fira Code', monospace`;
+    ctx.fillStyle = s.color || '#ff3cac';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(s.text, sp.x, sp.y);
+    ctx.restore();
+  }
+}
+
+// ── KANVAS EXPORT ─────────────────────────────────────────────────────────────
+function kvExportVAD() {
+  const geoRef = {
+    type:'kad-reference', locked:true,
+    objects: GeoMemory.objects,
+    units: unitMode,
+    layer: 'KAD Geometry',
+  };
+  const vad = {
+    version:'1.0', source:'KAD KANVAS',
+    layers:  KVM.layers,
+    activeLayer: KVM.activeLayer,
+    nextId:  KVM.nextId,
+    strokes: KVM.strokes,
+    dims:    KVM.dims,
+    welds:   KVM.welds,
+    page:    Object.keys(KV_PAGE_SIZES).find(k=>KV_PAGE_SIZES[k]===KV_PAGE)||'a3p',
+    dimStd:  kvDimStd,
+    kadRef:  geoRef,
+  };
+  const blob = new Blob([JSON.stringify(vad,null,2)], {type:'application/json'});
+  const a = Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(blob), download:'drawing.vad'
+  });
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  showToast('Saved drawing.vad');
+}
+
+function kvExportSVG() {
+  const W = KV_PAGE.w, H = KV_PAGE.h;
+  const lines = [`<svg xmlns="http://www.w3.org/2000/svg" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}">`];
+  lines.push(`<rect width="${W}" height="${H}" fill="white"/>`);
+  // Text strokes
+  for (const s of KVM.visibleStrokes()) {
+    if (s.type === 'text') {
+      lines.push(`<text x="${s.x.toFixed(2)}" y="${(H-s.y).toFixed(2)}" font-family="Fira Code,monospace" font-size="${(s.size||10)*0.5}" fill="${s.color||'#ff3cac'}">${s.text}</text>`);
+    }
+  }
+  // Dims (simplified)
+  lines.push('</svg>');
+  const blob = new Blob([lines.join('\n')], {type:'image/svg+xml'});
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob), download:'drawing.svg'});
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  showToast('Exported drawing.svg');
+}
+
+function kvPrintPDF() {
+  const origDisplay = document.getElementById('kanvas-pane').style.display;
+  window.print();
+}
+
+// ── KANVAS MODE TOGGLE (TAB) ──────────────────────────────────────────────────
+function kadSwitchTab(tab) {
+  kvActive = (tab === 'kanvas');
+
+  // Show/hide panes
+  document.getElementById('model-pane').style.display = kvActive ? 'none' : 'flex';
+  document.getElementById('kanvas-pane').style.display = kvActive ? 'flex' : 'none';
+
+  // Tab active states
+  document.getElementById('kad-tab-model').classList.toggle('active', !kvActive);
+  document.getElementById('kad-tab-kanvas').classList.toggle('active',  kvActive);
+
+  // Brand sub
+  const sub = document.getElementById('brand-sub');
+  if (sub) sub.textContent = kvActive ? 'KANVAS · Paperspace' : 'Kernel-Aided Design';
+
+  // Accent color on body
+  document.body.classList.toggle('kanvas-mode', kvActive);
+
+  if (kvActive) {
+    // Resize KANVAS canvas to match wrapper
+    kvResizeCanvas();
+    kvZoomFit();
+    kvScheduleDraw();
+    // Attach events
+    kvCanvas.addEventListener('pointerdown',  kvOnDown, {passive:false});
+    kvCanvas.addEventListener('pointermove',  kvOnMove, {passive:true});
+    kvCanvas.addEventListener('pointerup',    kvOnUp);
+    kvCanvas.addEventListener('pointercancel',kvOnUp);
+    kvCanvas.addEventListener('wheel', kvOnWheel, {passive:false});
+    kvCanvas.addEventListener('keydown', kvOnKey);
+    kvSetTool('brush');
+    kvBuildLayerList();
+    kvBuildSwatches();
+    showToast('KANVAS paperspace · Annotate over geometry · Ctrl+W to return');
+  } else {
+    kvCanvas.removeEventListener('pointerdown',  kvOnDown);
+    kvCanvas.removeEventListener('pointermove',  kvOnMove);
+    kvCanvas.removeEventListener('pointerup',    kvOnUp);
+    kvCanvas.removeEventListener('pointercancel',kvOnUp);
+    kvCanvas.removeEventListener('wheel', kvOnWheel);
+    kvCanvas.removeEventListener('keydown', kvOnKey);
+    render();
+    showToast('Model space');
+  }
+}
+
+function kvResizeCanvas() {
+  if (!kvCanvas) return;
+  const wrap = document.getElementById('kanvas-pane');
+  if (!wrap) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  kvCanvas.width  = W * dpr;
+  kvCanvas.height = H * dpr;
+  kvCanvas.style.width  = W + 'px';
+  kvCanvas.style.height = H + 'px';
+  kvCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (kvEraseC) {
+    kvEraseC.width  = kvCanvas.width;
+    kvEraseC.height = kvCanvas.height;
+  }
+}
+
+function kvOnWheel(e) {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.12 : 0.88;
+  const s = kvSpt(e);
+  kvPanX = s.x - (s.x - kvPanX) * factor;
+  kvPanY = s.y - (s.y - kvPanY) * factor;
+  kvZoom *= factor;
+  kvScheduleDraw();
+}
+
+function kvOnKey(e) {
+  if ((e.ctrlKey||e.metaKey) && e.key==='w') { e.preventDefault(); kadSwitchTab('model'); }
+  if (e.key==='b') kvSetTool('brush');
+  if (e.key==='t') kvSetTool('text');
+  if (e.key==='d') kvSetTool('dim-linear');
+  if (e.key==='r') kvSetTool('dim-radial');
+  if (e.key==='w') kvSetTool('weld');
+  if (e.key==='f') kvZoomFit(), kvScheduleDraw();
+  if (e.key==='Escape') { kvDimState.active=false; kvWeldState.active=false; kvScheduleDraw(); }
+  if ((e.ctrlKey||e.metaKey) && e.key==='z') { KVM.strokes.pop(); kvRebuildEraseCanvas(); kvScheduleDraw(); }
+}
+
+// ── KANVAS SIDEBAR HELPERS ────────────────────────────────────────────────────
+function kvBuildLayerList() {
+  const el = document.getElementById('kv-layers');
+  if (!el) return;
+  el.innerHTML = KVM.layers.map(l => `
+    <div class="kv-layer-item ${l.name===KVM.activeLayer?'active':''}"
+         onclick="KVM.activeLayer='${l.name}';kvBuildLayerList();">
+      <div class="kv-layer-dot" style="background:${l.color}"></div>
+      <span>${l.name}</span>
+    </div>`).join('');
+}
+
+const KV_SWATCHES = ['#ff3cac','#00d4ff','#00ff9d','#ffaa00','#7c4dbd',
+  '#ffffff','#c0c0c0','#808080','#404040','#000000'];
+
+function kvBuildSwatches() {
+  const el = document.getElementById('kv-swatches');
+  if (!el) return;
+  el.innerHTML = KV_SWATCHES.map(c =>
+    `<div class="kv-swatch" style="background:${c}" onclick="kvSetColor('${c}')"></div>`
+  ).join('');
+}
+
+function kvSetColor(hex) {
+  B.color = hex;
+  const chip = document.getElementById('kv-color-chip');
+  if (chip) chip.style.background = hex;
+}
+
+function kvSetPageSize(key) {
+  KV_PAGE = KV_PAGE_SIZES[key] || KV_PAGE_SIZES.a3p;
+  kvZoomFit();
+  kvScheduleDraw();
+  showToast('Page: ' + KV_PAGE.label);
+}
+
+function kvSetDimStd(std) {
+  kvDimStd = std;
+  document.querySelectorAll('.kv-dim-btn').forEach(b => b.classList.remove('act'));
+  const btn = document.getElementById(`kv-dim-${std}`);
+  if (btn) btn.classList.add('act');
+  kvScheduleDraw();
+  showToast('Dim standard: ' + DIM_STYLES[std].label);
+}
+
+// ── KANVAS INIT ───────────────────────────────────────────────────────────────
+function kvInit() {
+  kvCanvas = document.getElementById('kanvas-canvas');
+  if (!kvCanvas) return;
+  kvCtx    = kvCanvas.getContext('2d');
+  kvEraseC = document.createElement('canvas');
+  kvEraseCtx = kvEraseC.getContext('2d');
+}
+
+
+kvInit();
 </script>
 </body>
 </html>
