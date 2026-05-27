@@ -32,10 +32,10 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width:100%; height:100%; overflow:hidden; background:var(--void); color:var(--t1); font-family:var(--fd); font-size:13px; }
+html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; background:var(--void); color:var(--t1); font-family:var(--fd); font-size:13px; }
 
 /* ── LAYOUT ── */
-#app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr var(--status-h); width:100vw; height:100vh; }
+#app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr var(--status-h); width:100vw; height:100vh; overflow:hidden; }
 
 /* ── TOPBAR ── */
 #topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
@@ -59,7 +59,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
 .tb-dd-sep { height:1px; background:var(--border); margin:3px 0; }
 
 /* ── SIDEBAR ── */
-#sidebar { background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; position:relative; z-index:10; }
+#sidebar { background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; position:relative; z-index:10; height:100%; flex-shrink:0; }
 .section-head { padding:8px 14px 5px; font-family:var(--fm); font-size:9px; font-weight:500; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; border-bottom:1px solid var(--border); flex-shrink:0; }
 .tool-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; padding:6px; background:var(--border); border-bottom:1px solid var(--border); flex-shrink:0; }
 .tool-btn { background:var(--panel2); border:none; cursor:pointer; padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:3px; transition:background 0.15s,box-shadow 0.15s; position:relative; overflow:hidden; }
@@ -116,7 +116,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
 .layer-count { font-size:10px; color:var(--t3); font-family:var(--fm); }
 
 /* ── CANVAS AREA ── */
-#canvas-wrap { position:relative; overflow:hidden; background:var(--void); }
+#canvas-wrap { position:relative; overflow:hidden; background:var(--void); flex:1; min-width:0; }
 #main-canvas { display:block; }
 
 /* ── SNAP INDICATOR ── */
@@ -571,7 +571,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--void); c
 }
 
 /* ── Model / KANVAS pane wrappers ── */
-#model-pane  { display: flex; flex: 1; overflow: hidden; grid-column: 1 / -1; }
+#model-pane  { display: flex; flex: 1; overflow: hidden; grid-column: 1 / -1; height: 100%; min-height: 0; }
 #kanvas-pane { display: none; flex: 1; overflow: hidden; position: relative; grid-column: 1 / -1; }
 body.kanvas-mode #kanvas-pane { display: flex; }
 body.kanvas-mode #model-pane  { display: none; }
@@ -675,7 +675,21 @@ body.kanvas-mode #model-pane  { display: none; }
 #kanvas-canvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
 
 /* ── Sidebar reorganize: DELETE always at bottom ── */
-.tool-grid-bottom { margin-top: auto; padding: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
+.tool-grid-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  padding: 6px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+.tool-grid-bottom .tool-btn,
+.tool-grid-bottom .tbtn {
+  grid-column: 1 / -1;   /* delete spans all columns = same width as tool-grid row */
+}
+.tool-grid-bottom .tool-btn {
+  width: 100%;
+}
 
 /* ── KANVAS mode accent ── */
 body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba(0,212,200,0.15); }
@@ -704,7 +718,6 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
         <div class="tb-dd-item" onclick="document.getElementById('load-kad').click();closeMenus()">Open .kad<span class="dd-key">Ctrl+O</span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="exportDXF();closeMenus()">Export .dxf<span class="dd-key">Ctrl+E</span></div>
-        <div class="tb-dd-item" onclick="exportSCAD();closeMenus()">Export .scad<span class="dd-key">Ctrl+Shift+E</span></div>
         <div class="tb-dd-item" onclick="document.getElementById('load-dxf').click();closeMenus()">Import .dxf<span class="dd-key"></span></div>
       </div>
     </div>
@@ -809,10 +822,7 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><path d="M14 11.5l3 2.5-3 2.5" stroke-width="1.2"/></svg></div>
       <span class="tool-label">OFFSET</span>
     </button>
-    <button class="tool-btn" id="btn-select2" onclick="deleteSelected()" title="Delete selected (Del)">
-      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
-      <span class="tool-label">DELETE</span>
-    </button>
+
     <button class="tool-btn" id="btn-rotate" onclick="setTool('rotate')">
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></div>
       <span class="tool-label">ROTATE</span>
@@ -828,6 +838,13 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
     <button class="tool-btn" id="btn-fillet" onclick="setTool('fillet')">
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19 L5 8 Q5 5 8 5 L19 5"/></svg></div>
       <span class="tool-label">FILLET</span>
+    </button>
+    <button class="tool-btn" id="btn-chamfer" onclick="setTool('chamfer')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 20 L12 4 L20 20"/>
+        <line x1="7" y1="14" x2="17" y2="14"/>
+      </svg></div>
+      <span class="tool-label">CHAMFER</span>
     </button>
     <button class="tool-btn" id="btn-mirror" onclick="setTool('mirror')">
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="2 2"/><polyline points="3,7 9,12 3,17"/><polyline points="21,7 15,12 21,17"/></svg></div>
@@ -891,9 +908,20 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
     <label style="font-family:var(--fm);font-size:9px;color:var(--t3);text-transform:uppercase;">CIRC</label>
     <input type="checkbox" id="poly-inscribed" checked title="Inscribed (vertices on circle) vs circumscribed"/>
   </div>
+  <div class="tool-grid-bottom">
+    <button class="tool-btn" id="btn-delete" onclick="deleteSelected()" style="color:#ff4455;">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ff4455" stroke-width="1.5">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+        <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+      </svg></div>
+      <span class="tool-label" style="color:#ff4455;">DELETE</span>
+    </button>
+  </div>
 
   <div class="section-head">File</div>
   <div class="file-ops">
+    <!-- KAD native -->
     <button class="op-btn" onclick="saveKAD()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       Save .kad
@@ -903,13 +931,10 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
       Open .kad
     </button>
     <input type="file" id="load-kad" accept=".kad" onchange="loadKAD(event)">
+    <!-- DXF — export + import together -->
     <button class="op-btn dxf" onclick="exportDXF()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Export .dxf
-    </button>
-    <button class="op-btn" style="color:var(--amber);border-color:#664400;" onclick="exportSCAD()" title="Export OpenSCAD file for 3D modeling">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8M8 17h5"/></svg>
-      Export .scad
     </button>
     <button class="op-btn dxf" onclick="document.getElementById('load-dxf').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
