@@ -736,7 +736,13 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
     </div>
     <div class="tb-menu-item" id="menu-view" onmouseenter="openMenu('view')" onmouseleave="scheduleClose()">View
       <div class="tb-dropdown" id="dd-view" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
-        <div class="tb-dd-item" onclick="zoomExtents();closeMenus()">Zoom Extents<span class="dd-key">Z</span></div>
+        <div class="tb-dd-item" onclick="zoomExtents();closeMenus()">Zoom Extents<span class="dd-key">Z</span>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-label">Angle snap (Ctrl)</div>
+        <div class="tb-dd-item angle-snap-opt" data-deg="15" onclick="setAngleSnap(15);closeMenus()" style="font-weight:700;color:var(--green)">✓ 15° (standard)</div>
+        <div class="tb-dd-item angle-snap-opt" data-deg="5"  onclick="setAngleSnap(5);closeMenus()">5° (fine)</div>
+        <div class="tb-dd-item angle-snap-opt" data-deg="0"  onclick="setAngleSnap(0);closeMenus()">Free (off)</div>
+      </div>
         <div class="tb-dd-item" onclick="initCamera();render();closeMenus()">Reset View<span class="dd-key">Home</span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="toggleGrid();closeMenus()">Toggle Grid<span class="dd-key">G</span></div>
@@ -1379,17 +1385,7 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
         <b>Extrude</b> → ready-to-render 3D part in OpenSCAD.<br>
         <b>Flat 2D</b> → use with <code>linear_extrude()</code> in your own SCAD file.<br>
         <b>Raw</b> → individual shapes; compose manually.<br>
-        <span style="color:var(--t3);">Closed polylines become filled polygons · Circles/arcs are native SCAD primitives.</span>
-      </div>
-      <div class="dlg-actions" style="display:flex;gap:6px;margin-top:12px;">
-        <button class="dlg-btn cancel" onclick="closeSCADDialog()" style="flex:1">Cancel</button>
-        <button class="dlg-btn commit" onclick="commitSCADExport()" style="flex:2;background:rgba(255,170,0,0.12);border-color:var(--amber);color:var(--amber);">Export .scad</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
+        <span style="color:var(--t3);">Closed po
 'use strict';
 // ═══════════════════════════════════════════════════════════
 //  .KAD Gamma  v0.6  — Kernel-Aided Design + OpenSCAD Export
@@ -1726,6 +1722,9 @@ let showGrid     = true;
 
 // Line tool
 let lineState = { active:false, x1:0, y1:0 };
+let shiftLockActive = false;
+let shiftLockAngle  = 0;
+let angleSnapDeg    = 15;  // 5 | 15 | 0(free)
 // Chain accumulates vertices while drawing connected lines
 // When Enter is pressed or the chain closes back to start, it becomes a POLYLINE
 let lineChain = []; // [{x,y}, ...] — vertices in order
@@ -1789,6 +1788,16 @@ function toggleGrid() {
   document.getElementById('prop-grid-st').className   = 'prop-val '+(showGrid?'green':'');
   render();
 }
+function setAngleSnap(deg) {
+  angleSnapDeg = deg;
+  const labels = {0:'Free',5:'5°',15:'15°'};
+  showToast('Angle snap: ' + (labels[deg]||deg+'°'));
+  document.querySelectorAll('.angle-snap-opt').forEach(el => {
+    el.style.fontWeight = parseInt(el.dataset.deg)===deg ? '700' : '400';
+    el.style.color = parseInt(el.dataset.deg)===deg ? 'var(--green)' : '';
+  });
+}
+
 function toggleSnap() {
   snapEnabled = !snapEnabled;
   document.getElementById('sb-snap').textContent  = snapEnabled?'ON':'OFF';
@@ -2958,6 +2967,19 @@ function onMouseMove(e) {
   snapActive=!!snap; snapPoint=snap;
   mouseWorld=snapActive?snapPoint:raw;
 
+  // Shift = angle lock 15° increments (LINE tool)
+  shiftLockActive = false;
+  if ((e.shiftKey) && activeTool==='line' && lineState.active) {
+    const sx = lineState.x1, sy = lineState.y1;
+    const rawAng = Math.atan2(mouseWorld.y - sy, mouseWorld.x - sx);
+    const step   = (angleSnapDeg||15) * Math.PI / 180;
+    const locked = Math.round(rawAng / step) * step;
+    const dist   = Math.hypot(mouseWorld.x - sx, mouseWorld.y - sy);
+    mouseWorld      = { x: sx + dist*Math.cos(locked), y: sy + dist*Math.sin(locked) };
+    shiftLockActive = true;
+    shiftLockAngle  = locked;
+  }
+
   document.getElementById('cx').textContent=fmtCoord(mouseWorld.x);
   document.getElementById('cy').textContent=fmtCoord(mouseWorld.y);
 
@@ -3399,6 +3421,15 @@ function drawRubberBand() {
   ctx.stroke();
   ctx.setLineDash([]);
 
+  // Angle lock annotation
+  if (shiftLockActive) {
+    const deg = ((Math.round(shiftLockAngle*180/Math.PI)%360)+360)%360;
+    ctx.font = '9px Fira Code,monospace';
+    ctx.fillStyle = C.rubberLine;
+    ctx.globalAlpha = 0.85;
+    ctx.fillText('∠'+deg+'°', end.x+10, end.y-6);
+  }
+
   // ── Start point ring ──
   const chainStart = worldToScreen(lineChain[0].x, lineChain[0].y);
   ctx.strokeStyle = C.startPt;
@@ -3503,7 +3534,7 @@ function parseDXF(text) {
     if (code === 9  && val === '$INSUNITS') { nextIsInsUnits = true; continue; }
     if (nextIsInsUnits && code === 70) {
       rawInsUnits = parseInt(val, 10);
-      scaleMM = DXF_INSUNITS_TO_MM[rawInsUnits] ?? 1;
+      scaleMM = (DXF_INSUNITS_TO_MM[rawInsUnits] != null ? DXF_INSUNITS_TO_MM[rawInsUnits] : 1);
       nextIsInsUnits = false;
     }
   }
@@ -3748,9 +3779,9 @@ function importDXF(event) {
       0:'0 — Unitless', 1:'1 — Inches', 4:'4 — Millimeters', 2:'2 — Feet',
       5:'5 — Centimeters', 6:'6 — Meters',
     };
-    const rawUnits = parsed.rawInsUnits ?? 0;
+    const rawUnits = (parsed.rawInsUnits != null ? parsed.rawInsUnits : 0);
     const insEl = document.getElementById('dlg-insunits');
-    insEl.textContent = insunitsLabel[rawUnits] ?? `${rawUnits} — see DXF spec`;
+    insEl.textContent = (insunitsLabel[rawUnits] != null ? insunitsLabel[rawUnits] : `${rawUnits} — see DXF spec`);
     // Colour-code: 0 = ambiguous, 1 = inches (common gotcha), 4 = mm fine
     insEl.className = rawUnits===0 ? 'warn' : rawUnits===4 ? 'ok' : '';
 
@@ -3776,7 +3807,7 @@ function commitDxfImport() {
   // parseDXF now returns raw coordinates (no pre-scaling applied).
   let S;
   if (unitSel === 'auto') {
-    S = DXF_INSUNITS_TO_MM[parsed.rawInsUnits] ?? 1;
+    S = (DXF_INSUNITS_TO_MM[parsed.rawInsUnits] != null ? DXF_INSUNITS_TO_MM[parsed.rawInsUnits] : 1);
   } else if (unitSel === 'in') {
     S = 25.4;
   } else {
@@ -5092,6 +5123,24 @@ function kvSetPageSize(key) {
 function kvSetDimStd(std) {
   kvDimStd = std;
   document.querySelectorAll('.kv-dim-btn').forEach(b => b.classList.remove('act'));
+  const btn = document.getElementById(`kv-dim-${std}`);
+  if (btn) btn.classList.add('act');
+  kvScheduleDraw();
+  showToast('Dim standard: ' + DIM_STYLES[std].label);
+}
+
+// ── KANVAS INIT ───────────────────────────────────────────────────────────────
+function kvInit() {
+  kvCanvas = document.getElementById('kanvas-canvas');
+  if (!kvCanvas) return;
+  kvCtx    = kvCanvas.getContext('2d');
+  kvEraseC = document.createElement('canvas');
+  kvEraseCtx = kvEraseC.getContext('2d');
+}
+
+
+kvInit();
+t'));
   const btn = document.getElementById(`kv-dim-${std}`);
   if (btn) btn.classList.add('act');
   kvScheduleDraw();
