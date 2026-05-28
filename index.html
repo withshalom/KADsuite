@@ -1,4 +1,24 @@
 <!DOCTYPE html>
+<!--
+  KERFsuite™ — Kernel-Aided Design Suite
+  Copyright (C) 2024-2025 KERFsuite / withshalom
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published
+  by the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  Commercial use requires a separate license — see https://kerfsuite.com/commercial
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -348,6 +368,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
   backdrop-filter: blur(6px);
   z-index: 900;
   display: flex; align-items: center; justify-content: center;
+  pointer-events: all;
 }
 #splash-dialog {
   background: var(--panel);
@@ -781,7 +802,7 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
     </div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge">v0.6.0-gamma</span>
+    <span class="tb-badge">v0.6.0</span>
     <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
       <span class="unit-divider"></span>
@@ -1187,10 +1208,10 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span>M</span><span class="sb-val">mirror</span></div>
     <div class="sb-item"><span>D</span><span class="sb-val">measure</span></div>
-    <div class="sb-item"><span class="sb-val ok">.KAD Gamma v0.6</span></div>
+    <div class="sb-item"><span class="sb-val ok">.KAD v0.6</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
-      <span>© <span id="cc-year"></span> · Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" class="cc-link">CC BY-SA 4.0</a> · .KAD Kernel-Aided Design</span>
+      <span>© <span id="cc-year"></span> KERFsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · Free for non-commercial use · <a href="#" class="cc-link">Commercial license</a> required for paid work</span>
     </div>
   </div>
 </div>
@@ -1297,11 +1318,11 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
 </div>
 
 <!-- STARTUP UNIT SPLASH -->
-<div id="splash-overlay">
+<div id="splash-overlay" onclick="event.stopPropagation()">
   <div id="splash-dialog">
     <div class="dlg-head">
       <div class="splash-brand"><div class="splash-brand-dot"></div>.KAD</div>
-      <div class="splash-sub">Kernel-Aided Design · v0.6 Gamma</div>
+      <div class="splash-sub">Kernel-Aided Design · v0.6</div>
     </div>
     <div class="dlg-body">
       <div class="splash-prompt">
@@ -1323,7 +1344,8 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
       </div>
       <div class="splash-note">
         This preference is saved locally and won't appear again.<br>
-        CC BY-SA 4.0 · © <span id="splash-year"></span> · .KAD Kernel-Aided Design
+        AGPL-3.0 · Free for non-commercial use · Commercial license required for paid work<br>
+        © <span id="splash-year"></span> KERFsuite™ · .KAD Kernel-Aided Design
       </div>
     </div>
   </div>
@@ -1385,10 +1407,16 @@ body.kanvas-mode { --accent: #00d4c8; --accent-dim: #00a89e; --accent-glow: rgba
         <b>Extrude</b> → ready-to-render 3D part in OpenSCAD.<br>
         <b>Flat 2D</b> → use with <code>linear_extrude()</code> in your own SCAD file.<br>
         <b>Raw</b> → individual shapes; compose manually.<br>
-        <span style="color:var(--t3);">Closed po
+        <span style="color:var(--t3);">Closed polylines only.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
 'use strict';
 // ═══════════════════════════════════════════════════════════
-//  .KAD Gamma  v0.6  — Kernel-Aided Design + OpenSCAD Export
+//  .KAD v0.6  — Kernel-Aided Design + OpenSCAD Export
 // ═══════════════════════════════════════════════════════════
 
 // ── CANVAS ──────────────────────────────────────────────
@@ -1485,7 +1513,10 @@ function splashSelectUnit(unit) {
   }
   // Save and close — never show again this session/browser
   try { localStorage.setItem(SPLASH_KEY, unit); } catch(e){}
-  document.getElementById('splash-overlay').style.display = 'none';
+  const splashEl = document.getElementById('splash-overlay');
+  splashEl.style.display = 'none';
+  splashEl.style.pointerEvents = 'none';
+  canvas.style.pointerEvents = 'auto';
   canvas.focus();
 }
 
@@ -1494,12 +1525,13 @@ function initSplash() {
   let saved = null;
   try { saved = localStorage.getItem(SPLASH_KEY); } catch(e){}
   if (saved === 'mm' || saved === 'in') {
-    // Already chosen — apply silently and skip splash
     document.getElementById('splash-overlay').style.display = 'none';
+    canvas.style.pointerEvents = 'auto';
     if (saved !== unitMode) splashSelectUnit(saved);
-    else document.getElementById('splash-overlay').style.display = 'none';
+  } else {
+    // Block canvas until unit chosen
+    canvas.style.pointerEvents = 'none';
   }
-  // Otherwise splash remains visible — user must choose
 }
 
 function toggleUnits() {
@@ -3999,7 +4031,7 @@ function buildSCAD(objects, extrudeH, joinMode) {
   const RAD2DEG = 180 / Math.PI;
   const lines = [];
 
-  lines.push('// Generated by .KAD Gamma — Kernel-Aided Design');
+  lines.push('// Generated by .KAD — Kernel-Aided Design');
   lines.push('// https://kad.design | OpenSCAD 2D→3D export');
   lines.push(`// Extrude height: ${extrudeH} mm | Mode: ${joinMode}`);
   lines.push('// All coordinates in mm');
@@ -4177,7 +4209,6 @@ requestAnimationFrame(()=>{
     resizeCanvas();
     initCamera();
     setTool('select');
-    canvas.focus();
     document.getElementById('cc-year').textContent = new Date().getFullYear();
     initSplash();
     setTimeout(()=>{
@@ -5123,24 +5154,6 @@ function kvSetPageSize(key) {
 function kvSetDimStd(std) {
   kvDimStd = std;
   document.querySelectorAll('.kv-dim-btn').forEach(b => b.classList.remove('act'));
-  const btn = document.getElementById(`kv-dim-${std}`);
-  if (btn) btn.classList.add('act');
-  kvScheduleDraw();
-  showToast('Dim standard: ' + DIM_STYLES[std].label);
-}
-
-// ── KANVAS INIT ───────────────────────────────────────────────────────────────
-function kvInit() {
-  kvCanvas = document.getElementById('kanvas-canvas');
-  if (!kvCanvas) return;
-  kvCtx    = kvCanvas.getContext('2d');
-  kvEraseC = document.createElement('canvas');
-  kvEraseCtx = kvEraseC.getContext('2d');
-}
-
-
-kvInit();
-t'));
   const btn = document.getElementById(`kv-dim-${std}`);
   if (btn) btn.classList.add('act');
   kvScheduleDraw();
