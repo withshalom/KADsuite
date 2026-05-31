@@ -984,6 +984,45 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     </div>
   </div>
 
+  <!-- ── PART INFO ── -->
+  <div class="section-head" style="color:var(--accent);letter-spacing:0.14em;">Part Info</div>
+  <div style="padding:6px 8px 8px;border-bottom:1px solid var(--border);flex-shrink:0;">
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:flex;align-items:center;gap:5px;">
+        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);flex:0 0 28px;letter-spacing:0.06em;text-transform:uppercase;">Name</label>
+        <input id="kad-part-name" type="text" placeholder="part name"
+          style="flex:1;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
+          color:var(--accent);font-family:var(--fm);font-size:10px;padding:3px 6px;outline:none;min-width:0;"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-hi)'"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);flex:0 0 28px;letter-spacing:0.06em;text-transform:uppercase;">Qty</label>
+        <input id="kad-part-qty" type="number" value="1" min="1" step="1"
+          style="width:54px;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
+          color:var(--amber);font-family:var(--fm);font-size:11px;font-weight:700;padding:3px 6px;
+          outline:none;text-align:right;"
+          title="Quantity required — seeds KAM parts library on import"
+          onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--border-hi)'"/>
+        <span style="font-family:var(--fm);font-size:9px;color:var(--t3);">req'd</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);flex:0 0 28px;letter-spacing:0.06em;text-transform:uppercase;">Rev</label>
+        <input id="kad-part-rev" type="text" placeholder="A"
+          style="width:40px;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
+          color:var(--t1);font-family:var(--fm);font-size:10px;padding:3px 6px;outline:none;text-align:center;"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-hi)'"/>
+        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;margin-left:4px;">Desc</label>
+        <input id="kad-part-desc" type="text" placeholder="description"
+          style="flex:1;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
+          color:var(--t1);font-family:var(--fm);font-size:10px;padding:3px 6px;outline:none;min-width:0;"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-hi)'"/>
+      </div>
+    </div>
+    <div style="margin-top:5px;font-family:var(--fm);font-size:8px;color:var(--t3);line-height:1.5;">
+      Qty is the <span style="color:var(--amber)">design req.</span> KAM reads it on import and can override per nest.
+    </div>
+  </div>
+
   <div class="section-head">Properties</div>
   <div class="props-panel">
     <div class="prop-row"><span class="prop-key">Objects</span><span class="prop-val accent" id="prop-objects">0</span></div>
@@ -1702,7 +1741,20 @@ const GeoMemory = {
   },
 
   serialize() {
-    return JSON.stringify({version:'0.4',units:'mm',displayUnits:unitMode,nextId:this.nextId,objects:this.objects},null,2);
+    return JSON.stringify({
+      version:'0.5',
+      app:'kad',
+      units:'mm',
+      displayUnits:unitMode,
+      nextId:this.nextId,
+      part: {
+        name:        document.getElementById('kad-part-name').value.trim()        || '',
+        qty:         parseInt(document.getElementById('kad-part-qty').value)      || 1,
+        description: document.getElementById('kad-part-desc').value.trim()        || '',
+        revision:    document.getElementById('kad-part-rev').value.trim()         || '',
+      },
+      objects:this.objects
+    },null,2);
   },
   deserialize(s){
     try{
@@ -1710,6 +1762,13 @@ const GeoMemory = {
       this.objects=d.objects||[];
       this.nextId=d.nextId||1;
       if(d.displayUnits && d.displayUnits!==unitMode) toggleUnits();
+      // Restore part metadata if present
+      if(d.part){
+        document.getElementById('kad-part-name').value = d.part.name        || '';
+        document.getElementById('kad-part-qty').value  = d.part.qty         || 1;
+        document.getElementById('kad-part-desc').value = d.part.description || '';
+        document.getElementById('kad-part-rev').value  = d.part.revision    || '';
+      }
       updateProps();
       return true;
     }catch(e){ return false; }
