@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
-  KERFsuite™ — Kernel-Aided Design Suite
-  Copyright (C) 2024-2025 KERFsuite / withshalom
+  KADsuite™ — Kernel-Aided Design Suite
+  Copyright (C) 2024-2025 KADsuite / withshalom
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Affero General Public License as published
@@ -17,11 +17,24 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
   SPDX-License-Identifier: AGPL-3.0-or-later
-  Commercial use requires a separate license — see KERFsuite for details: https://withshalom.github.io
+  KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™,
+  KODE™, and KANVAS™ are trademarks of withshalom / KADsuite.
+  Trademark rights are independent of and not transferred by this
+  AGPL-3.0 license. Forks and derivative works may not use these
+  marks or any confusingly similar names without express written
+  permission. The AGPL license governs this source code only.
+
+  Forks must remain open source under AGPL — KADsuite™ trademarks
+  and branding are not licensed and may not be used in any fork or
+  derivative work without separate written permission.
+
+  KADsuite™ trademarks are not covered by the AGPL-3.0 license.
+  Native builds are separate proprietary products.
 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="copyright" content="Copyright (C) 2024-2025 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, and KANVAS™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KAD — Kernel-Aided Design</title>
 <style>
@@ -557,7 +570,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 .scad-hint code { color: var(--accent); font-family: var(--fm); }
 .scad-hint b { color: var(--amber); }
 
-/* ── KERFsuite suite tokens (override/align) ── */
+/* ── KADsuite suite tokens (override/align) ── */
 :root {
   --fm: 'Fira Code', monospace;
   --fd: 'Syne', sans-serif;
@@ -801,7 +814,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     </div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge">v0.6.0</span>
+    <span class="tb-badge">v0.0</span>
     <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
       <span class="unit-divider"></span>
@@ -981,45 +994,6 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
       <div class="coord-example"><i>@50,-20</i> — relative dX,dY</div>
       <div class="coord-example"><em>@100&lt;45</em> — polar dist&lt;angle°</div>
       <div class="coord-example" style="margin-top:4px;color:var(--t3);">Press <b>Enter</b> to commit · <b>Esc</b> to cancel · <b>U</b> to toggle units</div>
-    </div>
-  </div>
-
-  <!-- ── PART INFO ── -->
-  <div class="section-head" style="color:var(--accent);letter-spacing:0.14em;">Part Info</div>
-  <div style="padding:6px 8px 8px;border-bottom:1px solid var(--border);flex-shrink:0;">
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <div style="display:flex;align-items:center;gap:5px;">
-        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);flex:0 0 28px;letter-spacing:0.06em;text-transform:uppercase;">Name</label>
-        <input id="kad-part-name" type="text" placeholder="part name"
-          style="flex:1;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
-          color:var(--accent);font-family:var(--fm);font-size:10px;padding:3px 6px;outline:none;min-width:0;"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-hi)'"/>
-      </div>
-      <div style="display:flex;align-items:center;gap:5px;">
-        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);flex:0 0 28px;letter-spacing:0.06em;text-transform:uppercase;">Qty</label>
-        <input id="kad-part-qty" type="number" value="1" min="1" step="1"
-          style="width:54px;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
-          color:var(--amber);font-family:var(--fm);font-size:11px;font-weight:700;padding:3px 6px;
-          outline:none;text-align:right;"
-          title="Quantity required — seeds KAM parts library on import"
-          onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--border-hi)'"/>
-        <span style="font-family:var(--fm);font-size:9px;color:var(--t3);">req'd</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:5px;">
-        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);flex:0 0 28px;letter-spacing:0.06em;text-transform:uppercase;">Rev</label>
-        <input id="kad-part-rev" type="text" placeholder="A"
-          style="width:40px;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
-          color:var(--t1);font-family:var(--fm);font-size:10px;padding:3px 6px;outline:none;text-align:center;"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-hi)'"/>
-        <label style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;margin-left:4px;">Desc</label>
-        <input id="kad-part-desc" type="text" placeholder="description"
-          style="flex:1;background:var(--panel);border:1px solid var(--border-hi);border-radius:3px;
-          color:var(--t1);font-family:var(--fm);font-size:10px;padding:3px 6px;outline:none;min-width:0;"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border-hi)'"/>
-      </div>
-    </div>
-    <div style="margin-top:5px;font-family:var(--fm);font-size:8px;color:var(--t3);line-height:1.5;">
-      Qty is the <span style="color:var(--amber)">design req.</span> KAM reads it on import and can override per nest.
     </div>
   </div>
 
@@ -1246,10 +1220,10 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span>M</span><span class="sb-val">mirror</span></div>
     <div class="sb-item"><span>D</span><span class="sb-val">measure</span></div>
-    <div class="sb-item"><span class="sb-val ok">.KAD v0.6</span></div>
+    <div class="sb-item"><span class="sb-val ok">.KAD v0.0</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
-      <span>© <span id="cc-year"></span> KERFsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · Free for non-commercial use · <a href="#" class="cc-link">Commercial license</a> required for paid work</span>
+      <span>© <span id="cc-year"></span> KADsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener" class="cc-link">Source on GitHub</a> · withshalom</span>
     </div>
   </div>
 </div>
@@ -1360,7 +1334,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   <div id="splash-dialog">
     <div class="dlg-head">
       <div class="splash-brand"><div class="splash-brand-dot"></div>.KAD</div>
-      <div class="splash-sub">Kernel-Aided Design · v0.6</div>
+      <div class="splash-sub">Kernel-Aided Design · v0.0</div>
     </div>
     <div class="dlg-body">
       <div class="splash-prompt">
@@ -1382,8 +1356,8 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
       </div>
       <div class="splash-note">
         This preference is saved locally and won't appear again.<br>
-        AGPL-3.0 · Free for non-commercial use · Commercial license required for paid work<br>
-        © <span id="splash-year"></span> KERFsuite™ · .KAD Kernel-Aided Design
+        AGPL-3.0 · Open source · withshalom<br>
+        © <span id="splash-year"></span> KADsuite™ · .KAD Kernel-Aided Design
       </div>
     </div>
   </div>
@@ -1454,7 +1428,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 <script>
 'use strict';
 // ═══════════════════════════════════════════════════════════
-//  .KAD v0.6  — Kernel-Aided Design + OpenSCAD Export
+//  .KAD v0.0  — Kernel-Aided Design
 // ═══════════════════════════════════════════════════════════
 
 // ── CANVAS ──────────────────────────────────────────────
@@ -1741,20 +1715,7 @@ const GeoMemory = {
   },
 
   serialize() {
-    return JSON.stringify({
-      version:'0.5',
-      app:'kad',
-      units:'mm',
-      displayUnits:unitMode,
-      nextId:this.nextId,
-      part: {
-        name:        document.getElementById('kad-part-name').value.trim()        || '',
-        qty:         parseInt(document.getElementById('kad-part-qty').value)      || 1,
-        description: document.getElementById('kad-part-desc').value.trim()        || '',
-        revision:    document.getElementById('kad-part-rev').value.trim()         || '',
-      },
-      objects:this.objects
-    },null,2);
+    return JSON.stringify({version:'0.0',units:'mm',displayUnits:unitMode,nextId:this.nextId,objects:this.objects},null,2);
   },
   deserialize(s){
     try{
@@ -1762,13 +1723,6 @@ const GeoMemory = {
       this.objects=d.objects||[];
       this.nextId=d.nextId||1;
       if(d.displayUnits && d.displayUnits!==unitMode) toggleUnits();
-      // Restore part metadata if present
-      if(d.part){
-        document.getElementById('kad-part-name').value = d.part.name        || '';
-        document.getElementById('kad-part-qty').value  = d.part.qty         || 1;
-        document.getElementById('kad-part-desc').value = d.part.description || '';
-        document.getElementById('kad-part-rev').value  = d.part.revision    || '';
-      }
       updateProps();
       return true;
     }catch(e){ return false; }
@@ -5045,7 +4999,7 @@ function kvExportVAD() {
     layer: 'KAD Geometry',
   };
   const vad = {
-    version:'1.0', source:'KAD KANVAS',
+    version:'0.0', source:'KAD KANVAS',
     layers:  KVM.layers,
     activeLayer: KVM.activeLayer,
     nextId:  KVM.nextId,
