@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  KADsuite™ — Kernel-Aided Design Suite · KAD BETA (undo/redo development branch)
+  KADsuite™ — Kernel-Aided Design Suite
   Copyright (C) 2024-2025 KADsuite / withshalom
 
   This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@
 <meta charset="UTF-8">
 <meta name="copyright" content="Copyright (C) 2024-2025 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, and KANVAS™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KAD beta — Kernel-Aided Design</title>
+<title>KADsuite beta — Kernel-Aided Design Suite</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
 
@@ -68,7 +68,17 @@
 html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; background:var(--void); color:var(--t1); font-family:var(--fd); font-size:13px; }
 
 /* ── LAYOUT ── */
-#app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr var(--status-h); width:100vw; height:100vh; overflow:hidden; }
+/* KADsuite beta: KAD fixed behind the suite page */
+#app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr var(--status-h); width:100vw; height:100vh; overflow:hidden; transition:opacity 0.3s; }
+body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
+body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
+#suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; transition:opacity 0.35s; background:rgba(6,10,16,0.92); }
+#kad-escape-bar { position:fixed; top:0; left:0; right:0; z-index:999; height:36px; display:none; align-items:center; justify-content:space-between; padding:0 16px; background:rgba(4,6,10,0.97); border-bottom:1px solid var(--accent); font-family:var(--fm); font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(12px); }
+body.drafting-mode #kad-escape-bar { display:flex; }
+.kes-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent); animation:pulse 1.6s ease infinite; flex-shrink:0; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+#btn-close-kad { display:flex; align-items:center; gap:6px; padding:4px 12px; background:none; border:1px solid rgba(0,212,255,0.4); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:9px; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; transition:all .2s; }
+#btn-close-kad:hover { background:rgba(0,212,255,0.08); border-color:var(--accent); }
 
 /* ── TOPBAR ── */
 #topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
@@ -81,15 +91,6 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 .tb-menu-item.open { color:var(--t1); background:var(--hover); }
 .tb-sep { width:1px; height:18px; background:var(--border); margin:0 4px; }
 .tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
-.tb-undo-btn {
-  background: var(--panel2); border: 1px solid var(--border); border-radius: 4px;
-  color: var(--t2); font-family: var(--fm); font-size: 11px; padding: 3px 9px;
-  cursor: pointer; transition: all 0.13s; letter-spacing: 0.04em;
-  display: flex; align-items: center; gap: 5px;
-}
-.tb-undo-btn:hover { background: var(--hover); border-color: var(--border-hi); color: var(--t1); }
-.tb-undo-btn:active { transform: scale(0.96); }
-.tb-undo-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
 .tb-badge { font-family:var(--fm); font-size:10px; color:var(--t3); background:var(--panel2); border:1px solid var(--border); padding:2px 7px; border-radius:3px; letter-spacing:0.06em; }
 
 /* Topbar dropdown */
@@ -743,8 +744,1904 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 #unit-seg-in { color: rgba(255,170,0,0.50); }
 #unit-seg-mm.active { background: var(--accent); color: var(--void); font-weight:700; }
 #unit-seg-in.active { background: #ffaa00; color: #060e08; font-weight:700; }
+
+/* ── KADsuite suite page styles ── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --void:    #050607;
+  --surface: #0a0b0e;
+  --panel:   #111318;
+  --border:  rgba(255,255,255,0.07);
+  --text1:   #f2ede4;
+  --text2:   #b0a898;
+  --text3:   #504840;
+
+  --kad:   #00d4ff;
+  --kam:   #ffaa00;
+  --kube:  #20e8c0;
+  --karve: #d4aa40;
+  --kode:  #e03800;
+  
+  --kanvas: #0090a8; /* → #8b5cf6 via gradient */
+
+  --kad-g:  rgba(0,212,255,0.12);
+  --kam-g:  rgba(255,170,0,0.12);
+  --kube-g: rgba(32,232,192,0.12);
+  --karve-g:rgba(212,170,64,0.12);
+  --kode-g: rgba(224,56,0,0.12);
+  --kultivate: #6ab830;  /* fresh growth green */
+  --kultivate-g: rgba(90,158,60,0.12);
+  --kanvas-g: rgba(0,144,168,0.12);
+
+  
+  --konstruct:   #4a8fd4;  /* blueprint technical blue */
+  --konstruct-g: rgba(74,143,212,0.12);
+
+  --ff-display: 'Syne', sans-serif;
+  --ff-mono:    'Fira Code', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text1);
+  font-family: var(--ff-display);
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ── DOT GRID ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+/* ── CANVAS BG ── */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  opacity: 0.35;
+}
+
+/* ── LAYOUT ── */
+.page {
+  position: relative; z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background:rgba(6,10,16,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,212,255,0.15);
+}
+
+.nav-brand {
+  font-family: var(--ff-display);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--text1);
+}
+.nav-brand sup {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--text2);
+  vertical-align: super;
+}
+
+.nav-links {
+  display: flex; align-items: center; gap: 32px;
+}
+.nav-link {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  color: var(--text2);
+  text-decoration: none;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--text1); }
+
+/* ── HERO ── */
+.hero {
+  padding: 180px 0 48px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+}
+
+.hero-eyebrow {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  width: 40px; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.15));
+}
+.hero-eyebrow::after { transform: scaleX(-1); }
+
+  .hero-tagline {
+    font-family: var(--ff-display);
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    font-weight: 700;
+    color: var(--text1);
+    letter-spacing: 0.01em;
+    margin: 0 0 0.6rem;
+    opacity: 0.85;
+  }
+
+  .hero-title {
+  font-size: clamp(58px, 9vw, 110px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  margin-bottom: 32px;
+}
+
+.hero-title .kerf {
+  display: block;
+  background: linear-gradient(90deg,
+    #00d4ff 0%,
+    #00b8dd 20%,
+    #e8e4dc 44%,
+    #ffaa00 68%,
+    #ff6b00 88%,
+    #ff4400 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titlePan 6s ease-in-out infinite alternate;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.hero-title .suite { font-size:0.38em; letter-spacing:0.02em; vertical-align:super; line-height:0; }
+
+.hero-mission {
+  max-width: 580px;
+  margin: 0 auto 56px;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: #c0b8b0;
+}
+.hero-mission strong {
+  color: var(--text1);
+  font-weight: 600;
+}
+
+/* ── PROGRAM GRID ── */
+.programs {
+  padding: 40px 0 120px;
+  opacity: 0;
+  transform: translateY(32px);
+  animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.35s forwards;
+}
+
+.programs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ── PROGRAM CARD ── */
+.card {
+  position: relative;
+  background:rgba(8,12,20,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 36px 36px 32px;
+  text-decoration: none;
+  color: inherit;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1),
+              border-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--card-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: var(--card-color);
+  box-shadow: 0 0 0 1px var(--card-color),
+              0 24px 64px rgba(0,0,0,0.6),
+              0 0 60px var(--card-glow);
+}
+.card:hover::before { opacity: 1; }
+
+.card-kad  { --card-color: var(--kad);  --card-glow: var(--kad-g); }
+.card-kam  { --card-color: var(--kam);  --card-glow: var(--kam-g); }
+.card-kube  { --card-color: var(--kube);  --card-glow: var(--kube-g);  }
+.card-karve { --card-color: var(--karve); --card-glow: var(--karve-g); }
+.card-karve .card-mark { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); box-shadow: 0 0 20px rgba(212,170,64,0.45); }
+.card-kode { --card-color: var(--kode); --card-glow: var(--kode-g); }
+
+  
+
+
+/* Card corner mark */
+.card-mark {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-mono);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #000;
+  margin-bottom: 28px;
+  flex-shrink: 0;
+}
+.card-kad  .card-mark { background: linear-gradient(135deg, #00d4ff, #0088bb); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
+.card-kam  .card-mark { background: linear-gradient(135deg, #ffaa00, #ff6b00); box-shadow: 0 0 20px rgba(255,170,0,0.4); }
+.card-kube .card-mark { background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40); box-shadow: 0 0 20px rgba(32,232,192,0.45); }
+  .card-kode .card-mark { background: linear-gradient(135deg, #2a0800, #882000, #e03800); box-shadow: 0 0 20px rgba(224,56,0,0.45); }
+
+  
+
+
+.card-name {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin-bottom: 6px;
+  color: var(--card-color);
+}
+
+.card-full {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #686058;
+  margin-bottom: 20px;
+}
+
+.card-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #c8c0b4;
+  flex: 1;
+  margin-bottom: 28px;
+}
+
+/* Card preview — mini canvas mockup */
+.card-preview {
+  height: 120px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 24px;
+}
+.card-preview canvas {
+  width: 100%; height: 100%;
+  display: block;
+}
+
+.card-cta {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--card-color);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.card:hover .card-cta { opacity: 1; }
+.card-cta-arrow { font-size: 14px; }
+
+
+/* ── TAGLINE STRIP ── */
+.strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 22px 0;
+  margin-bottom: 100px;
+  overflow: hidden;
+  position: relative;
+  opacity: 0;
+  animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.55s forwards;
+}
+
+.strip-track {
+  display: flex; gap: 56px;
+  white-space: nowrap;
+  animation: scroll 28s linear infinite;
+}
+
+.strip-item {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  display: flex; align-items: center; gap: 20px; flex-shrink: 0;
+}
+.strip-item::after {
+  content: '·';
+  color: var(--text3);
+}
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes titlePan {
+  0%   { background-position: 0% center; }
+  100% { background-position: 100% center; }
+}
+
+/* ── SUITE DIAGRAM ── */
+.diagram {
+  text-align: center;
+  padding: 0 0 120px;
+  opacity: 0;
+  animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+}
+
+.diagram-title {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 40px;
+}
+
+.diagram-flow { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.flow-row { display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; }
+
+.flow-node {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 14px;
+}
+
+.flow-icon {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-mono);
+  font-weight: 600;
+  font-size: 10px;
+  color: #000;
+  letter-spacing: 0.04em;
+}
+.flow-icon.kad       { background: linear-gradient(135deg,#006080,#00a8cc,#00d4ff); }
+.flow-icon.kam       { background: linear-gradient(135deg,#804800,#cc8000,#ffaa00); }
+.flow-icon.kube      { background: linear-gradient(135deg,#001c18,#20e8c0,#d4aa40); }
+  .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
+  .flow-icon.kode      { background: linear-gradient(135deg,#2a0800,#882000,#e03800); }
+  .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
+.flow-icon.kanvas    { background: linear-gradient(135deg,#001c28,#005878,#0090a8,#6030c8,#8b5cf6); }
+.flow-icon.kultivate { background: linear-gradient(135deg,#201008,#2e5818,#6ab830); }
+.flow-icon.konnector { background: linear-gradient(135deg,#1a2838,#3a5870,#b8c8d8); }
+.flow-icon.kid       { background: linear-gradient(135deg,#3a1800,#cc5500,#ff8800); }
+.flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
+
+
+.flow-label {
+  font-family: var(--ff-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.flow-arrow {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  color: var(--text3);
+  padding: 0 2px;
+  margin-top: -16px;
+}
+
+.flow-desc {
+  margin-top: 48px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text2);
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 0 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s forwards;
+}
+
+.footer-brand {
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: var(--text2);
+}
+.footer-brand sup { font-size: 8px; vertical-align: super; }
+
+.footer-links {
+  display: flex; align-items: center; gap: 28px;
+}
+
+.footer-link {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text2);
+  text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  transition: color 0.2s;
+}
+.footer-link:hover { color: var(--text1); }
+
+.footer-link svg {
+  width: 14px; height: 14px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.footer-copy {
+  font-family: var(--ff-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  width: 100%;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+
+/* ── KANVAS card — rectangle on desktop, natural height on mobile ─── */
+
+
+
+.card-konstruct { --card-color: var(--konstruct); --card-glow: var(--konstruct-g); }
+.card-konstruct .card-mark {
+  background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4);
+  box-shadow: 0 0 20px rgba(74,143,212,0.40);
+}
+.card-kultivate { --card-color: var(--kultivate); --card-glow: var(--kultivate-g); }
+.card-kultivate .card-mark {
+  background: linear-gradient(135deg,#0e1e0c,#2e5818,#6ab830);
+  box-shadow: 0 0 20px rgba(90,158,60,0.38);
+}
+
+.card-kanvas { --card-color: var(--kanvas); --card-glow: rgba(139,92,246,0.14); }
+.card-kanvas .card-mark {
+  background: linear-gradient(105deg,#0090a8 0%,#5b4fd4 55%,#8b5cf6 100%);
+  box-shadow: 0 0 20px rgba(0,144,168,0.40);
+}
+
+/* ── KONNECTOR ── */
+.card-konnector { --card-color: #b8c8d8; --card-glow: rgba(184,200,216,0.10); }
+.card-konnector .card-mark {
+  background: linear-gradient(135deg, #1a2838, #3a5870, #b8c8d8);
+  box-shadow: 0 0 20px rgba(184,200,216,0.35);
+}
+
+/* ── KID ── */
+.card-kid { --card-color: #ff8800; --card-glow: rgba(255,136,0,0.10); }
+.card-kid .card-mark {
+  background: linear-gradient(135deg, #3a1800, #cc5500, #ff8800);
+  box-shadow: 0 0 20px rgba(255,136,0,0.45);
+}
+
+@media (max-width: 680px) {
+  /* ── Layout ── */
+  nav { padding: 14px 20px; }
+  .page { padding: 0 18px; }
+  .nav-links { gap: 14px; }
+  .nav-link { font-size: 9px; letter-spacing: 0.1em; }
+
+  /* ── Hero ── */
+  .hero { padding: 110px 0 48px; text-align: left; }
+  .hero-eyebrow { justify-content: flex-start; font-size: 9px; }
+  .hero-eyebrow::before { display: none; }
+  .hero-eyebrow::after  { display: none; }
+
+  .hero-title { font-size: clamp(36px, 10.5vw, 68px); letter-spacing:-0.02em; margin-bottom: 16px; }
+  .hero-title .kerf { white-space: nowrap; }
+  .hero-title .suite { font-size:0.38em; letter-spacing:0.02em; vertical-align:super; line-height:0; }
+
+  .hero-mission {
+    font-size: 15px; text-align: left; margin-bottom: 40px;
+  }
+
+  /* ── Strip ── */
+  .strip { margin-bottom: 56px; }
+
+  /* ── Cards — single column, more compact ── */
+  .programs-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  .card { padding: 24px 24px 20px; border-radius: 12px; }
+  .card-mark { width: 36px; height: 36px; border-radius: 8px;
+    font-size: 9px; margin-bottom: 20px; }
+  .card-name { font-size: 28px; }
+  .card-full { font-size: 8px; margin-bottom: 14px; }
+  .card-preview { height: 90px; margin-bottom: 18px; }
+  .card-desc { font-size: 13px; margin-bottom: 20px; }
+
+  /* ── Flow ── */
+  .flow-arrow { display: none; }
+  .diagram-flow { gap: 8px; }
+  .flow-node { padding: 12px 16px; }
+  .flow-icon { width: 44px; height: 44px; border-radius: 10px; font-size: 9px; }
+  .flow-desc { font-size: 12px; }
+
+  /* ── Footer ── */
+  footer { flex-direction: column; align-items: flex-start; gap: 16px;
+    padding: 32px 0 40px; }
+  .footer-links { flex-wrap: wrap; gap: 16px; }
+}
+
+/* ── Very small screens ── */
+@media (max-width: 380px) {
+  .hero-title { font-size: 46px; }
+  nav .nav-links { display: none; }
+}
+
+/* ── LICENSING SECTION ── */
+.licensing {
+  padding: 0 0 120px;
+  opacity: 0;
+  animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;
+}
+
+.licensing-header {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.license-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 680px) {
+  .license-grid { grid-template-columns: 1fr; }
+  .licensing { padding: 0 0 72px; }
+}
+
+.license-card {
+  background:rgba(8,12,20,0.92);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.license-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--lc-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+.license-card:hover { border-color: var(--lc-color); box-shadow: 0 0 40px var(--lc-glow); }
+.license-card:hover::before { opacity: 1; }
+
+.lc-agpl   { --lc-color: rgba(0,212,255,0.5);  --lc-glow: rgba(0,212,255,0.07); }
+.lc-free   { --lc-color: rgba(0,232,122,0.5);  --lc-glow: rgba(0,232,122,0.07); }
+
+.lc-tag {
+  font-family: var(--ff-mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lc-color);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--lc-color);
+  border-radius: 4px;
+  padding: 3px 8px;
+  width: fit-content;
+}
+
+.lc-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text1);
+  line-height: 1.1;
+}
+
+.lc-subtitle {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: -6px;
+}
+
+.lc-price {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--lc-color);
+  line-height: 1;
+}
+.lc-price span {
+  font-size: 12px;
+  font-weight: 400;
+  font-family: var(--ff-mono);
+  color: var(--text3);
+  letter-spacing: 0.08em;
+}
+
+.lc-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.lc-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.lc-items li {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+.lc-items li::before {
+  content: '›';
+  color: var(--lc-color);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.lc-btn {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lc-color);
+  border: 1px solid var(--lc-color);
+  border-radius: 6px;
+  padding: 10px 16px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none;
+  width: 100%;
+}
+.lc-btn:hover { background: var(--lc-color); color: #000; }
+
+/* ── LICENSE MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(5,6,7,0.92);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 48px;
+  position: relative;
+  transform: translateY(16px);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-close {
+  position: absolute; top: 20px; right: 20px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.modal-close:hover { color: var(--text1); border-color: rgba(255,255,255,0.2); }
+
+.modal-tag {
+  font-family: var(--ff-mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--kam);
+  border: 1px solid rgba(255,170,0,0.3);
+  border-radius: 4px;
+  padding: 3px 8px;
+  width: fit-content;
+  margin-bottom: 20px;
+}
+
+.modal h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text1);
+  margin-bottom: 6px;
+}
+
+.modal-version {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 32px;
+}
+
+.modal-section {
+  margin-bottom: 28px;
+}
+
+.modal-section h3 {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--kam);
+  margin-bottom: 10px;
+}
+
+.modal-section p, .modal-section li {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text2);
+}
+
+.modal-section ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+}
+
+.modal-section li::before {
+  content: '› ';
+  color: var(--kam);
+}
+
+.modal-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 28px 0;
+}
+
+.modal-note {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  line-height: 1.7;
+  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* ── Nav link icons (show on mobile, hide text) ── */
+.nav-link-icon { display: none; }
+.nav-link-text { display: inline; }
+@media (max-width: 680px) {
+  .nav-link-icon { display: block; opacity: 0.6; }
+  .nav-link-text { display: none; }
+  .nav-links { gap: 12px; }
+  .nav-link { padding: 4px; }
+}
+
 </style>
 <body>
+<!-- KAD escape bar — shown in drafting mode -->
+<div id="kad-escape-bar">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="kes-dot"></div>
+    <span>KAD · Kernel-Aided Design · drafting workspace</span>
+  </div>
+  <button id="btn-close-kad" onclick="closeDraftingMode()">
+    ← Return to KADsuite
+  </button>
+</div>
+<div id="suite-scroll">
+  <div id="site-shell" style="background:rgba(6,10,16,0.92);min-height:100%;position:relative;z-index:1;">
+<!-- Background canvas for animated dots -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">KAD<sup>suite™</sup></div>
+  <div class="nav-links">
+    <a class="nav-link" href="https://www.instagram.com/kadsuite" target="_blank">
+      <span class="nav-link-text">Instagram</span>
+      <svg class="nav-link-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    </a>
+    <a class="nav-link" href="https://www.linkedin.com/in/withshalom" target="_blank">
+      <span class="nav-link-text">LinkedIn</span>
+      <svg class="nav-link-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+    <a class="nav-link" href="https://github.com/withshalom" target="_blank">
+      <span class="nav-link-text">GitHub</span>
+      <svg class="nav-link-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page">
+  <section class="hero" style="background:rgba(6,10,16,0.92);border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;padding-bottom:48px;position:relative;z-index:1;">
+    <div class="hero-eyebrow">Browser-native · No install · AGPL-3.0 · Open source</div>
+    <p style="font-family:var(--ff-mono);font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--text2);opacity:0.85;margin:0 0 0.6rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
+    <h1 class="hero-title"><span class="kerf">KADsuite<sup class="suite">™</sup></span></h1>
+    <p class="hero-tagline">The cutting edge of design software.</p>
+    <p class="hero-mission">
+      <strong>Next-generation web-hosted drafting software</strong> giving everyone
+      access to technical design. KAD draws, KAM manufactures, KUBE builds, KARVE machines,
+      KONSTRUCT structures, KULTIVATE plans the site it sits on, KODE verifies, and KANVAS illustrates.
+    </p>
+  </section>
+</div>
+
+<!-- SCROLL STRIP -->
+<div class="strip" style="background:rgba(6,10,16,0.92);border-top:1px solid rgba(0,212,255,0.10);border-bottom:1px solid rgba(0,212,255,0.10);position:relative;z-index:1;">
+  <div class="strip-track">
+    <span class="strip-item">Kernel-Aided Design</span>
+    <span class="strip-item">Kernel-Aided Manufacturing</span>
+    <span class="strip-item">KONSTRUCT</span>
+    <span class="strip-item">Kernel-Oriented Dev Env</span>
+    <span class="strip-item">Vector-Aided Design</span>
+    <span class="strip-item">KULTIVATE</span>
+    <span class="strip-item">Browser Native</span>
+    <span class="strip-item">No Install Required</span>
+    <span class="strip-item">DXF · NC · SVG · KNV · KAM · KSA</span>
+    <span class="strip-item">Plasma · CNC · Laser</span>
+    <span class="strip-item">KARVE</span>
+    <span class="strip-item">Kernel-Aided Robotic Volume Extraction</span>
+    <span class="strip-item">Lathe · Mill · G-code</span>
+    <!-- duplicate for seamless loop -->
+    <span class="strip-item">Kernel-Aided Design</span>
+    <span class="strip-item">Kernel-Aided Manufacturing</span>
+    <span class="strip-item">KONSTRUCT</span>
+    <span class="strip-item">Kernel-Oriented Dev Env</span>
+    <span class="strip-item">Vector-Aided Design</span>
+    <span class="strip-item">KULTIVATE</span>
+    <span class="strip-item">Browser Native</span>
+    <span class="strip-item">No Install Required</span>
+    <span class="strip-item">DXF · NC · SVG · KNV · KAM · KSA</span>
+    <span class="strip-item">Plasma · CNC · Laser</span>
+  </div>
+</div>
+
+<!-- PROGRAM GRID -->
+<div class="page">
+  <section class="programs" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;padding-bottom:60px;">
+    <div class="programs-grid">
+
+      <!-- KAD -->
+      <div class="card card-kad" onclick="openDraftingMode()" style="cursor:pointer;">
+        <div class="card-mark">KD</div>
+        <div class="card-name">.KAD</div>
+        <div class="card-full">Kernel-Aided Design</div>
+        <div class="card-preview">
+          <canvas id="kad-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Precision drafting in your browser. Draw lines, arcs, circles,
+          and polylines in real-world millimetres or inches. Snap to geometry,
+          export DXF, and open KANVAS paperspace for annotation.
+        </div>
+        <div class="card-cta">
+          <span>Enter KAD</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </div>
+
+      <!-- KAM -->
+      <a class="card card-kam" href="https://withshalom.github.io/KAM" target="_blank">
+        
+        <div class="card-mark">KM</div>
+        <div class="card-name">.KAM</div>
+        <div class="card-full">Kernel-Aided Manufacturing</div>
+        <div class="card-preview">
+          <canvas id="kam-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          KAM for plasma, laser, and torch cutting. Import KAD geometry,
+          tag contours, nest parts on sheet material, set machine parameters,
+          and export verified G-code ready for the machine controller.
+        </div>
+        <div class="card-cta">
+          <span>Open KAM</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KUBE -->
+      <a class="card card-kube" href="https://withshalom.github.io/KUBE" target="_blank">
+        <div class="card-mark">KB</div>
+        <div class="card-name">.KUBE</div>
+        <div class="card-full">Kernel-Unified Build Environment</div>
+        <div class="card-preview">
+          <canvas id="kube-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          3D solid modeler built for fabrication. Sketch profiles on a workplane,
+          extrude to solid, push and pull faces, run boolean operations.
+          Exports STL and STEP — imports back to KAM as flat cut profiles.
+        </div>
+        <div class="card-cta">
+          <span>Open KUBE</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+
+      <!-- KARVE -->
+      <a class="card card-karve" href="https://withshalom.github.io/KARVE/" target="_blank">
+        <div class="card-mark">KV</div>
+        <div class="card-name">.KARVE</div>
+        <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
+        <div class="card-preview">
+          <canvas id="karve-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Lathe and mill G-code generator for subtractive machining. Define raw
+          stock, import .KBE part geometry from KUBE, and KARVE computes the
+          cutting operations needed. Outputs RS-274 G-code directly to KODE
+          for review and editing.
+        </div>
+        <div class="card-cta">
+          <span>Open KARVE</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+            <!-- KONSTRUCT -->
+      <a class="card card-konstruct" href="https://withshalom.github.io/KONSTRUCT" target="_blank">
+        <div class="card-mark">KON</div>
+        <div class="card-name">.KONSTRUCT</div>
+        <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
+        <div class="card-preview">
+          <canvas id="konstruct-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Wall-aware floor plan drafting. Place typed walls — brick, block,
+          concrete, glass — with automatic miter joins. Export to KAD for
+          detailing or DXF for any CAD tool.
+        </div>
+        <div class="card-cta">
+          <span>Open KONSTRUCT</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KULTIVATE -->
+      <a class="card card-kultivate" href="https://withshalom.github.io/KULTIVATE/" target="_blank">
+        <div class="card-mark">KLT</div>
+        <div class="card-name">.KULTIVATE</div>
+        <div class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</div>
+        <div class="card-preview">
+          <canvas id="kultivate-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Landscape architecture and site-plan drafting. Draw site boundaries,
+          hardscape zones, and planting regions. Place trees, shrubs, and
+          groundcover from a built-in plant library with scientific names and
+          canopy spread. Exports a plant schedule and full SVG drawing.
+        </div>
+        <div class="card-cta">
+          <span>Open KULTIVATE</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KANVAS -->
+      <a class="card card-kanvas" href="https://withshalom.github.io/KANVAS/" target="_blank">
+        <div class="card-mark">KNV</div>
+        <div class="card-name">KANVAS</div>
+        <div class="card-full">Kernel-Aided Node Vector Art Suite</div>
+        <div class="card-preview">
+          <canvas id="kanvas-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Vector illustration with freehand brush, pen, shapes, and text.
+          Two modes: KANVAS for bounded artboard work, KREATE for infinite
+          freeform. Exports SVG. Links to KAD via KANVAS paperspace.
+        </div>
+        <div class="card-cta">
+          <span>Open KANVAS</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+      <!-- KODE -->
+      <a class="card card-kode" href="https://withshalom.github.io/KODE" target="_blank">
+        
+        <div class="card-mark">GK</div>
+        <div class="card-name">.KODE</div>
+        <div class="card-full">Kernel-Oriented Development Environment</div>
+        <div class="card-preview">
+          <canvas id="kode-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          CNC G-code editor and live toolpath verifier. Plasma-aware error
+          detection, KAM session integration, and real-time cut path preview.
+          Also runs as a full JavaScript environment — KOFFEE mode for
+          parametric scripting, web development, and application logic.
+        </div>
+        <div class="card-cta">
+          <span>Open KODE</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="card card-konnector" href="https://withshalom.github.io/KONNECTOR/" target="_blank">
+        <div class="card-mark">KN</div>
+        <div class="card-name">.KONNECTOR</div>
+        <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
+        <div class="card-desc">
+          Structural steel detailing and connection design. Imports geometry
+          from KAD, KUBE, and KONSTRUCT. AISC section database, bolt group
+          placement, weld tagging, piece marking, and export to KAM for
+          cutting and nesting.
+        </div>
+        <div class="card-cta">
+          <span>Open KONNECTOR</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="card card-kid" href="https://withshalom.github.io/KID/" target="_blank">
+        <div class="card-mark">KD</div>
+        <div class="card-name">.KID</div>
+        <div class="card-full">Kernel-Instructed Design</div>
+        <div class="card-desc">
+          Learn to draft through play. Age-adaptive line weights, four color-coded
+          drafting layers — solid, hidden, center, and dimension — and mission-based
+          tutorials that unlock as you draw. The right tool for future designers
+          of any age.
+        </div>
+        <div class="card-cta">
+          <span>Open KID</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- FLOW DIAGRAM -->
+  <section class="diagram" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
+    <div class="diagram-title">The manufacturing sequence</div>
+    <div class="diagram-flow">
+      <div class="flow-row">
+        <div class="flow-node"><div class="flow-icon kad">KD</div><div class="flow-label">Draw</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon kam">KM</div><div class="flow-label">Manufacture</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon kube">KB</div><div class="flow-label">Build</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon karve">KV</div><div class="flow-label">Machine</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon konstruct">KON</div><div class="flow-label">Structure</div></div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-node"><div class="flow-icon kultivate">KLT</div><div class="flow-label">Plan</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon kanvas">KNV</div><div class="flow-label">Illustrate</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon kode">GK</div><div class="flow-label">Verify</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon konnector">KN</div><div class="flow-label">Connect</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">Learn</div></div>
+      </div>
+    </div>
+      </div>
+    </div>
+    <p class="flow-desc">
+      Each program has one job and does it completely. KAD draws, KAM manufactures, KUBE models, KARVE machines,
+      KONSTRUCT builds, KULTIVATE plans the site it sits on.
+      Files flow forward: <code style="font-family:var(--ff-mono);font-size:11px;color:var(--text2)">.kad .kam .nc</code>
+      and KAM sends directly to KODE without managing files manually.
+      AGPL-3.0 open source — use it for anything, share it with everyone, keep forks open.
+    </p>
+  </section>
+
+  <!-- LICENSING -->
+  <section class="licensing" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
+    <div class="licensing-header">Licensing</div>
+    <div class="license-grid">
+
+
+      <!-- AGPL Code License -->
+      <div class="license-card lc-agpl">
+        <div class="lc-tag">Source Code</div>
+        <div class="lc-title">AGPL-3.0</div>
+        <div class="lc-subtitle">Affero General Public License</div>
+        <div class="lc-price">Free <span>/ always</span></div>
+        <div class="lc-divider"></div>
+        <ul class="lc-items">
+          <li>Full source code publicly available</li>
+          <li>Use, study, and modify freely</li>
+          <li>Distribute or host modified versions — but you must publish your source under AGPL</li>
+          <li>Commercial use is unrestricted — run it in any business, shop, or studio</li>
+          <li>Copyleft: improvements stay open</li>
+        </ul>
+        <a class="lc-btn" href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">Read AGPL-3.0 →</a>
+      </div>
+
+      <!-- Trademark Notice -->
+      <div class="license-card" style="--lc-color:#8b5cf6;--lc-glow:rgba(139,92,246,0.12);">
+        <div class="lc-tag" style="background:rgba(139,92,246,0.12);color:#c084fc;border-color:rgba(139,92,246,0.25);">Trademarks</div>
+        <div class="lc-title" style="color:#c084fc;">KADsuite™</div>
+        <div class="lc-subtitle">withshalom / KADsuite</div>
+        <div class="lc-divider"></div>
+        <ul class="lc-items">
+          <li>KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KODEX™, and KID™ are trademarks of withshalom / KADsuite</li>
+          <li>Trademark rights are independent of and not transferred by the AGPL-3.0 license</li>
+          <li>Forks and derivative works may not use these marks without express written permission</li>
+          <li>Forks must remain open source under AGPL</li>
+          <li>Native builds are separate proprietary products</li>
+        </ul>
+        <a class="lc-btn" href="https://github.com/withshalom" target="_blank" style="border-color:rgba(139,92,246,0.4);color:#c084fc;">View on GitHub →</a>
+      </div>
+
+      <!-- Open Use -->
+      <div class="license-card lc-free">
+        <div class="lc-tag">Open Use</div>
+        <div class="lc-title">Unrestricted</div>
+        <div class="lc-subtitle">Everyone · Every purpose</div>
+        <div class="lc-price">$0 <span>/ always</span></div>
+        <div class="lc-divider"></div>
+        <ul class="lc-items">
+          <li>Students, educators, and universities</li>
+          <li>Professional shops and studios</li>
+          <li>Commercial projects and client work</li>
+          <li>Research and development</li>
+          <li>AGPL requires source disclosure if you distribute modified code — that is all</li>
+        </ul>
+        <a class="lc-btn" href="https://github.com/withshalom" target="_blank">Start using KADsuite →</a>
+      </div>
+
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
+    <div class="footer-brand">KAD<sup>suite™</sup></div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://www.instagram.com/kadsuite" target="_blank">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+        @kadsuite
+      </a>
+      <a class="footer-link" href="https://www.linkedin.com/in/withshalom" target="_blank">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+        withshalom
+      </a>
+      <a class="footer-link" href="https://github.com/withshalom" target="_blank">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+        </svg>
+        withshalom
+      </a>
+    </div>
+    <div class="footer-copy">© 2025 KADsuite™ · KAD™ · KAM™ · KUBE™ · KARVE™ · KONSTRUCT™ · KULTIVATE™ · KODE™ · KANVAS™ · KONNECTOR™ · KODEX™ · KID™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · withshalom.github.io</div>
+  </footer>
+</div>
+
+
+<script>
+'use strict';
+
+// ── BACKGROUND ANIMATED MESH ──────────────────────────────────────────────────
+(function() {
+  const cv  = document.getElementById('bg-canvas');
+  const ctx = cv.getContext('2d');
+  let W, H, nodes = [], mouse = {x: -999, y: -999};
+
+  function resize() {
+    W = cv.width  = window.innerWidth;
+    H = cv.height = window.innerHeight;
+  }
+
+  function initNodes() {
+    nodes = [];
+    const count = Math.min(80, Math.floor((W * H) / 14000));
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x:  Math.random() * W,
+        y:  Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        r:  Math.random() * 1.2 + 0.3,
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Move
+    for (const n of nodes) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0) n.x = W; if (n.x > W) n.x = 0;
+      if (n.y < 0) n.y = H; if (n.y > H) n.y = 0;
+    }
+    // Connections
+    const CONN = 140, MOUSE = 180, MOUSE_TOUCH = 260;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < CONN) {
+          ctx.strokeStyle = `rgba(255,255,255,${0.04 * (1 - dist / CONN)})`;
+          ctx.lineWidth   = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+      // Mouse/touch glow — cyan near cursor, amber at far nodes
+      const mdx = nodes[i].x - mouse.x, mdy = nodes[i].y - mouse.y;
+      const md   = Math.sqrt(mdx*mdx + mdy*mdy);
+      const mRad = (typeof touchActive !== 'undefined' && touchActive) ? MOUSE_TOUCH : MOUSE;
+      if (md < mRad) {
+        const t    = 1 - md / mRad;
+        const warm = Math.min(1, md / (mRad * 0.7));
+        const nr   = Math.round(warm * 255);
+        const ng   = Math.round(212 - warm * 42);
+        const nb   = Math.round(255 * (1 - warm));
+        ctx.strokeStyle = `rgba(${nr},${ng},${nb},${(0.18 * t).toFixed(3)})`;
+        ctx.lineWidth   = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+        // Node lights up when close
+        if (md < 70) {
+          ctx.fillStyle = `rgba(${nr},${ng},${nb},${(0.75 * t).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r * (1 + t * 2.5), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+    // Dots
+    for (const n of nodes) {
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); initNodes(); });
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    mouse.x = t.clientX; mouse.y = t.clientY;
+  }, {passive:true});
+
+  // Touch: set mouse position AND boost glow radius temporarily
+  let touchActive = false;
+  window.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    mouse.x = t.clientX; mouse.y = t.clientY;
+    touchActive = true;
+  }, {passive:true});
+  window.addEventListener('touchend', () => {
+    touchActive = false;
+  }, {passive:true});
+
+  window.addEventListener('touchend', () => {
+    // keep last position so glow fades naturally
+  }, {passive:true});
+
+  resize(); initNodes(); draw();
+})();
+
+// ── PROGRAM CARD PREVIEWS ─────────────────────────────────────────────────────
+function initPreview(id, drawFn) {
+  const cv = document.getElementById(id);
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio, 2);
+
+  function resize() {
+    const rect = cv.getBoundingClientRect();
+    cv.width  = rect.width  * dpr;
+    cv.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawFn(ctx, rect.width, rect.height);
+  }
+
+  new ResizeObserver(resize).observe(cv);
+  setTimeout(resize, 10);
+}
+
+// KAD preview — technical drawing lines + grid
+initPreview('kad-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Grid
+  ctx.strokeStyle = 'rgba(0,212,255,0.07)';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < W; x += 16) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 16) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  // Part outline
+  ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 1.5;
+  const px = 24, py = 18, pw = W-48, ph = H-36;
+  // Bracket shape
+  ctx.beginPath();
+  ctx.moveTo(px+20, py); ctx.lineTo(px+pw-20, py);
+  ctx.lineTo(px+pw, py+20); ctx.lineTo(px+pw, py+ph-20);
+  ctx.lineTo(px+pw-20, py+ph); ctx.lineTo(px+20, py+ph);
+  ctx.lineTo(px, py+ph-20); ctx.lineTo(px, py+20);
+  ctx.closePath();
+  ctx.stroke();
+  // Holes
+  ctx.strokeStyle = 'rgba(0,212,255,0.5)'; ctx.lineWidth = 1;
+  [[px+40, py+ph/2, 10],[px+pw-40, py+ph/2, 10]].forEach(([cx,cy,r]) => {
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+  });
+  // Dim lines
+  ctx.strokeStyle = 'rgba(0,212,255,0.25)'; ctx.lineWidth = 0.5; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(px, H-8); ctx.lineTo(px+pw, H-8); ctx.stroke();
+  ctx.setLineDash([]);
+  // Origin cross
+  ctx.strokeStyle = 'rgba(0,255,157,0.6)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W/2-8,H/2); ctx.lineTo(W/2+8,H/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W/2,H/2-8); ctx.lineTo(W/2,H/2+8); ctx.stroke();
+});
+
+// KAM preview — sheet with nested parts
+initPreview('kam-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Sheet
+  ctx.strokeStyle = 'rgba(255,170,0,0.55)'; ctx.lineWidth = 1.5; ctx.setLineDash([6,3]);
+  ctx.strokeRect(10, 10, W-20, H-20); ctx.setLineDash([]);
+  // Parts as outlines
+  const parts = [
+    {x:20,y:20,w:55,h:35,c:'rgba(255,170,0,0.7)'},
+    {x:85,y:20,w:40,h:35,c:'rgba(255,107,0,0.55)'},
+    {x:20,y:63,w:35,h:30,c:'rgba(255,170,0,0.55)'},
+    {x:63,y:63,w:60,h:30,c:'rgba(204,136,255,0.5)'},
+  ];
+  for (const p of parts) {
+    ctx.strokeStyle = p.c; ctx.lineWidth = 1;
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
+    ctx.fillStyle = p.c.replace(')', ',0.05)').replace('rgba','rgba');
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+  }
+  // Utilization bar
+  ctx.fillStyle = 'rgba(255,170,0,0.12)'; ctx.fillRect(10, H-14, W-20, 6);
+  ctx.fillStyle = 'rgba(255,170,0,0.7)';  ctx.fillRect(10, H-14, (W-20)*0.68, 6);
+  ctx.font = '7px Fira Code,monospace'; ctx.fillStyle = 'rgba(255,170,0,0.5)';
+  ctx.fillText('68% utilization', 14, H-19);
+});
+
+// KODE preview — G-KODE mode (green toolpath, amber M-codes)
+
+// KUBE preview — green 3D solid with extrude metaphor
+initPreview('kube-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle='rgba(0,10,6,0.55)'; ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(32,232,192,0.08)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=10){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Isometric cube
+  const cx=W*0.40, cy=H*0.54, s=24;
+  const iso=(x,y,z)=>({px:cx+(x-z)*s*0.866, py:cy+(x+z)*s*0.5-y*s});
+  const C=[[0,0,0],[1,0,0],[1,0,1],[0,0,1],[0,1,0],[1,1,0],[1,1,1],[0,1,1]].map(([x,y,z])=>iso(x,y,z));
+  // Back edges dim dashed
+  ctx.strokeStyle='rgba(32,232,192,0.22)'; ctx.lineWidth=0.8; ctx.setLineDash([2,2]);
+  [[0,1],[1,2],[2,3],[3,0]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(C[a].px,C[a].py);ctx.lineTo(C[b].px,C[b].py);ctx.stroke();});
+  ctx.setLineDash([]);
+  // Face fills
+  const fillFace=(idxs,alpha)=>{ctx.fillStyle=`rgba(32,232,192,${alpha})`;ctx.beginPath();idxs.forEach((i,j)=>j?ctx.lineTo(C[i].px,C[i].py):ctx.moveTo(C[i].px,C[i].py));ctx.closePath();ctx.fill();};
+  fillFace([4,5,6,7],0.10); fillFace([3,7,6,2],0.06); fillFace([1,5,6,2],0.04);
+  // Front edges vivid
+  ctx.strokeStyle='rgba(32,232,192,0.95)'; ctx.lineWidth=1.7;
+  [[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(C[a].px,C[a].py);ctx.lineTo(C[b].px,C[b].py);ctx.stroke();});
+  // Corner dots
+  ctx.fillStyle='rgba(32,232,192,0.95)';
+  [4,5,6,7].forEach(i=>{ctx.beginPath();ctx.arc(C[i].px,C[i].py,2.2,0,Math.PI*2);ctx.fill();});
+  // Sketch base cyan
+  ctx.strokeStyle='rgba(0,212,255,0.4)'; ctx.lineWidth=1; ctx.setLineDash([1,2]);
+  ctx.beginPath();[0,1,2,3].forEach((i,j)=>j?ctx.lineTo(C[i].px,C[i].py):ctx.moveTo(C[i].px,C[i].py));ctx.closePath();ctx.stroke();
+  ctx.setLineDash([]);
+  // Extrude arrow
+  const ax=W*0.80, ay1=H*0.72, ay2=H*0.30;
+  ctx.strokeStyle='rgba(32,232,192,0.5)'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+  ctx.beginPath();ctx.moveTo(ax,ay1);ctx.lineTo(ax,ay2+10);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(32,232,192,0.92)'; ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.moveTo(ax-5,ay2+10);ctx.lineTo(ax,ay2);ctx.lineTo(ax+5,ay2+10);ctx.stroke();
+  // KB badge
+  ctx.fillStyle='rgba(32,232,192,0.15)'; ctx.fillRect(3,3,14,10);
+  ctx.font='6px Fira Code,monospace'; ctx.fillStyle='rgba(32,232,192,0.88)'; ctx.fillText('KB',5,11);
+});
+
+  initPreview('karve-preview', (ctx, W, H) => {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(8,5,2,0.70)'; ctx.fillRect(0, 0, W, H);
+
+    // Grid — carbide (technical reference)
+    ctx.strokeStyle = 'rgba(32,232,192,0.07)'; ctx.lineWidth = 0.5;
+    for (let x = 0; x < W; x += 12) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 12) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    const cx = W*0.46, cy = H*0.50, r = H*0.24, len = W*0.62;
+    const x0 = cx-len/2, x1 = cx+len/2;
+    const split = x0 + len*0.46; // machined / raw boundary
+
+    // Raw stock (right side) — bronze: unmachined, hot material
+    ctx.fillStyle = 'rgba(212,170,64,0.08)';
+    ctx.fillRect(split, cy-r, x1-split, r*2);
+    ctx.strokeStyle = 'rgba(212,170,64,0.42)'; ctx.lineWidth = 1.0;
+    ctx.beginPath(); ctx.moveTo(split, cy-r); ctx.lineTo(x1, cy-r); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(split, cy+r); ctx.lineTo(x1, cy+r); ctx.stroke();
+
+    // End ellipses — bronze (raw stock ends)
+    ctx.strokeStyle = 'rgba(212,170,64,0.30)'; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.ellipse(x0, cy, 5, r, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x1, cy, 3.5, r*0.85, 0, 0, Math.PI*2); ctx.stroke();
+
+    // Spiral turning marks on raw section — bronze
+    ctx.strokeStyle = 'rgba(212,170,64,0.22)'; ctx.lineWidth = 0.5;
+    for (let p=0; p<10; p++) {
+      const xp = split + (x1-split)*(p/10);
+      const yn = cy - r + 2 + Math.sin(p*1.1)*3;
+      ctx.beginPath(); ctx.moveTo(xp, yn);
+      ctx.lineTo(xp+(x1-split)/10, yn+Math.sin((p+1)*1.1)*3-Math.sin(p*1.1)*3);
+      ctx.stroke();
+    }
+
+    // Machined section (left) — carbide: precision finished surface
+    const mr = r*0.76;
+    ctx.fillStyle = 'rgba(32,232,192,0.10)';
+    ctx.fillRect(x0, cy-mr, split-x0, mr*2);
+    ctx.strokeStyle = 'rgba(32,232,192,0.60)'; ctx.lineWidth = 1.0;
+    ctx.beginPath(); ctx.moveTo(x0, cy-mr); ctx.lineTo(split, cy-mr); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, cy+mr); ctx.lineTo(split, cy+mr); ctx.stroke();
+
+    // Cutting tool — carbide insert
+    const tx = split+3, ty = cy-mr;
+    ctx.fillStyle = 'rgba(32,232,192,0.88)';
+    ctx.beginPath();
+    ctx.moveTo(tx, ty); ctx.lineTo(tx+13, ty+mr);
+    ctx.lineTo(tx, ty+mr*2); ctx.lineTo(tx-2, ty+mr);
+    ctx.closePath(); ctx.fill();
+
+    // Tool holder — carbide
+    ctx.fillStyle = 'rgba(32,232,192,0.22)';
+    ctx.fillRect(tx+9, ty+mr*0.28, W*0.16, mr*0.40);
+
+    // Chip curls — bronze (hot metal being removed)
+    ctx.strokeStyle = 'rgba(212,170,64,0.80)'; ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.moveTo(tx+1, ty+2);
+    ctx.bezierCurveTo(tx+8, ty-11, tx+20, ty-9, tx+24, ty-18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(tx+2, ty+5);
+    ctx.bezierCurveTo(tx+7, ty-5, tx+16, ty-3, tx+18, ty-13); ctx.stroke();
+
+    // Centreline — carbide (technical reference)
+    ctx.strokeStyle = 'rgba(32,232,192,0.20)'; ctx.lineWidth = 0.6;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(x0-6, cy); ctx.lineTo(x1+10, cy); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Caption
+    ctx.fillStyle = 'rgba(212,170,64,0.52)';
+    ctx.font = 'bold 7.5px Fira Code';
+    ctx.fillText('LATHE · MILL · G-CODE', W*0.08, H-9);
+  });
+initPreview('kode-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Dark bg — matches KODE void
+  ctx.fillStyle='rgba(5,6,10,0.9)'; ctx.fillRect(0,0,W,H);
+
+  // ── Top bar (mode buttons) ──────────────────────────────
+  const bar={h:14};
+  ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,W,bar.h);
+  // GK pill — cherry red, active
+  const gkW=18, gkH=10, gkX=W*0.36, gkY=2;
+  ctx.fillStyle='rgba(224,56,0,0.22)'; ctx.beginPath();
+  ctx.roundRect(gkX,gkY,gkW,gkH,3); ctx.fill();
+  ctx.strokeStyle='rgba(224,56,0,0.6)'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.roundRect(gkX,gkY,gkW,gkH,3); ctx.stroke();
+  // GK dot + label
+  ctx.fillStyle='rgba(224,56,0,0.9)';
+  ctx.beginPath(); ctx.arc(gkX+4,gkY+5,2,0,Math.PI*2); ctx.fill();
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(224,56,0,0.95)';
+  ctx.fillText('GK',gkX+7,gkY+8);
+  // KF pill — dim tan
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(212,170,120,0.45)';
+  ctx.fillText('☕ KF',gkX+22,gkY+8);
+  // + KR dim
+  ctx.fillStyle='rgba(242,232,208,0.3)'; ctx.fillText('+ KR',gkX+42,gkY+8);
+
+  // ── File tab ─────────────────────────────────────────────
+  const tabY=bar.h;
+  ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fillRect(0,tabY,W*0.52,11);
+  // Cherry dot for .nc file
+  ctx.fillStyle='rgba(224,56,0,0.9)';
+  ctx.beginPath(); ctx.arc(6,tabY+5.5,2.5,0,Math.PI*2); ctx.fill();
+  ctx.font='6px Fira Code,monospace'; ctx.fillStyle='rgba(200,210,230,0.7)';
+  ctx.fillText('program.nc',11,tabY+9);
+
+  // ── Editor area ──────────────────────────────────────────
+  const edY=bar.h+11, edH=H-edY, edW=W*0.58;
+  // Line number gutter
+  ctx.fillStyle='rgba(255,255,255,0.02)'; ctx.fillRect(0,edY,16,edH);
+  // Active line highlight (cherry tint)
+  ctx.fillStyle='rgba(224,56,0,0.06)'; ctx.fillRect(0,edY+22,edW,9);
+
+  const lines=[
+    {t:'G21 G90', c:'rgba(100,115,140,0.7)'},
+    {t:'M08',     c:'rgba(224,56,0,0.9)'},
+    {t:'G41 D1',  c:'rgba(100,115,140,0.6)'},
+    {t:'G1 X80',  c:'rgba(255,232,239,0.85)'},  // foam highlight = cut move
+    {t:'G2 I10',  c:'rgba(224,56,0,0.75)'},
+    {t:'M09',     c:'rgba(224,56,0,0.8)'},
+    {t:'M30',     c:'rgba(255,232,239,0.6)'},
+  ];
+  ctx.font='6.5px Fira Code,monospace';
+  lines.forEach((l,i)=>{
+    const y=edY+8+i*9;
+    ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillText(i+1,3,y);
+    ctx.fillStyle=l.c; ctx.fillText(l.t,18,y);
+  });
+
+  // ── Toolpath panel (right) ───────────────────────────────
+  const tp={x:edW+2, y:edY, w:W-edW-2, h:edH};
+  ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.fillRect(tp.x,tp.y,tp.w,tp.h);
+  // TOOLPATH label
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.fillText('TOOLPATH',tp.x+3,tp.y+7);
+  // Rapid (amber dashed)
+  ctx.strokeStyle='rgba(255,170,0,0.55)'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+  ctx.beginPath(); ctx.moveTo(tp.x+4,tp.y+tp.h-12); ctx.lineTo(tp.x+8,tp.y+16); ctx.stroke();
+  ctx.setLineDash([]);
+  // Cut path (cherry) — C-shape profile
+  ctx.strokeStyle='rgba(224,56,0,0.88)'; ctx.lineWidth=1.3; ctx.lineCap='round';
+  const px=tp.x+8, pw=tp.w-10, py1=tp.y+16, py2=tp.y+tp.h-12;
+  ctx.beginPath();
+  ctx.moveTo(px,py1);
+  ctx.lineTo(px+pw*0.7,py1);
+  ctx.arc(px+pw*0.7,(py1+py2)/2,(py2-py1)/2,Math.PI*1.5,Math.PI*0.5);
+  ctx.lineTo(px,py2);
+  ctx.stroke();
+  // Legend dots
+  const leg=[
+    {c:'rgba(255,170,0,0.8)',  l:'G0'},
+    {c:'rgba(224,56,0,0.85)', l:'G1'},
+    {c:'rgba(100,120,200,0.7)',l:'G2'},
+  ];
+  ctx.font='5px Fira Code,monospace';
+  leg.forEach((e,i)=>{
+    const ly=tp.y+tp.h-18+i*6;
+    ctx.fillStyle=e.c; ctx.beginPath(); ctx.arc(tp.x+5,ly,1.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.fillText(e.l,tp.x+9,ly+2);
+  });
+  // GK badge — cherry
+  ctx.fillStyle='rgba(224,56,0,0.15)'; ctx.fillRect(tp.x+2,tp.y+9,12,8);
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(224,56,0,0.8)';
+  ctx.fillText('GK',tp.x+3,tp.y+15);
+});
+
+
+// KULTIVATE preview — site plan: boundary, hardscape, planting zones, trees
+initPreview('kultivate-preview', (ctx, W, H) => {
+  ctx.clearRect(0,0,W,H);
+  // Botanical paper canvas
+  ctx.fillStyle='#e8e4c8'; ctx.fillRect(0,18,W,H-18);
+  // Deep forest chrome band
+  ctx.fillStyle='#0e1e0c'; ctx.fillRect(0,0,W,18);
+  ctx.fillStyle='#6ab830'; ctx.font='bold 7px Fira Code,monospace';
+  ctx.fillText('KLT',4,12);
+  // Green ink grid on paper
+  ctx.strokeStyle='rgba(60,100,30,0.16)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=10){ctx.beginPath();ctx.moveTo(x,18);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=18;y<H;y+=10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Site boundary
+  ctx.strokeStyle='rgba(106,160,32,0.80)'; ctx.lineWidth=1.2; ctx.setLineDash([3,2]);
+  ctx.strokeRect(6,24,W-12,H-30); ctx.setLineDash([]);
+  // Planting zones
+  const hw=W*0.44,hh=H*0.50;
+  ctx.fillStyle='rgba(46,120,24,0.20)'; ctx.fillRect(6+hw,24,W-hw-12,hh);
+  ctx.strokeStyle='rgba(40,96,16,0.65)'; ctx.lineWidth=0.8; ctx.strokeRect(6+hw,24,W-hw-12,hh);
+  // Hardscape
+  ctx.fillStyle='rgba(106,80,40,0.16)'; ctx.fillRect(6,24,hw,hh);
+  ctx.save(); ctx.beginPath(); ctx.rect(6,24,hw,hh); ctx.clip();
+  ctx.strokeStyle='rgba(106,80,40,0.26)'; ctx.lineWidth=0.6;
+  for(let d=-H;d<W+H;d+=7){ctx.beginPath();ctx.moveTo(d,0);ctx.lineTo(d+H,H);ctx.stroke();}
+  ctx.restore();
+  ctx.strokeStyle='rgba(100,78,38,0.55)'; ctx.lineWidth=0.8; ctx.strokeRect(6,24,hw,hh);
+  // Groundcover
+  ctx.fillStyle='rgba(80,136,24,0.14)'; ctx.fillRect(6,24+hh,W-12,H-hh-30);
+  ctx.strokeStyle='rgba(64,120,20,0.45)'; ctx.lineWidth=0.8; ctx.strokeRect(6,24+hh,W-12,H-hh-30);
+  // Water feature
+  ctx.fillStyle='rgba(24,112,160,0.28)'; ctx.strokeStyle='rgba(24,112,160,0.75)'; ctx.lineWidth=0.9;
+  ctx.beginPath(); ctx.ellipse(W*0.74,H*0.42,W*0.10,H*0.08,0,0,Math.PI*2);
+  ctx.fill(); ctx.stroke();
+  // Trees — deep green canopies
+  [[W*0.17,H*0.38],[W*0.57,H*0.35],[W*0.80,H*0.68]].forEach(([tx,ty])=>{
+    ctx.fillStyle='rgba(30,88,14,0.52)'; ctx.strokeStyle='rgba(40,96,14,0.92)'; ctx.lineWidth=0.9;
+    ctx.beginPath(); ctx.arc(tx,ty,8,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='rgba(40,96,14,1)'; ctx.beginPath(); ctx.arc(tx,ty,2,0,Math.PI*2); ctx.fill();
+  });
+  // Shrubs
+  [[W*0.37,H*0.56],[W*0.60,H*0.75]].forEach(([sx,sy])=>{
+    ctx.fillStyle='rgba(56,136,64,0.48)'; ctx.strokeStyle='rgba(40,108,48,0.82)'; ctx.lineWidth=0.7;
+    ctx.beginPath(); ctx.arc(sx,sy,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  });
+  // KLT watermark
+  ctx.font='bold 8px Fira Code,monospace'; ctx.fillStyle='rgba(30,88,14,0.28)';
+  ctx.textAlign='right'; ctx.fillText('.KLT',W-6,H-6);
+});
+// KANVAS preview — brush strokes on white artboard
+initPreview('kanvas-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Drafting paper background
+  ctx.fillStyle = '#f8f5ee'; ctx.fillRect(0,0,W,H);
+  // Warm paper texture
+  ctx.fillStyle = 'rgba(180,155,110,0.06)'; ctx.fillRect(0,0,W,H);
+
+  // ── Helper: pencil line ────────────────────────────────────────
+  function pLine(x1,y1,x2,y2,w,a) {
+    ctx.globalAlpha=a||0.72; ctx.lineWidth=w||0.7;
+    ctx.strokeStyle='#2a2018'; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+  function grain(x,y,r,n,a) {
+    ctx.fillStyle='#2a2018';
+    for(let i=0;i<n;i++){
+      const ang=Math.random()*Math.PI*2, d=Math.random()*r;
+      ctx.globalAlpha=Math.random()*a;
+      ctx.fillRect(x+Math.cos(ang)*d,y+Math.sin(ang)*d,0.6,0.6);
+    }
+  }
+
+  ctx.save();
+  ctx.strokeStyle = '#2a2018';
+
+  // ── Construction lines (very faint, light-blue graphite) ───────
+  ctx.globalAlpha=0.10; ctx.lineWidth=0.5;
+  ctx.strokeStyle='#4060a0';
+  [W*0.25, W*0.5, W*0.75].forEach(x=>{pLine(x,0,x,H,0.5,0.08);});
+  [H*0.33, H*0.66].forEach(y=>{pLine(0,y,W,y,0.5,0.08);});
+
+  // ── Floor plan sketch (left half) ─────────────────────────────
+  const mx=W*0.48, my=H*0.52;
+  // Outer walls — heavy pencil
+  ctx.strokeStyle='#1e1608'; ctx.lineWidth=1.8; ctx.globalAlpha=0.82;
+  ctx.strokeRect(W*0.06, H*0.12, W*0.38, H*0.72);
+  grain(W*0.25, H*0.50, W*0.18, 120, 0.06);
+
+  // Interior partition
+  pLine(W*0.06, H*0.52, W*0.30, H*0.52, 1.4, 0.78);
+  pLine(W*0.30, H*0.12, W*0.30, H*0.52, 1.4, 0.78);
+
+  // Door arc (compass drawn)
+  ctx.globalAlpha=0.50; ctx.lineWidth=0.7; ctx.strokeStyle='#2a2018';
+  ctx.setLineDash([2,2]);
+  ctx.beginPath(); ctx.arc(W*0.30,H*0.52,W*0.10,Math.PI*0.5,Math.PI); ctx.stroke();
+  pLine(W*0.30,H*0.52,W*0.20,H*0.52,0.7,0.55);
+  pLine(W*0.30,H*0.52,W*0.30,H*0.42,0.7,0.55);
+  ctx.setLineDash([]);
+
+  // Window ticks
+  pLine(W*0.20,H*0.12,W*0.20,H*0.10,1.2,0.65);
+  pLine(W*0.26,H*0.12,W*0.26,H*0.10,1.2,0.65);
+
+  // Dimension lines
+  ctx.globalAlpha=0.42; ctx.lineWidth=0.6; ctx.strokeStyle='#1e1608';
+  pLine(W*0.06,H*0.90, W*0.44,H*0.90, 0.6, 0.45);
+  pLine(W*0.06,H*0.88, W*0.06,H*0.92, 0.6, 0.45);
+  pLine(W*0.44,H*0.88, W*0.44,H*0.92, 0.6, 0.45);
+  ctx.font='7px Fira Code,monospace'; ctx.textAlign='center';
+  ctx.fillStyle='#2a2018'; ctx.globalAlpha=0.55;
+  ctx.fillText('6.40m', W*0.25, H*0.895);
+
+  // ── Elevation sketch (right half) ─────────────────────────────
+  // Ground line
+  pLine(W*0.54, H*0.74, W*0.96, H*0.74, 1.5, 0.72);
+  // Building elevation — 3D block sketch
+  pLine(W*0.58, H*0.74, W*0.58, H*0.28, 1.3, 0.75);
+  pLine(W*0.92, H*0.74, W*0.92, H*0.28, 1.3, 0.75);
+  pLine(W*0.58, H*0.28, W*0.92, H*0.28, 1.3, 0.75);
+  // Roof pitch
+  pLine(W*0.58, H*0.28, W*0.75, H*0.14, 1.0, 0.68);
+  pLine(W*0.92, H*0.28, W*0.75, H*0.14, 1.0, 0.68);
+  // Hatch: shadow side (right face)
+  ctx.globalAlpha=0.18; ctx.lineWidth=0.5; ctx.strokeStyle='#2a2018';
+  for(let y=H*0.28;y<H*0.74;y+=4){pLine(W*0.82,y,W*0.92,y+2,0.5,0.18);}
+  // Windows
+  pLine(W*0.63,H*0.44,W*0.63,H*0.58,1.0,0.60);
+  pLine(W*0.71,H*0.44,W*0.71,H*0.58,1.0,0.60);
+  pLine(W*0.63,H*0.44,W*0.71,H*0.44,1.0,0.60);
+  pLine(W*0.63,H*0.58,W*0.71,H*0.58,1.0,0.60);
+  pLine(W*0.67,H*0.44,W*0.67,H*0.58,0.6,0.45);
+
+  // ── KOMPASS circle (compass-drawn arc detail) ──────────────────
+  ctx.globalAlpha=0.35; ctx.lineWidth=0.8; ctx.strokeStyle='#2a2018';
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(W*0.75,H*0.51,H*0.12,Math.PI*0.8,Math.PI*2.0); ctx.stroke();
+  // Compass center mark
+  pLine(W*0.75-4,H*0.51,W*0.75+4,H*0.51,0.6,0.30);
+  pLine(W*0.75,H*0.51-4,W*0.75,H*0.51+4,0.6,0.30);
+
+  // ── Pencil smudge zones (tonal shading) ───────────────────────
+  const grd=ctx.createLinearGradient(W*0.54,H*0.28,W*0.78,H*0.74);
+  grd.addColorStop(0,'rgba(40,32,24,0)');
+  grd.addColorStop(1,'rgba(40,32,24,0.07)');
+  ctx.fillStyle=grd; ctx.globalAlpha=1;
+  ctx.fillRect(W*0.54,H*0.28,W*0.25,H*0.46);
+
+  // ── KNV watermark ────────────────────────────────────────────
+  ctx.font='bold 8px Fira Code,monospace';
+  ctx.fillStyle='#2a2018'; ctx.globalAlpha=0.25;
+  ctx.textAlign='right'; ctx.fillText('.KNV', W-6, H-6);
+
+  ctx.restore();
+});
+
+initPreview('konstruct-preview', (ctx, W, H) => {
+  ctx.clearRect(0,0,W,H);
+  // Blueprint dark ground
+  ctx.fillStyle='#0c1824'; ctx.fillRect(0,0,W,H);
+  // Blueprint grid — fine technical lines
+  ctx.strokeStyle='rgba(74,143,212,0.14)'; ctx.lineWidth=0.4;
+  for(let x=0;x<W;x+=8){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=8){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Major grid
+  ctx.strokeStyle='rgba(74,143,212,0.25)'; ctx.lineWidth=0.6;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Floor plan — blueprint white lines
+  const bc='rgba(200,228,255,0.90)', bd='rgba(74,143,212,0.55)';
+  ctx.strokeStyle=bc; ctx.lineWidth=1.4;
+  // Outer walls
+  ctx.strokeRect(8,12,W-16,H-20);
+  // Interior partition
+  ctx.beginPath(); ctx.moveTo(W*0.45,12); ctx.lineTo(W*0.45,H*0.62); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(8,H*0.62); ctx.lineTo(W*0.45,H*0.62); ctx.stroke();
+  // Door arc — thin blueprint style
+  ctx.strokeStyle='rgba(160,210,255,0.60)'; ctx.lineWidth=0.7; ctx.setLineDash([2,2]);
+  ctx.beginPath(); ctx.arc(W*0.45,H*0.62,W*0.12,Math.PI*0.5,Math.PI); ctx.stroke();
+  ctx.setLineDash([]);
+  // Window ticks
+  ctx.strokeStyle=bc; ctx.lineWidth=1.2;
+  [[W*0.22,12],[W*0.32,12],[W*0.66,12],[W*0.78,12]].forEach(([x,y])=>{
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y-5); ctx.stroke();
+  });
+  // Dimension lines
+  ctx.strokeStyle=bd; ctx.lineWidth=0.6;
+  ctx.beginPath(); ctx.moveTo(8,H-4); ctx.lineTo(W-8,H-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(8,H-7); ctx.lineTo(8,H-1); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W-8,H-7); ctx.lineTo(W-8,H-1); ctx.stroke();
+  // Labels
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(160,210,255,0.75)';
+  ctx.textAlign='center'; ctx.fillText('KONSTRUCT',W/2,H-8);
+  ctx.textAlign='left'; ctx.fillStyle='rgba(74,143,212,0.60)';
+  ctx.fillText('KON',3,10);
+});
+
+// ── LICENSE MODAL ─────────────────────────────────────────────────────────────
+
+
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+  </div>
+</div>
+
 <div id="app">
 
 <!-- TOPBAR -->
@@ -766,7 +2663,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     <div class="tb-menu-item" id="menu-edit" onmouseenter="openMenu('edit')" onmouseleave="scheduleClose()">Edit
       <div class="tb-dropdown" id="dd-edit" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
         <div class="tb-dd-item" onclick="deleteSelected();closeMenus()">Delete Selected<span class="dd-key">Del</span></div>
-        <div class="tb-dd-item" onclick="pushUndo();GeoMemory.clear();render();showToast('KANVAS cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
+        <div class="tb-dd-item" onclick="GeoMemory.clear();render();showToast('KANVAS cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="joinSelected();closeMenus()">Join → Polyline<span class="dd-key">J</span></div>
         <div class="tb-dd-item" onclick="explodeSelected();closeMenus()">Explode Polyline<span class="dd-key">X</span></div>
@@ -823,20 +2720,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     </div>
   </div>
   <div class="tb-right">
-    <button class="tb-undo-btn" id="tb-btn-undo" onclick="undo()" title="Undo (Ctrl+Z)" style="opacity:0.3">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M3 10h11a5 5 0 0 1 0 10H7"/><polyline points="3 10 7 6 3 2 3 10"/>
-      </svg>
-      <span id="sb-undo-count">—</span>
-    </button>
-    <button class="tb-undo-btn" id="tb-btn-redo" onclick="redo()" title="Redo (Ctrl+Y / Ctrl+Shift+Z)" style="opacity:0.3">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M21 10H10a5 5 0 0 0 0 10h7"/><polyline points="21 10 17 6 21 2 21 10"/>
-      </svg>
-      <span id="sb-redo-count">—</span>
-    </button>
-    <div class="tb-sep"></div>
-    <span class="tb-badge" style="color:var(--amber)">beta</span>
+    <span class="tb-badge">v0.0</span>
     <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
       <span class="unit-divider"></span>
@@ -1242,7 +3126,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span>M</span><span class="sb-val">mirror</span></div>
     <div class="sb-item"><span>D</span><span class="sb-val">measure</span></div>
-    <div class="sb-item"><span class="sb-val ok" style="color:var(--amber)">.KAD beta · undo/redo</span></div>
+    <div class="sb-item"><span class="sb-val ok">.KAD v0.0</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
       <span>© <span id="cc-year"></span> KADsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener" class="cc-link">Source on GitHub</a> · withshalom</span>
@@ -1450,7 +3334,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 <script>
 'use strict';
 // ═══════════════════════════════════════════════════════════
-//  .KAD v0.0  — Kernel-Aided Design + OpenSCAD Export
+//  .KAD v0.0  — Kernel-Aided Design
 // ═══════════════════════════════════════════════════════════
 
 // ── CANVAS ──────────────────────────────────────────────
@@ -1555,17 +3439,10 @@ function splashSelectUnit(unit) {
 }
 
 function initSplash() {
-  document.getElementById('splash-year').textContent = new Date().getFullYear();
-  let saved = null;
-  try { saved = localStorage.getItem(SPLASH_KEY); } catch(e){}
-  if (saved === 'mm' || saved === 'in') {
-    document.getElementById('splash-overlay').style.display = 'none';
-    canvas.style.pointerEvents = 'auto';
-    if (saved !== unitMode) splashSelectUnit(saved);
-  } else {
-    // Block canvas until unit chosen
-    canvas.style.pointerEvents = 'none';
-  }
+  // KADsuite beta — no unit splash, default inches
+  document.getElementById('splash-overlay').style.display = 'none';
+  canvas.style.pointerEvents = 'auto';
+  if (unitMode !== 'in') splashSelectUnit('in');
 }
 
 function toggleUnits() {
@@ -1658,7 +3535,6 @@ function setArcMode(m){
 function getFillet(){const r=parseFloat(document.getElementById('fillet-r-input').value)||5;return parseFloat(fromDisplay(r).toFixed(6));}
 function commitFillet(l1,l2){
   const r=getFillet();if(r<=0){showToast('Enter a fillet radius > 0');return;}
-  pushUndo();
   const inter=lineIntersectPt(l1,l2);if(!inter){showToast('Lines are parallel');return;}
   const len1=Math.hypot(l1.x2-l1.x1,l1.y2-l1.y1),len2=Math.hypot(l2.x2-l2.x1,l2.y2-l2.y1);
   if(len1<1e-10||len2<1e-10){showToast('Degenerate line');return;}
@@ -1751,77 +3627,6 @@ const GeoMemory = {
     }catch(e){ return false; }
   },
 };
-
-
-// ══════════════════════════════════════════════════════════════════════════
-// KAD BETA — UNDO / REDO ENGINE
-// Strategy: snapshot-based history. Before every geometry mutation,
-// call pushUndo(). Undo pops the last snapshot and restores it. Redo
-// pops the redo stack. Both stacks hold serialized GeoMemory JSON strings
-// (true deep copies — no aliasing). Cap: 50 undo steps.
-// ══════════════════════════════════════════════════════════════════════════
-const UNDO_LIMIT = 50;
-const _undoStack = [];   // [ jsonString, ... ]  — oldest first
-const _redoStack = [];   // [ jsonString, ... ]  — most recent first
-
-function _geoSnapshot() {
-  // Serialize only the geometry state that matters for undo
-  return JSON.stringify({
-    objects: JSON.parse(JSON.stringify(GeoMemory.objects)), // deep copy
-    nextId:  GeoMemory.nextId,
-  });
-}
-
-function pushUndo() {
-  _undoStack.push(_geoSnapshot());
-  if (_undoStack.length > UNDO_LIMIT) _undoStack.shift(); // evict oldest
-  _redoStack.length = 0; // any new action invalidates redo history
-  _updateUndoUI();
-}
-
-function undo() {
-  if (!_undoStack.length) { showToast('Nothing to undo'); return; }
-  // Save current state to redo stack before restoring
-  _redoStack.push(_geoSnapshot());
-  const snap = _undoStack.pop();
-  _restoreSnapshot(snap);
-  showToast(`Undo · ${_undoStack.length} step${_undoStack.length!==1?'s':''} remaining`);
-  _updateUndoUI();
-}
-
-function redo() {
-  if (!_redoStack.length) { showToast('Nothing to redo'); return; }
-  _undoStack.push(_geoSnapshot());
-  const snap = _redoStack.pop();
-  _restoreSnapshot(snap);
-  showToast(`Redo · ${_redoStack.length} step${_redoStack.length!==1?'s':''} remaining`);
-  _updateUndoUI();
-}
-
-function _restoreSnapshot(jsonStr) {
-  const d = JSON.parse(jsonStr);
-  GeoMemory.objects = d.objects;
-  GeoMemory.nextId  = d.nextId;
-  // Clear selection — restored geometry IDs may no longer match
-  selectedIds.clear();
-  updateSelectionProps();
-  updateProps();
-  render();
-}
-
-function _updateUndoUI() {
-  // Update the undo/redo indicators in the status bar
-  const undoEl = document.getElementById('sb-undo-count');
-  const redoEl = document.getElementById('sb-redo-count');
-  if (undoEl) undoEl.textContent = _undoStack.length || '—';
-  if (redoEl) redoEl.textContent = _redoStack.length || '—';
-  // Dim the undo/redo buttons in the toolbar if empty
-  const btnUndo = document.getElementById('tb-btn-undo');
-  const btnRedo = document.getElementById('tb-btn-redo');
-  if (btnUndo) btnUndo.style.opacity = _undoStack.length ? '1' : '0.3';
-  if (btnRedo) btnRedo.style.opacity = _redoStack.length ? '1' : '0.3';
-}
-// ── END UNDO ENGINE ──────────────────────────────────────────────────────
 
 // ── SNAP ────────────────────────────────────────────────
 const SNAP_PX = 14;
@@ -2085,7 +3890,6 @@ function cancelOffsetPopup() {
 function confirmOffsetPopup() {
   const v = parseFloat(offsetPopupInput.value);
   if (isNaN(v) || v <= 0) { offsetPopupInput.focus(); offsetPopupInput.select(); return; }
-  pushUndo();
   const mm = fromDisplay(v);
   document.getElementById('offset-dist-input').value =
     parseFloat(toDisplay(mm).toFixed(unitDecimals()));
@@ -2141,7 +3945,6 @@ function ptSegDist(px,py,ax,ay,bx,by) {
 function commitRect(x1,y1,x2,y2) {
   const lx=Math.min(x1,x2), rx=Math.max(x1,x2);
   const by=Math.min(y1,y2), ty=Math.max(y1,y2);
-  pushUndo();
   GeoMemory.addPolyline([
     {x:lx,y:by},{x:rx,y:by},{x:rx,y:ty},{x:lx,y:ty}
   ], true); // closed
@@ -2156,7 +3959,6 @@ function commitPolygon(cx,cy,px,py) {
   const n = getPolySides();
   const r = Math.hypot(px-cx, py-cy);
   if(r<1e-6){ showToast('Polygon too small'); return; }
-  pushUndo();
   const vr = getPolyInscribed() ? r : r/Math.cos(Math.PI/n);
   const startAngle = Math.atan2(py-cy, px-cx);
   const pts=[];
@@ -2180,7 +3982,6 @@ function commitLineChain(closed) {
     lineChain = [];
     render(); return;
   }
-  pushUndo();
   if(lineChain.length === 2 && !closed) {
     // Two points = one line segment — store as LINE for simplicity
     GeoMemory.addLine(lineChain[0].x, lineChain[0].y, lineChain[1].x, lineChain[1].y);
@@ -2197,7 +3998,6 @@ function commitLineChain(closed) {
 // JOIN: take selected LINE entities and chain them into POLYLINE(s)
 // Algorithm: build an adjacency graph by matching endpoints, then walk chains
 function joinSelected() {
-  pushUndo();
   const selLines = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'LINE');
   if(selLines.length < 2) { showToast('Select 2+ lines to join'); return; }
 
@@ -2290,7 +4090,6 @@ function joinSelected() {
 
 // EXPLODE: break selected POLYLINE(s) back into individual LINE entities
 function explodeSelected() {
-  pushUndo();
   const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE');
   if(selPoly.length === 0) { showToast('Select polylines to explode'); return; }
 
@@ -2317,7 +4116,6 @@ function explodeSelected() {
 
 // CLOSE POLYLINE: add closing segment to selected open polyline
 function closePolyline() {
-  pushUndo();
   const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE' && !o.closed);
   if(selPoly.length === 0) { showToast('Select an open polyline to close'); return; }
   for(const pl of selPoly) pl.closed = true;
@@ -2327,7 +4125,6 @@ function closePolyline() {
 
 // OPEN POLYLINE: remove closing connection
 function openPolyline() {
-  pushUndo();
   const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE' && o.closed);
   if(selPoly.length === 0) { showToast('Select a closed polyline to open'); return; }
   for(const pl of selPoly) pl.closed = false;
@@ -2396,7 +4193,6 @@ function pickObject(sx,sy) {
 
 function deleteSelected() {
   if(selectedIds.size===0){ showToast('Nothing selected'); return; }
-  pushUndo();
   for(const id of selectedIds) GeoMemory.remove(id);
   showToast(`Deleted ${selectedIds.size} object(s)`);
   selectedIds.clear();
@@ -2480,7 +4276,6 @@ function rotateSelected(deltaDeg, pivot) {
   if (selectedIds.size === 0) { showToast('Nothing selected — select lines first'); return; }
   const p = pivot || selectionCentroid();
   if (!p) { showToast('No geometry to rotate'); return; }
-  pushUndo();
 
   let count=0;
   for (const o of GeoMemory.objects) {
@@ -3318,9 +5113,6 @@ function onKeyDown(e) {
     if(k==='?')          showCoordHelp();
   }
   if(e.ctrlKey){
-    if(k==='z'){ e.preventDefault(); undo(); return; }
-    if(k==='y'){ e.preventDefault(); redo(); return; }
-    if(k==='Z' && e.shiftKey){ e.preventDefault(); redo(); return; } // Ctrl+Shift+Z
     if(k==='s'){ e.preventDefault(); saveKAD(); }
     if(k==='n'){ e.preventDefault(); newDocument(); }
     if(k==='e' && e.shiftKey){ e.preventDefault(); exportSCAD(); }
@@ -3953,7 +5745,6 @@ function importDXF(event) {
 function commitDxfImport() {
   const { parsed, unitSel, mergeSel } = dxfDialog;
   if (!parsed) return;
-  pushUndo();
 
   // Determine final mm-per-file-unit scale from user choice.
   // parseDXF now returns raw coordinates (no pre-scaling applied).
@@ -4066,7 +5857,6 @@ function mirrorPoint(x, y, axis, axisData) {
 function mirrorSelected() {
   const ids = [...selectedIds];
   if (!ids.length) { showToast('Select objects first (S)'); return; }
-  pushUndo();
 
   // Compute bounding box of selected objects for h/v axis center
   let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
@@ -4136,7 +5926,7 @@ function saveKAD() { downloadText(GeoMemory.serialize(),'drawing.kad','applicati
 function loadKAD(event) {
   const file=event.target.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=e=>{ pushUndo(); const ok=GeoMemory.deserialize(e.target.result); ok?render():null; showToast(ok?`Loaded ${file.name}`:'Invalid .kad'); event.target.value=''; };
+  reader.onload=e=>{ const ok=GeoMemory.deserialize(e.target.result); ok?render():null; showToast(ok?`Loaded ${file.name}`:'Invalid .kad'); event.target.value=''; };
   reader.readAsText(file);
 }
 function exportDXF() {
@@ -4306,7 +6096,6 @@ function downloadText(content,filename,mime) {
 }
 function newDocument() {
   if(GeoMemory.objects.length&&!confirm('New document? Unsaved changes will be lost.')) return;
-  pushUndo();
   GeoMemory.clear(); cancelTool(); selectedIds.clear(); updateSelectionProps(); render(); showToast('New document');
 }
 
@@ -4326,6 +6115,23 @@ function showToast(msg) {
 }
 
 // ── INIT ────────────────────────────────────────────────
+// ── KADsuite beta: drafting mode toggle ────────────────────────────────────
+function openDraftingMode() {
+  document.body.classList.add('drafting-mode');
+  setTimeout(() => {
+    const cv = document.getElementById('main-canvas');
+    if (cv) { resizeCanvas(); render(); cv.focus(); }
+  }, 50);
+}
+function closeDraftingMode() {
+  document.body.classList.remove('drafting-mode');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.body.classList.contains('drafting-mode')) {
+    closeDraftingMode();
+  }
+});
+
 requestAnimationFrame(()=>{
   requestAnimationFrame(()=>{
     resizeCanvas();
@@ -4333,7 +6139,6 @@ requestAnimationFrame(()=>{
     setTool('select');
     document.getElementById('cc-year').textContent = new Date().getFullYear();
     initSplash();
-    _updateUndoUI(); // initialise undo/redo button states
     setTimeout(()=>{
       GeoMemory.addLine(-15,0,15,0);
       GeoMemory.addLine(0,-15,0,15);
@@ -4350,7 +6155,6 @@ let chamferState = {active:false, line1:null, line2:null};
 let chamferDist  = 5;
 
 function commitChamfer(line1Id, line2Id) {
-  pushUndo();
   const o1 = GeoMemory.objects.find(o=>o.id===line1Id);
   const o2 = GeoMemory.objects.find(o=>o.id===line2Id);
   if (!o1||!o2||o1.type!=='LINE'||o2.type!=='LINE') { showToast('Select two lines for chamfer'); return; }
@@ -4414,7 +6218,6 @@ let copyOffset = {x:10, y:-10}; // default offset in mm
 function copySelected() {
   const ids = [...selectedIds];
   if (!ids.length) { showToast('Select objects first'); return; }
-  pushUndo();
   const copies = [];
   for (const id of ids) {
     const o = GeoMemory.objects.find(x=>x.id===id);
@@ -5112,7 +6915,7 @@ function kvExportVAD() {
     layer: 'KAD Geometry',
   };
   const vad = {
-    version:'1.0', source:'KAD KANVAS',
+    version:'0.0', source:'KAD KANVAS',
     layers:  KVM.layers,
     activeLayer: KVM.activeLayer,
     nextId:  KVM.nextId,
@@ -5296,6 +7099,612 @@ function kvInit() {
 
 
 kvInit();
+
+// ── KADsuite suite page JS ──
+
+'use strict';
+
+// ── BACKGROUND ANIMATED MESH ──────────────────────────────────────────────────
+(function() {
+  const cv  = document.getElementById('bg-canvas');
+  const ctx = cv.getContext('2d');
+  let W, H, nodes = [], mouse = {x: -999, y: -999};
+
+  function resize() {
+    W = cv.width  = window.innerWidth;
+    H = cv.height = window.innerHeight;
+  }
+
+  function initNodes() {
+    nodes = [];
+    const count = Math.min(80, Math.floor((W * H) / 14000));
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x:  Math.random() * W,
+        y:  Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        r:  Math.random() * 1.2 + 0.3,
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Move
+    for (const n of nodes) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0) n.x = W; if (n.x > W) n.x = 0;
+      if (n.y < 0) n.y = H; if (n.y > H) n.y = 0;
+    }
+    // Connections
+    const CONN = 140, MOUSE = 180, MOUSE_TOUCH = 260;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < CONN) {
+          ctx.strokeStyle = `rgba(255,255,255,${0.04 * (1 - dist / CONN)})`;
+          ctx.lineWidth   = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+      // Mouse/touch glow — cyan near cursor, amber at far nodes
+      const mdx = nodes[i].x - mouse.x, mdy = nodes[i].y - mouse.y;
+      const md   = Math.sqrt(mdx*mdx + mdy*mdy);
+      const mRad = (typeof touchActive !== 'undefined' && touchActive) ? MOUSE_TOUCH : MOUSE;
+      if (md < mRad) {
+        const t    = 1 - md / mRad;
+        const warm = Math.min(1, md / (mRad * 0.7));
+        const nr   = Math.round(warm * 255);
+        const ng   = Math.round(212 - warm * 42);
+        const nb   = Math.round(255 * (1 - warm));
+        ctx.strokeStyle = `rgba(${nr},${ng},${nb},${(0.18 * t).toFixed(3)})`;
+        ctx.lineWidth   = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+        // Node lights up when close
+        if (md < 70) {
+          ctx.fillStyle = `rgba(${nr},${ng},${nb},${(0.75 * t).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r * (1 + t * 2.5), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+    // Dots
+    for (const n of nodes) {
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); initNodes(); });
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    mouse.x = t.clientX; mouse.y = t.clientY;
+  }, {passive:true});
+
+  // Touch: set mouse position AND boost glow radius temporarily
+  let touchActive = false;
+  window.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    mouse.x = t.clientX; mouse.y = t.clientY;
+    touchActive = true;
+  }, {passive:true});
+  window.addEventListener('touchend', () => {
+    touchActive = false;
+  }, {passive:true});
+
+  window.addEventListener('touchend', () => {
+    // keep last position so glow fades naturally
+  }, {passive:true});
+
+  resize(); initNodes(); draw();
+})();
+
+// ── PROGRAM CARD PREVIEWS ─────────────────────────────────────────────────────
+function initPreview(id, drawFn) {
+  const cv = document.getElementById(id);
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio, 2);
+
+  function resize() {
+    const rect = cv.getBoundingClientRect();
+    cv.width  = rect.width  * dpr;
+    cv.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawFn(ctx, rect.width, rect.height);
+  }
+
+  new ResizeObserver(resize).observe(cv);
+  setTimeout(resize, 10);
+}
+
+// KAD preview — technical drawing lines + grid
+initPreview('kad-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Grid
+  ctx.strokeStyle = 'rgba(0,212,255,0.07)';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < W; x += 16) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 16) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  // Part outline
+  ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 1.5;
+  const px = 24, py = 18, pw = W-48, ph = H-36;
+  // Bracket shape
+  ctx.beginPath();
+  ctx.moveTo(px+20, py); ctx.lineTo(px+pw-20, py);
+  ctx.lineTo(px+pw, py+20); ctx.lineTo(px+pw, py+ph-20);
+  ctx.lineTo(px+pw-20, py+ph); ctx.lineTo(px+20, py+ph);
+  ctx.lineTo(px, py+ph-20); ctx.lineTo(px, py+20);
+  ctx.closePath();
+  ctx.stroke();
+  // Holes
+  ctx.strokeStyle = 'rgba(0,212,255,0.5)'; ctx.lineWidth = 1;
+  [[px+40, py+ph/2, 10],[px+pw-40, py+ph/2, 10]].forEach(([cx,cy,r]) => {
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+  });
+  // Dim lines
+  ctx.strokeStyle = 'rgba(0,212,255,0.25)'; ctx.lineWidth = 0.5; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(px, H-8); ctx.lineTo(px+pw, H-8); ctx.stroke();
+  ctx.setLineDash([]);
+  // Origin cross
+  ctx.strokeStyle = 'rgba(0,255,157,0.6)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W/2-8,H/2); ctx.lineTo(W/2+8,H/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W/2,H/2-8); ctx.lineTo(W/2,H/2+8); ctx.stroke();
+});
+
+// KAM preview — sheet with nested parts
+initPreview('kam-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Sheet
+  ctx.strokeStyle = 'rgba(255,170,0,0.55)'; ctx.lineWidth = 1.5; ctx.setLineDash([6,3]);
+  ctx.strokeRect(10, 10, W-20, H-20); ctx.setLineDash([]);
+  // Parts as outlines
+  const parts = [
+    {x:20,y:20,w:55,h:35,c:'rgba(255,170,0,0.7)'},
+    {x:85,y:20,w:40,h:35,c:'rgba(255,107,0,0.55)'},
+    {x:20,y:63,w:35,h:30,c:'rgba(255,170,0,0.55)'},
+    {x:63,y:63,w:60,h:30,c:'rgba(204,136,255,0.5)'},
+  ];
+  for (const p of parts) {
+    ctx.strokeStyle = p.c; ctx.lineWidth = 1;
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
+    ctx.fillStyle = p.c.replace(')', ',0.05)').replace('rgba','rgba');
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+  }
+  // Utilization bar
+  ctx.fillStyle = 'rgba(255,170,0,0.12)'; ctx.fillRect(10, H-14, W-20, 6);
+  ctx.fillStyle = 'rgba(255,170,0,0.7)';  ctx.fillRect(10, H-14, (W-20)*0.68, 6);
+  ctx.font = '7px Fira Code,monospace'; ctx.fillStyle = 'rgba(255,170,0,0.5)';
+  ctx.fillText('68% utilization', 14, H-19);
+});
+
+// KODE preview — G-KODE mode (green toolpath, amber M-codes)
+
+// KUBE preview — green 3D solid with extrude metaphor
+initPreview('kube-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle='rgba(0,10,6,0.55)'; ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(32,232,192,0.08)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=10){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Isometric cube
+  const cx=W*0.40, cy=H*0.54, s=24;
+  const iso=(x,y,z)=>({px:cx+(x-z)*s*0.866, py:cy+(x+z)*s*0.5-y*s});
+  const C=[[0,0,0],[1,0,0],[1,0,1],[0,0,1],[0,1,0],[1,1,0],[1,1,1],[0,1,1]].map(([x,y,z])=>iso(x,y,z));
+  // Back edges dim dashed
+  ctx.strokeStyle='rgba(32,232,192,0.22)'; ctx.lineWidth=0.8; ctx.setLineDash([2,2]);
+  [[0,1],[1,2],[2,3],[3,0]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(C[a].px,C[a].py);ctx.lineTo(C[b].px,C[b].py);ctx.stroke();});
+  ctx.setLineDash([]);
+  // Face fills
+  const fillFace=(idxs,alpha)=>{ctx.fillStyle=`rgba(32,232,192,${alpha})`;ctx.beginPath();idxs.forEach((i,j)=>j?ctx.lineTo(C[i].px,C[i].py):ctx.moveTo(C[i].px,C[i].py));ctx.closePath();ctx.fill();};
+  fillFace([4,5,6,7],0.10); fillFace([3,7,6,2],0.06); fillFace([1,5,6,2],0.04);
+  // Front edges vivid
+  ctx.strokeStyle='rgba(32,232,192,0.95)'; ctx.lineWidth=1.7;
+  [[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(C[a].px,C[a].py);ctx.lineTo(C[b].px,C[b].py);ctx.stroke();});
+  // Corner dots
+  ctx.fillStyle='rgba(32,232,192,0.95)';
+  [4,5,6,7].forEach(i=>{ctx.beginPath();ctx.arc(C[i].px,C[i].py,2.2,0,Math.PI*2);ctx.fill();});
+  // Sketch base cyan
+  ctx.strokeStyle='rgba(0,212,255,0.4)'; ctx.lineWidth=1; ctx.setLineDash([1,2]);
+  ctx.beginPath();[0,1,2,3].forEach((i,j)=>j?ctx.lineTo(C[i].px,C[i].py):ctx.moveTo(C[i].px,C[i].py));ctx.closePath();ctx.stroke();
+  ctx.setLineDash([]);
+  // Extrude arrow
+  const ax=W*0.80, ay1=H*0.72, ay2=H*0.30;
+  ctx.strokeStyle='rgba(32,232,192,0.5)'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+  ctx.beginPath();ctx.moveTo(ax,ay1);ctx.lineTo(ax,ay2+10);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(32,232,192,0.92)'; ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.moveTo(ax-5,ay2+10);ctx.lineTo(ax,ay2);ctx.lineTo(ax+5,ay2+10);ctx.stroke();
+  // KB badge
+  ctx.fillStyle='rgba(32,232,192,0.15)'; ctx.fillRect(3,3,14,10);
+  ctx.font='6px Fira Code,monospace'; ctx.fillStyle='rgba(32,232,192,0.88)'; ctx.fillText('KB',5,11);
+});
+
+  initPreview('karve-preview', (ctx, W, H) => {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(8,5,2,0.70)'; ctx.fillRect(0, 0, W, H);
+
+    // Grid — carbide (technical reference)
+    ctx.strokeStyle = 'rgba(32,232,192,0.07)'; ctx.lineWidth = 0.5;
+    for (let x = 0; x < W; x += 12) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 12) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    const cx = W*0.46, cy = H*0.50, r = H*0.24, len = W*0.62;
+    const x0 = cx-len/2, x1 = cx+len/2;
+    const split = x0 + len*0.46; // machined / raw boundary
+
+    // Raw stock (right side) — bronze: unmachined, hot material
+    ctx.fillStyle = 'rgba(212,170,64,0.08)';
+    ctx.fillRect(split, cy-r, x1-split, r*2);
+    ctx.strokeStyle = 'rgba(212,170,64,0.42)'; ctx.lineWidth = 1.0;
+    ctx.beginPath(); ctx.moveTo(split, cy-r); ctx.lineTo(x1, cy-r); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(split, cy+r); ctx.lineTo(x1, cy+r); ctx.stroke();
+
+    // End ellipses — bronze (raw stock ends)
+    ctx.strokeStyle = 'rgba(212,170,64,0.30)'; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.ellipse(x0, cy, 5, r, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x1, cy, 3.5, r*0.85, 0, 0, Math.PI*2); ctx.stroke();
+
+    // Spiral turning marks on raw section — bronze
+    ctx.strokeStyle = 'rgba(212,170,64,0.22)'; ctx.lineWidth = 0.5;
+    for (let p=0; p<10; p++) {
+      const xp = split + (x1-split)*(p/10);
+      const yn = cy - r + 2 + Math.sin(p*1.1)*3;
+      ctx.beginPath(); ctx.moveTo(xp, yn);
+      ctx.lineTo(xp+(x1-split)/10, yn+Math.sin((p+1)*1.1)*3-Math.sin(p*1.1)*3);
+      ctx.stroke();
+    }
+
+    // Machined section (left) — carbide: precision finished surface
+    const mr = r*0.76;
+    ctx.fillStyle = 'rgba(32,232,192,0.10)';
+    ctx.fillRect(x0, cy-mr, split-x0, mr*2);
+    ctx.strokeStyle = 'rgba(32,232,192,0.60)'; ctx.lineWidth = 1.0;
+    ctx.beginPath(); ctx.moveTo(x0, cy-mr); ctx.lineTo(split, cy-mr); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, cy+mr); ctx.lineTo(split, cy+mr); ctx.stroke();
+
+    // Cutting tool — carbide insert
+    const tx = split+3, ty = cy-mr;
+    ctx.fillStyle = 'rgba(32,232,192,0.88)';
+    ctx.beginPath();
+    ctx.moveTo(tx, ty); ctx.lineTo(tx+13, ty+mr);
+    ctx.lineTo(tx, ty+mr*2); ctx.lineTo(tx-2, ty+mr);
+    ctx.closePath(); ctx.fill();
+
+    // Tool holder — carbide
+    ctx.fillStyle = 'rgba(32,232,192,0.22)';
+    ctx.fillRect(tx+9, ty+mr*0.28, W*0.16, mr*0.40);
+
+    // Chip curls — bronze (hot metal being removed)
+    ctx.strokeStyle = 'rgba(212,170,64,0.80)'; ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.moveTo(tx+1, ty+2);
+    ctx.bezierCurveTo(tx+8, ty-11, tx+20, ty-9, tx+24, ty-18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(tx+2, ty+5);
+    ctx.bezierCurveTo(tx+7, ty-5, tx+16, ty-3, tx+18, ty-13); ctx.stroke();
+
+    // Centreline — carbide (technical reference)
+    ctx.strokeStyle = 'rgba(32,232,192,0.20)'; ctx.lineWidth = 0.6;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(x0-6, cy); ctx.lineTo(x1+10, cy); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Caption
+    ctx.fillStyle = 'rgba(212,170,64,0.52)';
+    ctx.font = 'bold 7.5px Fira Code';
+    ctx.fillText('LATHE · MILL · G-CODE', W*0.08, H-9);
+  });
+initPreview('kode-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Dark bg — matches KODE void
+  ctx.fillStyle='rgba(5,6,10,0.9)'; ctx.fillRect(0,0,W,H);
+
+  // ── Top bar (mode buttons) ──────────────────────────────
+  const bar={h:14};
+  ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,W,bar.h);
+  // GK pill — cherry red, active
+  const gkW=18, gkH=10, gkX=W*0.36, gkY=2;
+  ctx.fillStyle='rgba(224,56,0,0.22)'; ctx.beginPath();
+  ctx.roundRect(gkX,gkY,gkW,gkH,3); ctx.fill();
+  ctx.strokeStyle='rgba(224,56,0,0.6)'; ctx.lineWidth=0.7;
+  ctx.beginPath(); ctx.roundRect(gkX,gkY,gkW,gkH,3); ctx.stroke();
+  // GK dot + label
+  ctx.fillStyle='rgba(224,56,0,0.9)';
+  ctx.beginPath(); ctx.arc(gkX+4,gkY+5,2,0,Math.PI*2); ctx.fill();
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(224,56,0,0.95)';
+  ctx.fillText('GK',gkX+7,gkY+8);
+  // KF pill — dim tan
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(212,170,120,0.45)';
+  ctx.fillText('☕ KF',gkX+22,gkY+8);
+  // + KR dim
+  ctx.fillStyle='rgba(242,232,208,0.3)'; ctx.fillText('+ KR',gkX+42,gkY+8);
+
+  // ── File tab ─────────────────────────────────────────────
+  const tabY=bar.h;
+  ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fillRect(0,tabY,W*0.52,11);
+  // Cherry dot for .nc file
+  ctx.fillStyle='rgba(224,56,0,0.9)';
+  ctx.beginPath(); ctx.arc(6,tabY+5.5,2.5,0,Math.PI*2); ctx.fill();
+  ctx.font='6px Fira Code,monospace'; ctx.fillStyle='rgba(200,210,230,0.7)';
+  ctx.fillText('program.nc',11,tabY+9);
+
+  // ── Editor area ──────────────────────────────────────────
+  const edY=bar.h+11, edH=H-edY, edW=W*0.58;
+  // Line number gutter
+  ctx.fillStyle='rgba(255,255,255,0.02)'; ctx.fillRect(0,edY,16,edH);
+  // Active line highlight (cherry tint)
+  ctx.fillStyle='rgba(224,56,0,0.06)'; ctx.fillRect(0,edY+22,edW,9);
+
+  const lines=[
+    {t:'G21 G90', c:'rgba(100,115,140,0.7)'},
+    {t:'M08',     c:'rgba(224,56,0,0.9)'},
+    {t:'G41 D1',  c:'rgba(100,115,140,0.6)'},
+    {t:'G1 X80',  c:'rgba(255,232,239,0.85)'},  // foam highlight = cut move
+    {t:'G2 I10',  c:'rgba(224,56,0,0.75)'},
+    {t:'M09',     c:'rgba(224,56,0,0.8)'},
+    {t:'M30',     c:'rgba(255,232,239,0.6)'},
+  ];
+  ctx.font='6.5px Fira Code,monospace';
+  lines.forEach((l,i)=>{
+    const y=edY+8+i*9;
+    ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillText(i+1,3,y);
+    ctx.fillStyle=l.c; ctx.fillText(l.t,18,y);
+  });
+
+  // ── Toolpath panel (right) ───────────────────────────────
+  const tp={x:edW+2, y:edY, w:W-edW-2, h:edH};
+  ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.fillRect(tp.x,tp.y,tp.w,tp.h);
+  // TOOLPATH label
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.fillText('TOOLPATH',tp.x+3,tp.y+7);
+  // Rapid (amber dashed)
+  ctx.strokeStyle='rgba(255,170,0,0.55)'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+  ctx.beginPath(); ctx.moveTo(tp.x+4,tp.y+tp.h-12); ctx.lineTo(tp.x+8,tp.y+16); ctx.stroke();
+  ctx.setLineDash([]);
+  // Cut path (cherry) — C-shape profile
+  ctx.strokeStyle='rgba(224,56,0,0.88)'; ctx.lineWidth=1.3; ctx.lineCap='round';
+  const px=tp.x+8, pw=tp.w-10, py1=tp.y+16, py2=tp.y+tp.h-12;
+  ctx.beginPath();
+  ctx.moveTo(px,py1);
+  ctx.lineTo(px+pw*0.7,py1);
+  ctx.arc(px+pw*0.7,(py1+py2)/2,(py2-py1)/2,Math.PI*1.5,Math.PI*0.5);
+  ctx.lineTo(px,py2);
+  ctx.stroke();
+  // Legend dots
+  const leg=[
+    {c:'rgba(255,170,0,0.8)',  l:'G0'},
+    {c:'rgba(224,56,0,0.85)', l:'G1'},
+    {c:'rgba(100,120,200,0.7)',l:'G2'},
+  ];
+  ctx.font='5px Fira Code,monospace';
+  leg.forEach((e,i)=>{
+    const ly=tp.y+tp.h-18+i*6;
+    ctx.fillStyle=e.c; ctx.beginPath(); ctx.arc(tp.x+5,ly,1.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.fillText(e.l,tp.x+9,ly+2);
+  });
+  // GK badge — cherry
+  ctx.fillStyle='rgba(224,56,0,0.15)'; ctx.fillRect(tp.x+2,tp.y+9,12,8);
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(224,56,0,0.8)';
+  ctx.fillText('GK',tp.x+3,tp.y+15);
+});
+
+
+// KULTIVATE preview — site plan: boundary, hardscape, planting zones, trees
+initPreview('kultivate-preview', (ctx, W, H) => {
+  ctx.clearRect(0,0,W,H);
+  // Botanical paper canvas
+  ctx.fillStyle='#e8e4c8'; ctx.fillRect(0,18,W,H-18);
+  // Deep forest chrome band
+  ctx.fillStyle='#0e1e0c'; ctx.fillRect(0,0,W,18);
+  ctx.fillStyle='#6ab830'; ctx.font='bold 7px Fira Code,monospace';
+  ctx.fillText('KLT',4,12);
+  // Green ink grid on paper
+  ctx.strokeStyle='rgba(60,100,30,0.16)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=10){ctx.beginPath();ctx.moveTo(x,18);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=18;y<H;y+=10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Site boundary
+  ctx.strokeStyle='rgba(106,160,32,0.80)'; ctx.lineWidth=1.2; ctx.setLineDash([3,2]);
+  ctx.strokeRect(6,24,W-12,H-30); ctx.setLineDash([]);
+  // Planting zones
+  const hw=W*0.44,hh=H*0.50;
+  ctx.fillStyle='rgba(46,120,24,0.20)'; ctx.fillRect(6+hw,24,W-hw-12,hh);
+  ctx.strokeStyle='rgba(40,96,16,0.65)'; ctx.lineWidth=0.8; ctx.strokeRect(6+hw,24,W-hw-12,hh);
+  // Hardscape
+  ctx.fillStyle='rgba(106,80,40,0.16)'; ctx.fillRect(6,24,hw,hh);
+  ctx.save(); ctx.beginPath(); ctx.rect(6,24,hw,hh); ctx.clip();
+  ctx.strokeStyle='rgba(106,80,40,0.26)'; ctx.lineWidth=0.6;
+  for(let d=-H;d<W+H;d+=7){ctx.beginPath();ctx.moveTo(d,0);ctx.lineTo(d+H,H);ctx.stroke();}
+  ctx.restore();
+  ctx.strokeStyle='rgba(100,78,38,0.55)'; ctx.lineWidth=0.8; ctx.strokeRect(6,24,hw,hh);
+  // Groundcover
+  ctx.fillStyle='rgba(80,136,24,0.14)'; ctx.fillRect(6,24+hh,W-12,H-hh-30);
+  ctx.strokeStyle='rgba(64,120,20,0.45)'; ctx.lineWidth=0.8; ctx.strokeRect(6,24+hh,W-12,H-hh-30);
+  // Water feature
+  ctx.fillStyle='rgba(24,112,160,0.28)'; ctx.strokeStyle='rgba(24,112,160,0.75)'; ctx.lineWidth=0.9;
+  ctx.beginPath(); ctx.ellipse(W*0.74,H*0.42,W*0.10,H*0.08,0,0,Math.PI*2);
+  ctx.fill(); ctx.stroke();
+  // Trees — deep green canopies
+  [[W*0.17,H*0.38],[W*0.57,H*0.35],[W*0.80,H*0.68]].forEach(([tx,ty])=>{
+    ctx.fillStyle='rgba(30,88,14,0.52)'; ctx.strokeStyle='rgba(40,96,14,0.92)'; ctx.lineWidth=0.9;
+    ctx.beginPath(); ctx.arc(tx,ty,8,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='rgba(40,96,14,1)'; ctx.beginPath(); ctx.arc(tx,ty,2,0,Math.PI*2); ctx.fill();
+  });
+  // Shrubs
+  [[W*0.37,H*0.56],[W*0.60,H*0.75]].forEach(([sx,sy])=>{
+    ctx.fillStyle='rgba(56,136,64,0.48)'; ctx.strokeStyle='rgba(40,108,48,0.82)'; ctx.lineWidth=0.7;
+    ctx.beginPath(); ctx.arc(sx,sy,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  });
+  // KLT watermark
+  ctx.font='bold 8px Fira Code,monospace'; ctx.fillStyle='rgba(30,88,14,0.28)';
+  ctx.textAlign='right'; ctx.fillText('.KLT',W-6,H-6);
+});
+// KANVAS preview — brush strokes on white artboard
+initPreview('kanvas-preview', (ctx, W, H) => {
+  ctx.clearRect(0, 0, W, H);
+  // Drafting paper background
+  ctx.fillStyle = '#f8f5ee'; ctx.fillRect(0,0,W,H);
+  // Warm paper texture
+  ctx.fillStyle = 'rgba(180,155,110,0.06)'; ctx.fillRect(0,0,W,H);
+
+  // ── Helper: pencil line ────────────────────────────────────────
+  function pLine(x1,y1,x2,y2,w,a) {
+    ctx.globalAlpha=a||0.72; ctx.lineWidth=w||0.7;
+    ctx.strokeStyle='#2a2018'; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+  function grain(x,y,r,n,a) {
+    ctx.fillStyle='#2a2018';
+    for(let i=0;i<n;i++){
+      const ang=Math.random()*Math.PI*2, d=Math.random()*r;
+      ctx.globalAlpha=Math.random()*a;
+      ctx.fillRect(x+Math.cos(ang)*d,y+Math.sin(ang)*d,0.6,0.6);
+    }
+  }
+
+  ctx.save();
+  ctx.strokeStyle = '#2a2018';
+
+  // ── Construction lines (very faint, light-blue graphite) ───────
+  ctx.globalAlpha=0.10; ctx.lineWidth=0.5;
+  ctx.strokeStyle='#4060a0';
+  [W*0.25, W*0.5, W*0.75].forEach(x=>{pLine(x,0,x,H,0.5,0.08);});
+  [H*0.33, H*0.66].forEach(y=>{pLine(0,y,W,y,0.5,0.08);});
+
+  // ── Floor plan sketch (left half) ─────────────────────────────
+  const mx=W*0.48, my=H*0.52;
+  // Outer walls — heavy pencil
+  ctx.strokeStyle='#1e1608'; ctx.lineWidth=1.8; ctx.globalAlpha=0.82;
+  ctx.strokeRect(W*0.06, H*0.12, W*0.38, H*0.72);
+  grain(W*0.25, H*0.50, W*0.18, 120, 0.06);
+
+  // Interior partition
+  pLine(W*0.06, H*0.52, W*0.30, H*0.52, 1.4, 0.78);
+  pLine(W*0.30, H*0.12, W*0.30, H*0.52, 1.4, 0.78);
+
+  // Door arc (compass drawn)
+  ctx.globalAlpha=0.50; ctx.lineWidth=0.7; ctx.strokeStyle='#2a2018';
+  ctx.setLineDash([2,2]);
+  ctx.beginPath(); ctx.arc(W*0.30,H*0.52,W*0.10,Math.PI*0.5,Math.PI); ctx.stroke();
+  pLine(W*0.30,H*0.52,W*0.20,H*0.52,0.7,0.55);
+  pLine(W*0.30,H*0.52,W*0.30,H*0.42,0.7,0.55);
+  ctx.setLineDash([]);
+
+  // Window ticks
+  pLine(W*0.20,H*0.12,W*0.20,H*0.10,1.2,0.65);
+  pLine(W*0.26,H*0.12,W*0.26,H*0.10,1.2,0.65);
+
+  // Dimension lines
+  ctx.globalAlpha=0.42; ctx.lineWidth=0.6; ctx.strokeStyle='#1e1608';
+  pLine(W*0.06,H*0.90, W*0.44,H*0.90, 0.6, 0.45);
+  pLine(W*0.06,H*0.88, W*0.06,H*0.92, 0.6, 0.45);
+  pLine(W*0.44,H*0.88, W*0.44,H*0.92, 0.6, 0.45);
+  ctx.font='7px Fira Code,monospace'; ctx.textAlign='center';
+  ctx.fillStyle='#2a2018'; ctx.globalAlpha=0.55;
+  ctx.fillText('6.40m', W*0.25, H*0.895);
+
+  // ── Elevation sketch (right half) ─────────────────────────────
+  // Ground line
+  pLine(W*0.54, H*0.74, W*0.96, H*0.74, 1.5, 0.72);
+  // Building elevation — 3D block sketch
+  pLine(W*0.58, H*0.74, W*0.58, H*0.28, 1.3, 0.75);
+  pLine(W*0.92, H*0.74, W*0.92, H*0.28, 1.3, 0.75);
+  pLine(W*0.58, H*0.28, W*0.92, H*0.28, 1.3, 0.75);
+  // Roof pitch
+  pLine(W*0.58, H*0.28, W*0.75, H*0.14, 1.0, 0.68);
+  pLine(W*0.92, H*0.28, W*0.75, H*0.14, 1.0, 0.68);
+  // Hatch: shadow side (right face)
+  ctx.globalAlpha=0.18; ctx.lineWidth=0.5; ctx.strokeStyle='#2a2018';
+  for(let y=H*0.28;y<H*0.74;y+=4){pLine(W*0.82,y,W*0.92,y+2,0.5,0.18);}
+  // Windows
+  pLine(W*0.63,H*0.44,W*0.63,H*0.58,1.0,0.60);
+  pLine(W*0.71,H*0.44,W*0.71,H*0.58,1.0,0.60);
+  pLine(W*0.63,H*0.44,W*0.71,H*0.44,1.0,0.60);
+  pLine(W*0.63,H*0.58,W*0.71,H*0.58,1.0,0.60);
+  pLine(W*0.67,H*0.44,W*0.67,H*0.58,0.6,0.45);
+
+  // ── KOMPASS circle (compass-drawn arc detail) ──────────────────
+  ctx.globalAlpha=0.35; ctx.lineWidth=0.8; ctx.strokeStyle='#2a2018';
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(W*0.75,H*0.51,H*0.12,Math.PI*0.8,Math.PI*2.0); ctx.stroke();
+  // Compass center mark
+  pLine(W*0.75-4,H*0.51,W*0.75+4,H*0.51,0.6,0.30);
+  pLine(W*0.75,H*0.51-4,W*0.75,H*0.51+4,0.6,0.30);
+
+  // ── Pencil smudge zones (tonal shading) ───────────────────────
+  const grd=ctx.createLinearGradient(W*0.54,H*0.28,W*0.78,H*0.74);
+  grd.addColorStop(0,'rgba(40,32,24,0)');
+  grd.addColorStop(1,'rgba(40,32,24,0.07)');
+  ctx.fillStyle=grd; ctx.globalAlpha=1;
+  ctx.fillRect(W*0.54,H*0.28,W*0.25,H*0.46);
+
+  // ── KNV watermark ────────────────────────────────────────────
+  ctx.font='bold 8px Fira Code,monospace';
+  ctx.fillStyle='#2a2018'; ctx.globalAlpha=0.25;
+  ctx.textAlign='right'; ctx.fillText('.KNV', W-6, H-6);
+
+  ctx.restore();
+});
+
+initPreview('konstruct-preview', (ctx, W, H) => {
+  ctx.clearRect(0,0,W,H);
+  // Blueprint dark ground
+  ctx.fillStyle='#0c1824'; ctx.fillRect(0,0,W,H);
+  // Blueprint grid — fine technical lines
+  ctx.strokeStyle='rgba(74,143,212,0.14)'; ctx.lineWidth=0.4;
+  for(let x=0;x<W;x+=8){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=8){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Major grid
+  ctx.strokeStyle='rgba(74,143,212,0.25)'; ctx.lineWidth=0.6;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Floor plan — blueprint white lines
+  const bc='rgba(200,228,255,0.90)', bd='rgba(74,143,212,0.55)';
+  ctx.strokeStyle=bc; ctx.lineWidth=1.4;
+  // Outer walls
+  ctx.strokeRect(8,12,W-16,H-20);
+  // Interior partition
+  ctx.beginPath(); ctx.moveTo(W*0.45,12); ctx.lineTo(W*0.45,H*0.62); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(8,H*0.62); ctx.lineTo(W*0.45,H*0.62); ctx.stroke();
+  // Door arc — thin blueprint style
+  ctx.strokeStyle='rgba(160,210,255,0.60)'; ctx.lineWidth=0.7; ctx.setLineDash([2,2]);
+  ctx.beginPath(); ctx.arc(W*0.45,H*0.62,W*0.12,Math.PI*0.5,Math.PI); ctx.stroke();
+  ctx.setLineDash([]);
+  // Window ticks
+  ctx.strokeStyle=bc; ctx.lineWidth=1.2;
+  [[W*0.22,12],[W*0.32,12],[W*0.66,12],[W*0.78,12]].forEach(([x,y])=>{
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y-5); ctx.stroke();
+  });
+  // Dimension lines
+  ctx.strokeStyle=bd; ctx.lineWidth=0.6;
+  ctx.beginPath(); ctx.moveTo(8,H-4); ctx.lineTo(W-8,H-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(8,H-7); ctx.lineTo(8,H-1); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W-8,H-7); ctx.lineTo(W-8,H-1); ctx.stroke();
+  // Labels
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(160,210,255,0.75)';
+  ctx.textAlign='center'; ctx.fillText('KONSTRUCT',W/2,H-8);
+  ctx.textAlign='left'; ctx.fillStyle='rgba(74,143,212,0.60)';
+  ctx.fillText('KON',3,10);
+});
+
+// ── LICENSE MODAL ─────────────────────────────────────────────────────────────
+
+
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
 </script>
 </body>
 </html>
