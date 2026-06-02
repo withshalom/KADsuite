@@ -2885,6 +2885,34 @@ document.addEventListener('keydown', function(e) {
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="9" x2="4" y2="15"/><line x1="20" y1="9" x2="20" y2="15"/><line x1="12" y1="10" x2="12" y2="14"/></svg></div>
       <span class="tool-label">MEASURE</span>
     </button>
+    <button class="tool-btn" id="btn-trim" onclick="setTool('trim')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="12" x2="20" y2="12"/><line x1="12" y1="4" x2="12" y2="10"/><line x1="12" y1="14" x2="12" y2="20" stroke-dasharray="2 2" opacity="0.4"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></div>
+      <span class="tool-label">TRIM</span>
+    </button>
+    <button class="tool-btn" id="btn-extend" onclick="setTool('extend')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="12" x2="16" y2="12"/><polyline points="13,9 16,12 13,15"/><line x1="19" y1="5" x2="19" y2="19"/></svg></div>
+      <span class="tool-label">EXTEND</span>
+    </button>
+    <button class="tool-btn" id="btn-break" onclick="setTool('break')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="20" y2="12"/><line x1="9" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="15" y2="15"/></svg></div>
+      <span class="tool-label">BREAK</span>
+    </button>
+    <button class="tool-btn" id="btn-scale" onclick="setTool('scale')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/><line x1="11" y1="7" x2="13" y2="7" stroke-dasharray="2 2"/><line x1="17" y1="11" x2="17" y2="13" stroke-dasharray="2 2"/></svg></div>
+      <span class="tool-label">SCALE</span>
+    </button>
+    <button class="tool-btn" id="btn-stretch" onclick="setTool('stretch')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="12" y2="12"/><line x1="12" y1="12" x2="20" y2="4"/><circle cx="20" cy="4" r="2.5" fill="currentColor"/><path d="M17 1l3 3-3 3" stroke-width="1.2"/></svg></div>
+      <span class="tool-label">STRETCH</span>
+    </button>
+    <button class="tool-btn" id="btn-text" onclick="setTool('text')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7V5h16v2"/><line x1="12" y1="5" x2="12" y2="19"/><line x1="8" y1="19" x2="16" y2="19"/></svg></div>
+      <span class="tool-label">TEXT</span>
+    </button>
+    <button class="tool-btn" id="btn-array" onclick="openArrayDialog()">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5"/><rect x="17" y="3" width="4" height="5"/><rect x="3" y="10" width="5" height="5"/><rect x="10" y="10" width="5" height="5"/><rect x="17" y="10" width="4" height="5"/></svg></div>
+      <span class="tool-label">ARRAY</span>
+    </button>
   </div>
 
   <!-- Mirror axis bar -->
@@ -3195,7 +3223,8 @@ document.addEventListener('keydown', function(e) {
 <!-- ═══ KOMMAND LINE ════════════════════════════════════════════════════════ -->
 <div id="kommand-bar">
   <div id="kommand-context">SELECT</div>
-  <div id="kommand-echo">Type a command or coordinate</div>
+  <div id="kommand-label" style="flex-shrink:0;padding:0 8px;font-family:var(--fm);font-size:9px;font-weight:700;color:var(--accent);letter-spacing:0.14em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;">KOMMAND</div>
+  <div id="kommand-echo">ready</div>
   <div id="kommand-prefix">≫</div>
   <input id="kommand-input" type="text" spellcheck="false" autocomplete="off"
     placeholder="X,Y  @dX,dY  @D&lt;A°  or command…"
@@ -3204,7 +3233,7 @@ document.addEventListener('keydown', function(e) {
     <b>X,Y</b> abs &nbsp;·&nbsp;
     <i>@dX,dY</i> rel &nbsp;·&nbsp;
     <em>@D&lt;A°</em> polar &nbsp;·&nbsp;
-    <b>L</b>ine <b>A</b>rc <b>C</b>ircle <b>R</b>ect <b>O</b>ffset <b>M</b>irror <b>D</b>im <b>UNDO</b> <b>REDO</b>
+    <b>L</b>ine <b>A</b>rc <b>C</b>ircle <b>R</b>ect <b>TR</b>im <b>EX</b>tend <b>TX</b>t <b>AR</b>ray
   </div>
 </div>
 
@@ -3689,6 +3718,7 @@ const GeoMemory = {
     this.objects.push(o); updateProps(); return o;
   },
   addCircle(cx,cy,r,layer='Layer_0'){const o={id:this.nextId++,type:'CIRCLE',layer,cx:parseFloat(cx.toFixed(6)),cy:parseFloat(cy.toFixed(6)),r:parseFloat(r.toFixed(6))};this.objects.push(o);updateProps();return o;},
+  addText(x,y,text,height=5,layer='Layer_0'){const o={id:this.nextId++,type:'TEXT',layer,x,y,text,height};this.objects.push(o);updateProps();return o;},
   addArc(cx,cy,r,startA,endA,ccw=true,layer='Layer_0'){const o={id:this.nextId++,type:'ARC',layer,cx:parseFloat(cx.toFixed(6)),cy:parseFloat(cy.toFixed(6)),r:parseFloat(r.toFixed(6)),startA:parseFloat(startA.toFixed(8)),endA:parseFloat(endA.toFixed(8)),ccw};this.objects.push(o);updateProps();return o;},
   remove(id) {
     this.objects = this.objects.filter(o=>o.id!==id); updateProps();
@@ -4579,6 +4609,10 @@ function cancelTool() {
   filletState = {active:false,firstLine:null};
   rotateState = {phase:0,pivotX:0,pivotY:0,pivotSet:false,draggingPivot:false,startAngle:0,previewDelta:0};
   selBox      = {active:false, pending:false, startSX:0, startSY:0, startWX:0, startWY:0};
+  if(typeof trimHoverSeg!=='undefined')  trimHoverSeg=null;
+  if(typeof extendPreview!=='undefined') extendPreview=null;
+  if(typeof breakState!=='undefined')    breakState={active:false,obj:null,pt1:null};
+  if(typeof stretchState!=='undefined')  stretchState={active:false,endpt:null,obj:null,which:null};
   document.getElementById('rect-preview').style.display='none';
 }
 
@@ -4596,7 +4630,7 @@ function setTool(tool) {
   activeTool = tool;
 
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',mirror:'btn-mirror',measure:'btn-measure'};
+  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',chamfer:'btn-chamfer',mirror:'btn-mirror',measure:'btn-measure',trim:'btn-trim',extend:'btn-extend',break:'btn-break',scale:'btn-scale',stretch:'btn-stretch',text:'btn-text'};
   if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
 
   document.getElementById('sb-mode').textContent=tool.toUpperCase();
@@ -4932,6 +4966,11 @@ function onMouseDown(e) {
       render();return;
     }
 
+    if(activeTool==='trim')    { applyTrim();            return; }
+    if(activeTool==='extend')  { applyExtend();          return; }
+    if(activeTool==='break')   { applyBreak(wp.x,wp.y); return; }
+    if(activeTool==='text')    { placeTextAt(wp.x,wp.y); return; }
+    if(activeTool==='stretch'&&stretchState.endpt){ stretchState.active=true; return; }
     if(activeTool==='fillet') {
       const hit=pickLine(mouseScreen.x,mouseScreen.y);
       if(!hit){showToast('Click closer to a line');return;}
@@ -5084,11 +5123,17 @@ function onMouseMove(e) {
     document.getElementById('rect-preview').style.display='none';
   }
 
+  if(activeTool==='trim')    updateTrimHover(mouseWorld.x,mouseWorld.y);
+  if(activeTool==='extend')  updateExtendHover(mouseWorld.x,mouseWorld.y);
+  if(activeTool==='stretch') updateStretchHover(mouseWorld.x,mouseWorld.y);
+  if(activeTool==='stretch'&&stretchState.active&&stretchState.obj) applyStretch(mouseWorld.x,mouseWorld.y);
   if(dynVisible) positionDynInput();
   render();
+  if(typeof drawNewToolPreviews==='function') drawNewToolPreviews();
 }
 
 function onMouseUp(e) {
+  if(typeof stretchState!=='undefined'&&stretchState.active){stretchState.active=false;render();return;}
   if(isPanning){ isPanning=false; updateCursor(); }
 
   // Release pivot drag
@@ -5161,6 +5206,7 @@ window.addEventListener('keydown', onKeyDown);
 function onKeyDown(e) {
   if(document.activeElement===dynField) return;
   if(document.activeElement.tagName==='INPUT') return;
+  if(typeof kInput!=='undefined'&&document.activeElement===kInput) return;
 
   const k=e.key;
   if(k==='Escape'){
@@ -5205,8 +5251,13 @@ function onKeyDown(e) {
     if(k==='d'||k==='D') setTool('measure');
     if(k==='j'||k==='J') joinSelected();
     if(k==='x'||k==='X') explodeSelected();
-    if(k==='q'||k==='Q') rotateSelected(-90);  // CCW
-    if(k==='e'||k==='E') rotateSelected(90);   // CW
+    if(k==='q'||k==='Q') setTool('trim');
+    if(k==='e'||k==='E') setTool('extend');
+    if(k==='b'||k==='B') setTool('break');
+    if(k==='k'||k==='K'){ if(typeof kInput!=='undefined'){kInput.focus();kInput.select();} return; }
+    if(k==='n'||k==='N') openArrayDialog();
+    if(k==='<'||k===',') rotateSelected(-90);
+    if(k==='>'||k==='.') rotateSelected(90);
     if(k==='0')          flattenSelection();
     if(k==='z'||k==='Z') zoomExtents();
     if(k==='g'||k==='G') toggleGrid();
@@ -5319,6 +5370,278 @@ const C={
   rubberLine:'#00d4ff', startPt:'#00ff9d',
 };
 
+// ════════════════════════════════════════════════════════════════════════════
+//  NEW TOOLS: TRIM · EXTEND · BREAK · SCALE · STRETCH · TEXT · ARRAY
+// ════════════════════════════════════════════════════════════════════════════
+
+function lineLineIntersect(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2){
+  const dx1=ax2-ax1,dy1=ay2-ay1,dx2=bx2-bx1,dy2=by2-by1;
+  const d=dx1*dy2-dy1*dx2; if(Math.abs(d)<1e-12)return null;
+  const t1=((bx1-ax1)*dy2-(by1-ay1)*dx2)/d;
+  const t2=((bx1-ax1)*dy1-(by1-ay1)*dx1)/d;
+  return{x:ax1+t1*dx1,y:ay1+t1*dy1,t1,t2};
+}
+function findLineIntersections(obj){
+  if(obj.type!=='LINE')return[];
+  const pts=[];
+  for(const o of GeoMemory.objects){
+    if(o.id===obj.id||o.type!=='LINE')continue;
+    const ix=lineLineIntersect(obj.x1,obj.y1,obj.x2,obj.y2,o.x1,o.y1,o.x2,o.y2);
+    if(ix&&ix.t1>-1e-6&&ix.t1<1+1e-6&&ix.t2>-1e-6&&ix.t2<1+1e-6)
+      pts.push({x:ix.x,y:ix.y,t:Math.max(0,Math.min(1,ix.t1))});
+  }
+  return pts.sort((a,b)=>a.t-b.t);
+}
+function ptOnSegT(x,y,x1,y1,x2,y2){
+  const dx=x2-x1,dy=y2-y1,l2=dx*dx+dy*dy;
+  return l2<1e-12?0:Math.max(0,Math.min(1,((x-x1)*dx+(y-y1)*dy)/l2));
+}
+function nearestLineToPoint(wx,wy,maxPx){
+  const sp=worldToScreen(wx,wy); let best=null,bestD=maxPx;
+  for(const o of GeoMemory.objects){
+    if(o.type!=='LINE')continue;
+    const sa=worldToScreen(o.x1,o.y1),sb=worldToScreen(o.x2,o.y2);
+    const dx=sb.x-sa.x,dy=sb.y-sa.y,l2=dx*dx+dy*dy; if(l2<1)continue;
+    const t=Math.max(0,Math.min(1,((sp.x-sa.x)*dx+(sp.y-sa.y)*dy)/l2));
+    const d=Math.hypot(sp.x-sa.x-t*dx,sp.y-sa.y-t*dy);
+    if(d<bestD){bestD=d;best=o;}
+  } return best;
+}
+
+// TRIM
+let trimHoverSeg=null;
+function updateTrimHover(wx,wy){
+  trimHoverSeg=null;
+  const o=nearestLineToPoint(wx,wy,18); if(!o)return;
+  const ixs=findLineIntersections(o);
+  const t=ptOnSegT(wx,wy,o.x1,o.y1,o.x2,o.y2);
+  let tLo=0,tHi=1;
+  for(const ix of ixs){if(ix.t<=t)tLo=ix.t; if(ix.t>=t&&tHi===1)tHi=ix.t;}
+  const L=(a,b,t)=>a+(b-a)*t;
+  trimHoverSeg={x1:L(o.x1,o.x2,tLo),y1:L(o.y1,o.y2,tLo),x2:L(o.x1,o.x2,tHi),y2:L(o.y1,o.y2,tHi),tLo,tHi,obj:o};
+}
+function applyTrim(){
+  if(!trimHoverSeg)return;
+  const{tLo,tHi,obj:o}=trimHoverSeg;
+  const L=(a,b,t)=>a+(b-a)*t;
+  const x1=o.x1,y1=o.y1,x2=o.x2,y2=o.y2,lay=o.layer||'Layer_0';
+  GeoMemory.objects=GeoMemory.objects.filter(x=>x.id!==o.id);
+  if(tLo>1e-4)GeoMemory.addLine(x1,y1,L(x1,x2,tLo),L(y1,y2,tLo),lay);
+  if(tHi<1-1e-4)GeoMemory.addLine(L(x1,x2,tHi),L(y1,y2,tHi),x2,y2,lay);
+  trimHoverSeg=null; updateProps(); render(); showToast('Trimmed');
+}
+function drawTrimPreview(){
+  if(activeTool!=='trim'||!trimHoverSeg)return;
+  const{x1,y1,x2,y2}=trimHoverSeg;
+  const a=worldToScreen(x1,y1),b=worldToScreen(x2,y2);
+  ctx.save(); ctx.strokeStyle='rgba(255,68,68,0.9)'; ctx.lineWidth=3;
+  ctx.lineCap='round'; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+}
+
+// EXTEND
+let extendPreview=null;
+function updateExtendHover(wx,wy){
+  extendPreview=null;
+  const o=nearestLineToPoint(wx,wy,18); if(!o)return;
+  const sp=worldToScreen(wx,wy);
+  const sa=worldToScreen(o.x1,o.y1),sb=worldToScreen(o.x2,o.y2);
+  const da=Math.hypot(sp.x-sa.x,sp.y-sa.y),db=Math.hypot(sp.x-sb.x,sp.y-sb.y);
+  const extStart=da<db;
+  const ex=extStart?o.x1:o.x2, ey=extStart?o.y1:o.y2;
+  const dx=o.x2-o.x1,dy=o.y2-o.y1,len=Math.hypot(dx,dy); if(len<1e-6)return;
+  const dir=extStart?-1:1, ux=dir*dx/len, uy=dir*dy/len;
+  let bestT=Infinity;
+  for(const other of GeoMemory.objects){
+    if(other.id===o.id||other.type!=='LINE')continue;
+    const ix=lineLineIntersect(ex,ey,ex+ux*1e6,ey+uy*1e6,other.x1,other.y1,other.x2,other.y2);
+    if(ix&&ix.t1>1e-4&&ix.t2>-1e-4&&ix.t2<1+1e-4&&ix.t1<bestT)bestT=ix.t1;
+  }
+  if(bestT===Infinity||bestT>1e5)return;
+  const nx=ex+ux*bestT,ny=ey+uy*bestT;
+  extendPreview=extStart?{x1:nx,y1:ny,x2:o.x2,y2:o.y2,nx,ny,end:'start',obj:o}
+                        :{x1:o.x1,y1:o.y1,x2:nx,y2:ny,nx,ny,end:'end',obj:o};
+}
+function applyExtend(){
+  if(!extendPreview)return;
+  const p=extendPreview;
+  if(p.end==='start'){p.obj.x1=p.nx;p.obj.y1=p.ny;}else{p.obj.x2=p.nx;p.obj.y2=p.ny;}
+  extendPreview=null; render(); showToast('Extended');
+}
+function drawExtendPreview(){
+  if(activeTool!=='extend'||!extendPreview)return;
+  const p=extendPreview;
+  const a=worldToScreen(p.x1,p.y1),b=worldToScreen(p.x2,p.y2);
+  ctx.save(); ctx.strokeStyle='rgba(0,212,255,0.85)'; ctx.lineWidth=2;
+  ctx.lineCap='round'; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  ctx.setLineDash([]);
+  const ep=worldToScreen(p.nx,p.ny);
+  ctx.fillStyle='var(--accent)'; ctx.beginPath(); ctx.arc(ep.x,ep.y,4,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+// BREAK
+let breakState={active:false,obj:null,pt1:null};
+function applyBreak(wx,wy){
+  const SNAP=18;
+  if(!breakState.active){
+    const o=nearestLineToPoint(wx,wy,SNAP); if(!o){showToast('Click on a line');return;}
+    breakState={active:true,obj:o,pt1:{x:wx,y:wy}};
+    showToast('Break: click second point');
+  } else {
+    const o=breakState.obj;
+    const t1=ptOnSegT(breakState.pt1.x,breakState.pt1.y,o.x1,o.y1,o.x2,o.y2);
+    const t2=ptOnSegT(wx,wy,o.x1,o.y1,o.x2,o.y2);
+    const lo=Math.min(t1,t2),hi=Math.max(t1,t2);
+    const L=(a,b,t)=>a+(b-a)*t,lay=o.layer||'Layer_0';
+    const ox1=o.x1,oy1=o.y1,ox2=o.x2,oy2=o.y2;
+    GeoMemory.objects=GeoMemory.objects.filter(x=>x.id!==o.id);
+    if(lo>1e-4)GeoMemory.addLine(ox1,oy1,L(ox1,ox2,lo),L(oy1,oy2,lo),lay);
+    if(hi<1-1e-4)GeoMemory.addLine(L(ox1,ox2,hi),L(oy1,oy2,hi),ox2,oy2,lay);
+    breakState={active:false,obj:null,pt1:null};
+    updateProps(); render(); showToast('Broken');
+  }
+}
+
+// SCALE
+function openScaleDialog(){
+  if(!selectedIds.size){showToast('Select objects first');setTool('select');return;}
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;inset:0;background:rgba(4,6,10,0.85);backdrop-filter:blur(6px);z-index:400;display:flex;align-items:center;justify-content:center;';
+  el.innerHTML='<div style="background:var(--panel);border:1px solid var(--border-hi);border-radius:6px;width:260px;overflow:hidden;font-family:var(--fm);box-shadow:0 20px 60px rgba(0,0,0,0.8);">'+
+    '<div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--panel2);font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;">Scale Selection</div>'+
+    '<div style="padding:16px;display:flex;flex-direction:column;gap:10px;">'+
+    '<label style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;">Scale Factor</label>'+
+    '<input id="scale-f" type="number" value="2" step="0.1" min="0.01" style="background:var(--panel2);border:1px solid var(--border-hi);border-radius:3px;color:var(--t1);font-family:var(--fm);font-size:18px;padding:6px 10px;outline:none;text-align:center;">'+
+    '<div style="display:flex;gap:4px;">'+
+    '<button onclick="document.getElementById(\'scale-base\').value=\'centroid\'" style="flex:1;padding:5px;background:var(--accent-glow);border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:9px;cursor:pointer;">Centroid</button>'+
+    '<button onclick="document.getElementById(\'scale-base\').value=\'origin\'" style="flex:1;padding:5px;background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;">Origin</button>'+
+    '</div><input id="scale-base" type="hidden" value="centroid">'+
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">'+
+    '<button onclick="this.closest(\'[style*=position]\').remove()" style="padding:5px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--t2);font-family:var(--fm);font-size:10px;cursor:pointer;">Cancel</button>'+
+    '<button id="scale-ok" style="padding:5px 14px;background:var(--accent-glow);border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:10px;font-weight:700;cursor:pointer;">Apply</button>'+
+    '</div></div></div>';
+  document.body.appendChild(el);
+  el.querySelector('#scale-ok').onclick=()=>{
+    const f=parseFloat(el.querySelector('#scale-f').value)||1;
+    const useOrig=el.querySelector('#scale-base').value==='origin';
+    let cx=0,cy=0;
+    if(!useOrig){const pts=[];
+      for(const o of GeoMemory.objects){if(!selectedIds.has(o.id))continue;
+        if(o.type==='LINE'){pts.push({x:o.x1,y:o.y1},{x:o.x2,y:o.y2});}
+        else if(o.cx!==undefined){pts.push({x:o.cx,y:o.cy});}
+      }
+      if(pts.length){cx=pts.reduce((s,p)=>s+p.x,0)/pts.length;cy=pts.reduce((s,p)=>s+p.y,0)/pts.length;}
+    }
+    for(const o of GeoMemory.objects){if(!selectedIds.has(o.id))continue;
+      if(o.type==='LINE'){o.x1=cx+(o.x1-cx)*f;o.y1=cy+(o.y1-cy)*f;o.x2=cx+(o.x2-cx)*f;o.y2=cy+(o.y2-cy)*f;}
+      else if(o.cx!==undefined){o.cx=cx+(o.cx-cx)*f;o.cy=cy+(o.cy-cy)*f;o.r*=f;}
+    }
+    render();el.remove();showToast('Scaled x'+f);
+  };
+}
+
+// STRETCH
+let stretchState={active:false,endpt:null,obj:null,which:null};
+function updateStretchHover(wx,wy){
+  stretchState={active:false,endpt:null,obj:null,which:null};
+  const sp=worldToScreen(wx,wy); let bestD=18;
+  for(const o of GeoMemory.objects){
+    if(o.type!=='LINE')continue;
+    for(const[ex,ey,w] of [[o.x1,o.y1,'1'],[o.x2,o.y2,'2']]){
+      const ep=worldToScreen(ex,ey),d=Math.hypot(sp.x-ep.x,sp.y-ep.y);
+      if(d<bestD){bestD=d;stretchState={active:false,endpt:{x:ex,y:ey},obj:o,which:w};}
+    }
+  }
+}
+function applyStretch(wx,wy){
+  if(!stretchState.obj)return;
+  const o=stretchState.obj;
+  if(stretchState.which==='1'){o.x1=wx;o.y1=wy;}else{o.x2=wx;o.y2=wy;}
+  stretchState={active:false,endpt:null,obj:null,which:null};
+  render(); showToast('Stretched');
+}
+
+// TEXT IN MODEL SPACE
+function placeTextAt(wx,wy){
+  const sp=worldToScreen(wx,wy);
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;left:'+Math.min(sp.x,window.innerWidth-240)+'px;top:'+Math.max(sp.y-30,4)+'px;z-index:500;display:flex;gap:4px;align-items:center;';
+  el.innerHTML='<input id="txt-inp" type="text" placeholder="Text…" autocomplete="off" spellcheck="false" style="background:var(--panel);border:1px solid var(--accent);border-radius:3px;color:var(--t1);font-family:var(--fm);font-size:12px;padding:3px 8px;outline:none;min-width:140px;caret-color:var(--accent);">'+
+    '<select id="txt-h" style="background:var(--panel);border:1px solid var(--border);border-radius:3px;color:var(--t2);font-family:var(--fm);font-size:10px;padding:3px;">'+
+    '<option value="3">3</option><option value="5" selected>5</option><option value="7">7</option><option value="10">10</option><option value="14">14</option></select>';
+  document.body.appendChild(el);
+  const inp=el.querySelector('#txt-inp'); inp.focus();
+  const commit=()=>{
+    const txt=inp.value.trim();
+    if(txt){
+      const h=fromDisplay(parseFloat(el.querySelector('#txt-h').value)||5);
+      GeoMemory.addText(wx,wy,txt,h,activeLayer||'Layer_0');
+      updateProps(); render(); showToast('Text: "'+txt+'"');
+    }
+    el.remove();
+  };
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')commit();if(ev.key==='Escape')el.remove();});
+  setTimeout(()=>document.addEventListener('mousedown',function r(e){if(!el.contains(e.target)){el.remove();document.removeEventListener('mousedown',r);}},true),100);
+}
+
+// ARRAY
+function openArrayDialog(){
+  if(!selectedIds.size){showToast('Select objects first');setTool('select');return;}
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;inset:0;background:rgba(4,6,10,0.85);backdrop-filter:blur(6px);z-index:400;display:flex;align-items:center;justify-content:center;';
+  el.innerHTML='<div style="background:var(--panel);border:1px solid var(--border-hi);border-radius:6px;width:290px;overflow:hidden;font-family:var(--fm);box-shadow:0 20px 60px rgba(0,0,0,0.8);">'+
+    '<div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--panel2);font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;">Rectangular Array</div>'+
+    '<div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">'+
+    '<label style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;">Rows</label>'+
+    '<label style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;">Cols</label>'+
+    '<input id="ar-r" type="number" value="3" min="1" style="background:var(--panel2);border:1px solid var(--border-hi);border-radius:3px;color:var(--t1);font-family:var(--fm);font-size:14px;padding:5px 8px;outline:none;text-align:center;">'+
+    '<input id="ar-c" type="number" value="3" min="1" style="background:var(--panel2);border:1px solid var(--border-hi);border-radius:3px;color:var(--t1);font-family:var(--fm);font-size:14px;padding:5px 8px;outline:none;text-align:center;">'+
+    '<label style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;">Row Spacing ('+unitMode+')</label>'+
+    '<label style="font-size:9px;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;">Col Spacing ('+unitMode+')</label>'+
+    '<input id="ar-rs" type="number" value="50" step="1" style="background:var(--panel2);border:1px solid var(--border-hi);border-radius:3px;color:var(--t1);font-family:var(--fm);font-size:14px;padding:5px 8px;outline:none;text-align:center;">'+
+    '<input id="ar-cs" type="number" value="50" step="1" style="background:var(--panel2);border:1px solid var(--border-hi);border-radius:3px;color:var(--t1);font-family:var(--fm);font-size:14px;padding:5px 8px;outline:none;text-align:center;">'+
+    '<button onclick="this.closest(\'[style*=position]\').remove()" style="padding:5px;background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--t2);font-family:var(--fm);font-size:10px;cursor:pointer;">Cancel</button>'+
+    '<button id="ar-ok" style="padding:5px;background:var(--accent-glow);border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-family:var(--fm);font-size:10px;font-weight:700;cursor:pointer;">Create</button>'+
+    '</div></div>';
+  document.body.appendChild(el);
+  el.querySelector('#ar-ok').onclick=()=>{
+    const rows=parseInt(el.querySelector('#ar-r').value)||2;
+    const cols=parseInt(el.querySelector('#ar-c').value)||2;
+    const rowSp=fromDisplay(parseFloat(el.querySelector('#ar-rs').value)||50);
+    const colSp=fromDisplay(parseFloat(el.querySelector('#ar-cs').value)||50);
+    const src=GeoMemory.objects.filter(o=>selectedIds.has(o.id));
+    for(let r=0;r<rows;r++)for(let col=0;col<cols;col++){
+      if(r===0&&col===0)continue;
+      const dx=col*colSp,dy=r*rowSp;
+      for(const o of src){
+        if(o.type==='LINE')GeoMemory.addLine(o.x1+dx,o.y1-dy,o.x2+dx,o.y2-dy,o.layer||'Layer_0');
+        else if(o.cx!==undefined)GeoMemory.objects.push({...o,id:GeoMemory.nextId++,cx:o.cx+dx,cy:o.cy-dy});
+      }
+    }
+    selectedIds.clear();updateProps();render();el.remove();
+    showToast('Array '+rows+'x'+cols+': '+((rows*cols)-1)+' copies');
+  };
+}
+
+// Draw previews hook
+function drawNewToolPreviews(){
+  drawTrimPreview();
+  drawExtendPreview();
+  if(activeTool==='break'&&breakState.active&&breakState.pt1){
+    const sp=worldToScreen(breakState.pt1.x,breakState.pt1.y);
+    ctx.save();ctx.strokeStyle='rgba(255,170,0,0.9)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(sp.x,sp.y,6,0,Math.PI*2);ctx.stroke();ctx.restore();
+  }
+  if(activeTool==='stretch'&&stretchState.endpt){
+    const sp=worldToScreen(stretchState.endpt.x,stretchState.endpt.y);
+    ctx.save();ctx.fillStyle='rgba(0,212,255,0.8)';
+    ctx.beginPath();ctx.arc(sp.x,sp.y,5,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+}
+
 function render() {
   const W=canvas.width, H=canvas.height;
   ctx.clearRect(0,0,W,H);
@@ -5333,7 +5656,9 @@ function render() {
   drawRotatePreview();
   drawMirrorPreview();
   drawMeasurePreview();
+  drawChamferPreview();
   drawSelBox();
+  if(typeof drawNewToolPreviews==='function') drawNewToolPreviews();
 }
 
 function drawGrid(W,H) {
@@ -5397,6 +5722,14 @@ function drawEntities() {
         drawDot(p.x,p.y,sel?C.entitySel:C.entity, isEndpoint?2.5:1.5);
       }
 
+    } else if(o.type==='TEXT'){
+      const sp=worldToScreen(o.x,o.y);
+      const px=Math.max(8,o.height*cam.zoom);
+      ctx.save();ctx.font=px+'px Fira Code,monospace';
+      ctx.fillStyle=sel?C.entitySel:C.entity;ctx.textBaseline='bottom';
+      ctx.fillText(o.text,sp.x,sp.y);
+      if(sel){const m=ctx.measureText(o.text);ctx.strokeStyle=C.entitySel;ctx.lineWidth=1;ctx.setLineDash([2,2]);ctx.strokeRect(sp.x-2,sp.y-px-2,m.width+4,px+4);ctx.setLineDash([]);}
+      ctx.restore();
     } else if(o.type==='POINT'){
       const p=worldToScreen(o.x,o.y);
       drawDot(p.x,p.y,C.point);
@@ -7809,16 +8142,21 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
 
-// Keep context label in sync — patch setTool after DOM ready
-function _patchSetTool() {
-  const _orig = setTool;
-  window.setTool = function(t) {
-    _orig(t);
-    if (kContext) kContext.textContent = t.toUpperCase();
-    if (kPrefix)  kPrefix.textContent  = '≫';
-    kommandClear();
-  };
+// ── KOMMAND K-key + canvas blur ──────────────────────────────────────────────
+if(typeof kInput !== 'undefined') {
+  canvas.addEventListener('mousedown', () => {
+    if(document.activeElement===kInput) kInput.blur();
+  });
+  document.addEventListener('keydown', function(ev) {
+    if((ev.key==='k'||ev.key==='K')&&!ev.ctrlKey&&!ev.metaKey&&
+       document.activeElement!==kInput&&
+       !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
+      ev.preventDefault(); kInput.focus(); kInput.select(); return;
+    }
+  });
+  kInput.addEventListener('blur', () => { kommandClear(); });
 }
+
 // ════════════════════════════════════════════════════════════════════════════
 //  KOMMAND LINE — persistent coordinate + command entry bar
 //  Replaces the floating dyn-input popup.
@@ -7877,6 +8215,30 @@ const KOMMANDS = {
   'MEASURE': () => setTool('measure'),
   'TR':      () => setTool('trim'),
   'TRIM':    () => setTool('trim'),
+  'EX':      () => setTool('extend'),
+  'EXTEND':  () => setTool('extend'),
+  'BR':      () => setTool('break'),
+  'BREAK':   () => setTool('break'),
+  'SC':      () => { if(!selectedIds.size){setTool('select');kecho('Select objects then SC');} else openScaleDialog(); },
+  'SCALE':   () => { if(!selectedIds.size){setTool('select');kecho('Select objects then SC');} else openScaleDialog(); },
+  'TX':      () => setTool('text'),
+  'TEXT':    () => setTool('text'),
+  'AR':      () => openArrayDialog(),
+  'ARRAY':   () => openArrayDialog(),
+  'ST':      () => setTool('stretch'),
+  'STRETCH': () => setTool('stretch'),
+  'EX':      () => setTool('extend'),
+  'EXTEND':  () => setTool('extend'),
+  'BR':      () => setTool('break'),
+  'BREAK':   () => setTool('break'),
+  'SC':      () => { if(!selectedIds.size){setTool('select');kecho('Select objects then type SC');} else openScaleDialog(); },
+  'SCALE':   () => openScaleDialog(),
+  'TX':      () => setTool('text'),
+  'TEXT':    () => setTool('text'),
+  'AR':      () => openArrayDialog(),
+  'ARRAY':   () => openArrayDialog(),
+  'ST':      () => setTool('stretch'),
+  'STRETCH': () => setTool('stretch'),
   'F':       () => setTool('fillet'),
   'FILLET':  () => setTool('fillet'),
   'CH':      () => setTool('chamfer'),
@@ -8018,12 +8380,43 @@ function simulateWorldClick(wx, wy) {
 
 // Keep canvas from stealing focus from kommand bar unless clicking canvas
 canvas.addEventListener('mousedown', () => {
-  // When user clicks canvas, let canvas handle it — refocus kommand after
-  setTimeout(() => { if(document.activeElement !== kInput) kInput.focus(); }, 100);
+  // Canvas click: defocus kommand so tool shortcuts work
+  if (document.activeElement === kInput) kInput.blur();
 });
 
-// Focus kommand on load
-window.addEventListener('load', () => { setTimeout(()=>kInput.focus(), 500); });
+// K key focuses KOMMAND line
+document.addEventListener('keydown', function(ev) {
+  if ((ev.key==='k'||ev.key==='K') && !ev.ctrlKey && !ev.metaKey &&
+      document.activeElement !== kInput &&
+      !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+    ev.preventDefault();
+    kInput.focus();
+    kInput.select();
+    if(kContext) kContext.style.color='var(--accent)';
+    return;
+  }
+});
+
+kInput.addEventListener('blur', () => {
+  if(kContext) kContext.style.color='';
+  kommandClear();
+});
+
+// Override showDynInput to echo to kommand line instead of popup
+function showDynInput(seed) {
+  if (kInput) {
+    kInput.value = seed || '';
+    kInput.focus();
+    kInput.select();
+  }
+}
+function closeDynInput() { kommandClear(); }
+function positionDynInput() { /* no-op — kommand is fixed */ }
+
+// Sync context label when tools change
+document.addEventListener('DOMContentLoaded', () => {
+  if (kContext) kContext.textContent = (activeTool||'SELECT').toUpperCase();
+});
 </script>
 </body>
 </html>
