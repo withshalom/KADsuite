@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  KADsuite™ — Kernel-Aided Design Suite
+  KADsuite™ — Kernel-Aided Design Suite · KAD BETA (undo/redo development branch)
   Copyright (C) 2024-2025 KADsuite / withshalom
 
   This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@
 <meta charset="UTF-8">
 <meta name="copyright" content="Copyright (C) 2024-2025 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, and KANVAS™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KAD — Kernel-Aided Design</title>
+<title>KAD beta — Kernel-Aided Design</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
 
@@ -81,6 +81,15 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 .tb-menu-item.open { color:var(--t1); background:var(--hover); }
 .tb-sep { width:1px; height:18px; background:var(--border); margin:0 4px; }
 .tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+.tb-undo-btn {
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--t2); font-family: var(--fm); font-size: 11px; padding: 3px 9px;
+  cursor: pointer; transition: all 0.13s; letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 5px;
+}
+.tb-undo-btn:hover { background: var(--hover); border-color: var(--border-hi); color: var(--t1); }
+.tb-undo-btn:active { transform: scale(0.96); }
+.tb-undo-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
 .tb-badge { font-family:var(--fm); font-size:10px; color:var(--t3); background:var(--panel2); border:1px solid var(--border); padding:2px 7px; border-radius:3px; letter-spacing:0.06em; }
 
 /* Topbar dropdown */
@@ -757,7 +766,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     <div class="tb-menu-item" id="menu-edit" onmouseenter="openMenu('edit')" onmouseleave="scheduleClose()">Edit
       <div class="tb-dropdown" id="dd-edit" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
         <div class="tb-dd-item" onclick="deleteSelected();closeMenus()">Delete Selected<span class="dd-key">Del</span></div>
-        <div class="tb-dd-item" onclick="GeoMemory.clear();render();showToast('KANVAS cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
+        <div class="tb-dd-item" onclick="pushUndo();GeoMemory.clear();render();showToast('KANVAS cleared');closeMenus()">Clear All<span class="dd-key"></span></div>
         <div class="tb-dd-sep"></div>
         <div class="tb-dd-item" onclick="joinSelected();closeMenus()">Join → Polyline<span class="dd-key">J</span></div>
         <div class="tb-dd-item" onclick="explodeSelected();closeMenus()">Explode Polyline<span class="dd-key">X</span></div>
@@ -814,7 +823,20 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     </div>
   </div>
   <div class="tb-right">
-    <span class="tb-badge">v0.0</span>
+    <button class="tb-undo-btn" id="tb-btn-undo" onclick="undo()" title="Undo (Ctrl+Z)" style="opacity:0.3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 10h11a5 5 0 0 1 0 10H7"/><polyline points="3 10 7 6 3 2 3 10"/>
+      </svg>
+      <span id="sb-undo-count">—</span>
+    </button>
+    <button class="tb-undo-btn" id="tb-btn-redo" onclick="redo()" title="Redo (Ctrl+Y / Ctrl+Shift+Z)" style="opacity:0.3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 10H10a5 5 0 0 0 0 10h7"/><polyline points="21 10 17 6 21 2 21 10"/>
+      </svg>
+      <span id="sb-redo-count">—</span>
+    </button>
+    <div class="tb-sep"></div>
+    <span class="tb-badge" style="color:var(--amber)">beta</span>
     <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
       <span class="unit-divider"></span>
@@ -1220,7 +1242,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span>M</span><span class="sb-val">mirror</span></div>
     <div class="sb-item"><span>D</span><span class="sb-val">measure</span></div>
-    <div class="sb-item"><span class="sb-val ok">.KAD v0.0</span></div>
+    <div class="sb-item"><span class="sb-val ok" style="color:var(--amber)">.KAD beta · undo/redo</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
       <span>© <span id="cc-year"></span> KADsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener" class="cc-link">Source on GitHub</a> · withshalom</span>
@@ -1428,7 +1450,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 <script>
 'use strict';
 // ═══════════════════════════════════════════════════════════
-//  .KAD v0.0  — Kernel-Aided Design
+//  .KAD v0.0  — Kernel-Aided Design + OpenSCAD Export
 // ═══════════════════════════════════════════════════════════
 
 // ── CANVAS ──────────────────────────────────────────────
@@ -1636,6 +1658,7 @@ function setArcMode(m){
 function getFillet(){const r=parseFloat(document.getElementById('fillet-r-input').value)||5;return parseFloat(fromDisplay(r).toFixed(6));}
 function commitFillet(l1,l2){
   const r=getFillet();if(r<=0){showToast('Enter a fillet radius > 0');return;}
+  pushUndo();
   const inter=lineIntersectPt(l1,l2);if(!inter){showToast('Lines are parallel');return;}
   const len1=Math.hypot(l1.x2-l1.x1,l1.y2-l1.y1),len2=Math.hypot(l2.x2-l2.x1,l2.y2-l2.y1);
   if(len1<1e-10||len2<1e-10){showToast('Degenerate line');return;}
@@ -1728,6 +1751,77 @@ const GeoMemory = {
     }catch(e){ return false; }
   },
 };
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// KAD BETA — UNDO / REDO ENGINE
+// Strategy: snapshot-based history. Before every geometry mutation,
+// call pushUndo(). Undo pops the last snapshot and restores it. Redo
+// pops the redo stack. Both stacks hold serialized GeoMemory JSON strings
+// (true deep copies — no aliasing). Cap: 50 undo steps.
+// ══════════════════════════════════════════════════════════════════════════
+const UNDO_LIMIT = 50;
+const _undoStack = [];   // [ jsonString, ... ]  — oldest first
+const _redoStack = [];   // [ jsonString, ... ]  — most recent first
+
+function _geoSnapshot() {
+  // Serialize only the geometry state that matters for undo
+  return JSON.stringify({
+    objects: JSON.parse(JSON.stringify(GeoMemory.objects)), // deep copy
+    nextId:  GeoMemory.nextId,
+  });
+}
+
+function pushUndo() {
+  _undoStack.push(_geoSnapshot());
+  if (_undoStack.length > UNDO_LIMIT) _undoStack.shift(); // evict oldest
+  _redoStack.length = 0; // any new action invalidates redo history
+  _updateUndoUI();
+}
+
+function undo() {
+  if (!_undoStack.length) { showToast('Nothing to undo'); return; }
+  // Save current state to redo stack before restoring
+  _redoStack.push(_geoSnapshot());
+  const snap = _undoStack.pop();
+  _restoreSnapshot(snap);
+  showToast(`Undo · ${_undoStack.length} step${_undoStack.length!==1?'s':''} remaining`);
+  _updateUndoUI();
+}
+
+function redo() {
+  if (!_redoStack.length) { showToast('Nothing to redo'); return; }
+  _undoStack.push(_geoSnapshot());
+  const snap = _redoStack.pop();
+  _restoreSnapshot(snap);
+  showToast(`Redo · ${_redoStack.length} step${_redoStack.length!==1?'s':''} remaining`);
+  _updateUndoUI();
+}
+
+function _restoreSnapshot(jsonStr) {
+  const d = JSON.parse(jsonStr);
+  GeoMemory.objects = d.objects;
+  GeoMemory.nextId  = d.nextId;
+  // Clear selection — restored geometry IDs may no longer match
+  selectedIds.clear();
+  updateSelectionProps();
+  updateProps();
+  render();
+}
+
+function _updateUndoUI() {
+  // Update the undo/redo indicators in the status bar
+  const undoEl = document.getElementById('sb-undo-count');
+  const redoEl = document.getElementById('sb-redo-count');
+  if (undoEl) undoEl.textContent = _undoStack.length || '—';
+  if (redoEl) redoEl.textContent = _redoStack.length || '—';
+  // Dim the undo/redo buttons in the toolbar if empty
+  const btnUndo = document.getElementById('tb-btn-undo');
+  const btnRedo = document.getElementById('tb-btn-redo');
+  if (btnUndo) btnUndo.style.opacity = _undoStack.length ? '1' : '0.3';
+  if (btnRedo) btnRedo.style.opacity = _redoStack.length ? '1' : '0.3';
+}
+// ── END UNDO ENGINE ──────────────────────────────────────────────────────
 
 // ── SNAP ────────────────────────────────────────────────
 const SNAP_PX = 14;
@@ -1991,6 +2085,7 @@ function cancelOffsetPopup() {
 function confirmOffsetPopup() {
   const v = parseFloat(offsetPopupInput.value);
   if (isNaN(v) || v <= 0) { offsetPopupInput.focus(); offsetPopupInput.select(); return; }
+  pushUndo();
   const mm = fromDisplay(v);
   document.getElementById('offset-dist-input').value =
     parseFloat(toDisplay(mm).toFixed(unitDecimals()));
@@ -2046,6 +2141,7 @@ function ptSegDist(px,py,ax,ay,bx,by) {
 function commitRect(x1,y1,x2,y2) {
   const lx=Math.min(x1,x2), rx=Math.max(x1,x2);
   const by=Math.min(y1,y2), ty=Math.max(y1,y2);
+  pushUndo();
   GeoMemory.addPolyline([
     {x:lx,y:by},{x:rx,y:by},{x:rx,y:ty},{x:lx,y:ty}
   ], true); // closed
@@ -2060,6 +2156,7 @@ function commitPolygon(cx,cy,px,py) {
   const n = getPolySides();
   const r = Math.hypot(px-cx, py-cy);
   if(r<1e-6){ showToast('Polygon too small'); return; }
+  pushUndo();
   const vr = getPolyInscribed() ? r : r/Math.cos(Math.PI/n);
   const startAngle = Math.atan2(py-cy, px-cx);
   const pts=[];
@@ -2083,6 +2180,7 @@ function commitLineChain(closed) {
     lineChain = [];
     render(); return;
   }
+  pushUndo();
   if(lineChain.length === 2 && !closed) {
     // Two points = one line segment — store as LINE for simplicity
     GeoMemory.addLine(lineChain[0].x, lineChain[0].y, lineChain[1].x, lineChain[1].y);
@@ -2099,6 +2197,7 @@ function commitLineChain(closed) {
 // JOIN: take selected LINE entities and chain them into POLYLINE(s)
 // Algorithm: build an adjacency graph by matching endpoints, then walk chains
 function joinSelected() {
+  pushUndo();
   const selLines = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'LINE');
   if(selLines.length < 2) { showToast('Select 2+ lines to join'); return; }
 
@@ -2191,6 +2290,7 @@ function joinSelected() {
 
 // EXPLODE: break selected POLYLINE(s) back into individual LINE entities
 function explodeSelected() {
+  pushUndo();
   const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE');
   if(selPoly.length === 0) { showToast('Select polylines to explode'); return; }
 
@@ -2217,6 +2317,7 @@ function explodeSelected() {
 
 // CLOSE POLYLINE: add closing segment to selected open polyline
 function closePolyline() {
+  pushUndo();
   const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE' && !o.closed);
   if(selPoly.length === 0) { showToast('Select an open polyline to close'); return; }
   for(const pl of selPoly) pl.closed = true;
@@ -2226,6 +2327,7 @@ function closePolyline() {
 
 // OPEN POLYLINE: remove closing connection
 function openPolyline() {
+  pushUndo();
   const selPoly = GeoMemory.objects.filter(o => selectedIds.has(o.id) && o.type === 'POLYLINE' && o.closed);
   if(selPoly.length === 0) { showToast('Select a closed polyline to open'); return; }
   for(const pl of selPoly) pl.closed = false;
@@ -2294,6 +2396,7 @@ function pickObject(sx,sy) {
 
 function deleteSelected() {
   if(selectedIds.size===0){ showToast('Nothing selected'); return; }
+  pushUndo();
   for(const id of selectedIds) GeoMemory.remove(id);
   showToast(`Deleted ${selectedIds.size} object(s)`);
   selectedIds.clear();
@@ -2377,6 +2480,7 @@ function rotateSelected(deltaDeg, pivot) {
   if (selectedIds.size === 0) { showToast('Nothing selected — select lines first'); return; }
   const p = pivot || selectionCentroid();
   if (!p) { showToast('No geometry to rotate'); return; }
+  pushUndo();
 
   let count=0;
   for (const o of GeoMemory.objects) {
@@ -3214,6 +3318,9 @@ function onKeyDown(e) {
     if(k==='?')          showCoordHelp();
   }
   if(e.ctrlKey){
+    if(k==='z'){ e.preventDefault(); undo(); return; }
+    if(k==='y'){ e.preventDefault(); redo(); return; }
+    if(k==='Z' && e.shiftKey){ e.preventDefault(); redo(); return; } // Ctrl+Shift+Z
     if(k==='s'){ e.preventDefault(); saveKAD(); }
     if(k==='n'){ e.preventDefault(); newDocument(); }
     if(k==='e' && e.shiftKey){ e.preventDefault(); exportSCAD(); }
@@ -3846,6 +3953,7 @@ function importDXF(event) {
 function commitDxfImport() {
   const { parsed, unitSel, mergeSel } = dxfDialog;
   if (!parsed) return;
+  pushUndo();
 
   // Determine final mm-per-file-unit scale from user choice.
   // parseDXF now returns raw coordinates (no pre-scaling applied).
@@ -3958,6 +4066,7 @@ function mirrorPoint(x, y, axis, axisData) {
 function mirrorSelected() {
   const ids = [...selectedIds];
   if (!ids.length) { showToast('Select objects first (S)'); return; }
+  pushUndo();
 
   // Compute bounding box of selected objects for h/v axis center
   let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
@@ -4027,7 +4136,7 @@ function saveKAD() { downloadText(GeoMemory.serialize(),'drawing.kad','applicati
 function loadKAD(event) {
   const file=event.target.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=e=>{ const ok=GeoMemory.deserialize(e.target.result); ok?render():null; showToast(ok?`Loaded ${file.name}`:'Invalid .kad'); event.target.value=''; };
+  reader.onload=e=>{ pushUndo(); const ok=GeoMemory.deserialize(e.target.result); ok?render():null; showToast(ok?`Loaded ${file.name}`:'Invalid .kad'); event.target.value=''; };
   reader.readAsText(file);
 }
 function exportDXF() {
@@ -4197,6 +4306,7 @@ function downloadText(content,filename,mime) {
 }
 function newDocument() {
   if(GeoMemory.objects.length&&!confirm('New document? Unsaved changes will be lost.')) return;
+  pushUndo();
   GeoMemory.clear(); cancelTool(); selectedIds.clear(); updateSelectionProps(); render(); showToast('New document');
 }
 
@@ -4223,6 +4333,7 @@ requestAnimationFrame(()=>{
     setTool('select');
     document.getElementById('cc-year').textContent = new Date().getFullYear();
     initSplash();
+    _updateUndoUI(); // initialise undo/redo button states
     setTimeout(()=>{
       GeoMemory.addLine(-15,0,15,0);
       GeoMemory.addLine(0,-15,0,15);
@@ -4239,6 +4350,7 @@ let chamferState = {active:false, line1:null, line2:null};
 let chamferDist  = 5;
 
 function commitChamfer(line1Id, line2Id) {
+  pushUndo();
   const o1 = GeoMemory.objects.find(o=>o.id===line1Id);
   const o2 = GeoMemory.objects.find(o=>o.id===line2Id);
   if (!o1||!o2||o1.type!=='LINE'||o2.type!=='LINE') { showToast('Select two lines for chamfer'); return; }
@@ -4302,6 +4414,7 @@ let copyOffset = {x:10, y:-10}; // default offset in mm
 function copySelected() {
   const ids = [...selectedIds];
   if (!ids.length) { showToast('Select objects first'); return; }
+  pushUndo();
   const copies = [];
   for (const id of ids) {
     const o = GeoMemory.objects.find(x=>x.id===id);
@@ -4999,7 +5112,7 @@ function kvExportVAD() {
     layer: 'KAD Geometry',
   };
   const vad = {
-    version:'0.0', source:'KAD KANVAS',
+    version:'1.0', source:'KAD KANVAS',
     layers:  KVM.layers,
     activeLayer: KVM.activeLayer,
     nextId:  KVM.nextId,
