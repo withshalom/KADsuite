@@ -69,7 +69,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 
 /* ── LAYOUT ── */
 /* KADsuite beta: KAD fixed behind the suite page */
-#app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr var(--status-h); width:100vw; height:100vh; overflow:hidden; transition:opacity 0.3s; }
+#app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr 28px var(--status-h); width:100vw; height:100vh; overflow:hidden; transition:opacity 0.3s; }
 body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
 #suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; transition:opacity 0.35s; background:rgba(6,10,16,0.92); }
@@ -1630,6 +1630,92 @@ footer {
   .nav-link { padding: 4px; }
 }
 
+/* ── KOMMAND LINE ─────────────────────────────────────────────────────────── */
+#kommand-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding: 0;
+  overflow: hidden;
+  z-index: 30;
+}
+#kommand-context {
+  flex-shrink: 0;
+  padding: 0 10px;
+  font-family: var(--fm);
+  font-size: 9px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-right: 1px solid var(--border);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  min-width: 80px;
+  white-space: nowrap;
+  user-select: none;
+}
+#kommand-echo {
+  flex-shrink: 0;
+  padding: 0 8px;
+  font-family: var(--fm);
+  font-size: 9px;
+  color: var(--t3);
+  letter-spacing: 0.04em;
+  border-right: 1px solid var(--border);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  min-width: 180px;
+  max-width: 280px;
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+}
+#kommand-prefix {
+  flex-shrink: 0;
+  padding: 0 8px;
+  font-family: var(--fm);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--accent);
+  border-right: 1px solid var(--border);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  min-width: 40px;
+  user-select: none;
+}
+#kommand-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 10px;
+  font-family: var(--fm);
+  font-size: 11px;
+  color: var(--t1);
+  caret-color: var(--accent);
+  height: 100%;
+}
+#kommand-input::placeholder { color: var(--t3); font-size: 10px; }
+#kommand-hint {
+  flex-shrink: 0;
+  padding: 0 10px;
+  font-family: var(--fm);
+  font-size: 9px;
+  color: var(--t3);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+#kommand-hint b  { color: var(--accent); font-weight: 600; }
+#kommand-hint i  { color: var(--amber);  font-style: normal; }
+#kommand-hint em { color: var(--green);  font-style: normal; }
+
+
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -3106,6 +3192,22 @@ document.addEventListener('keydown', function(e) {
 </div>
 
 <!-- STATUS BAR -->
+<!-- ═══ KOMMAND LINE ════════════════════════════════════════════════════════ -->
+<div id="kommand-bar">
+  <div id="kommand-context">SELECT</div>
+  <div id="kommand-echo">Type a command or coordinate</div>
+  <div id="kommand-prefix">≫</div>
+  <input id="kommand-input" type="text" spellcheck="false" autocomplete="off"
+    placeholder="X,Y  @dX,dY  @D&lt;A°  or command…"
+    tabindex="1"/>
+  <div id="kommand-hint">
+    <b>X,Y</b> abs &nbsp;·&nbsp;
+    <i>@dX,dY</i> rel &nbsp;·&nbsp;
+    <em>@D&lt;A°</em> polar &nbsp;·&nbsp;
+    <b>L</b>ine <b>A</b>rc <b>C</b>ircle <b>R</b>ect <b>O</b>ffset <b>M</b>irror <b>D</b>im <b>UNDO</b> <b>REDO</b>
+  </div>
+</div>
+
 <div id="statusbar">
   <div class="sb-item"><span>MODE</span><span class="sb-val act" id="sb-mode">SELECT</span></div>
   <div class="sb-item"><span>SNAP</span><span class="sb-val ok" id="sb-snap">ON</span></div>
@@ -6134,6 +6236,7 @@ document.addEventListener('keydown', function(e) {
 
 requestAnimationFrame(()=>{
   requestAnimationFrame(()=>{
+    if(typeof _patchSetTool==='function') _patchSetTool();
     resizeCanvas();
     initCamera();
     setTool('select');
@@ -7705,6 +7808,222 @@ initPreview('konstruct-preview', (ctx, W, H) => {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
+
+// Keep context label in sync — patch setTool after DOM ready
+function _patchSetTool() {
+  const _orig = setTool;
+  window.setTool = function(t) {
+    _orig(t);
+    if (kContext) kContext.textContent = t.toUpperCase();
+    if (kPrefix)  kPrefix.textContent  = '≫';
+    kommandClear();
+  };
+}
+// ════════════════════════════════════════════════════════════════════════════
+//  KOMMAND LINE — persistent coordinate + command entry bar
+//  Replaces the floating dyn-input popup.
+//  Always receives keyboard input. No popup interruptions.
+// ════════════════════════════════════════════════════════════════════════════
+
+const kInput   = document.getElementById('kommand-input');
+const kContext = document.getElementById('kommand-context');
+const kEcho    = document.getElementById('kommand-echo');
+const kPrefix  = document.getElementById('kommand-prefix');
+
+// Keep context label in sync — patch setTool after DOM ready
+function _patchSetTool() {
+  const _orig = setTool;
+  window.setTool = function(t) {
+    _orig(t);
+    if (kContext) kContext.textContent = t.toUpperCase();
+    if (kPrefix)  kPrefix.textContent  = '≫';
+    kommandClear();
+  };
+}
+
+// Echo a message to the kommand line (replaces showToast for workflow msgs)
+function kecho(msg, type) {
+  if (!kEcho) return;
+  kEcho.textContent = msg;
+  kEcho.style.color = type==='ok'  ? 'var(--green)'  :
+                      type==='err' ? 'var(--red)'    :
+                      type==='dim' ? 'var(--amber)'  : 'var(--t3)';
+  // Also show toast for visibility
+  showToast(msg);
+}
+
+function kommandClear() {
+  if (kInput) kInput.value = '';
+  if (kPrefix) kPrefix.textContent = '≫';
+}
+
+// Command word table
+const KOMMANDS = {
+  'L':       () => setTool('line'),
+  'LINE':    () => setTool('line'),
+  'A':       () => setTool('arc'),
+  'ARC':     () => setTool('arc'),
+  'C':       () => setTool('circle'),
+  'CIRCLE':  () => setTool('circle'),
+  'R':       () => setTool('rect'),
+  'RECT':    () => setTool('rect'),
+  'P':       () => setTool('polygon'),
+  'POLY':    () => setTool('polygon'),
+  'O':       () => setTool('offset'),
+  'OFFSET':  () => setTool('offset'),
+  'M':       () => setTool('mirror'),
+  'MIRROR':  () => setTool('mirror'),
+  'D':       () => setTool('measure'),
+  'MEASURE': () => setTool('measure'),
+  'TR':      () => setTool('trim'),
+  'TRIM':    () => setTool('trim'),
+  'F':       () => setTool('fillet'),
+  'FILLET':  () => setTool('fillet'),
+  'CH':      () => setTool('chamfer'),
+  'CHAMFER': () => setTool('chamfer'),
+  'V':       () => setTool('select'),
+  'SELECT':  () => setTool('select'),
+  'Z':       () => { zoomExtents(); kecho('Zoom extents'); },
+  'G':       () => { toggleGrid();  kecho('Grid toggled'); },
+  'S':       () => { toggleSnap();  kecho('Snap toggled'); },
+  'U':       () => { toggleUnits(); kecho('Units: ' + unitMode); },
+  'UNDO':    () => { if(typeof undo==='function') undo(); else { GeoMemory.objects.pop && GeoMemory.objects.pop(); render(); } kecho('Undo'); },
+  'REDO':    () => { if(typeof redo==='function') redo(); kecho('Redo'); },
+  'CLEAR':   () => { if(confirm('Clear all?')){ GeoMemory.clear(); render(); kecho('Cleared'); } },
+  'NEW':     () => { if(confirm('New document?')){ GeoMemory.clear(); render(); kecho('New document'); } },
+};
+
+// Parse coordinate input: "X,Y" | "@dX,dY" | "@D<A"
+function parseKommandCoord(raw) {
+  const s = raw.trim();
+  // Polar relative: @D<A
+  const polar = s.match(/^@([+-]?[\d.]+)<([+-]?[\d.]+)$/);
+  if (polar) {
+    const d = fromDisplay(parseFloat(polar[1]));
+    const a = parseFloat(polar[2]) * Math.PI / 180;
+    return { mode:'polar', d, a };
+  }
+  // Relative: @dX,dY
+  const rel = s.match(/^@([+-]?[\d.]+)[,\s]+([+-]?[\d.]+)$/);
+  if (rel) {
+    return { mode:'rel', dx:fromDisplay(parseFloat(rel[1])), dy:fromDisplay(parseFloat(rel[2])) };
+  }
+  // Absolute: X,Y
+  const abs = s.match(/^([+-]?[\d.]+)[,\s]+([+-]?[\d.]+)$/);
+  if (abs) {
+    return { mode:'abs', x:fromDisplay(parseFloat(abs[1])),
+                         y:fromDisplay(parseFloat(abs[2])) };
+  }
+  // Single number = distance along current direction
+  const num = s.match(/^([+-]?[\d.]+)$/);
+  if (num) return { mode:'dist', d: fromDisplay(parseFloat(num[1])) };
+  return null;
+}
+
+// Resolve coord to absolute world position given last point
+function resolveCoord(parsed, lastX, lastY, lastAngle) {
+  if (!parsed) return null;
+  if (parsed.mode === 'abs') return { x: parsed.x, y: parsed.y };
+  if (parsed.mode === 'rel') return { x: lastX + parsed.dx, y: lastY + parsed.dy };
+  if (parsed.mode === 'polar') {
+    return { x: lastX + parsed.d * Math.cos(parsed.a),
+             y: lastY + parsed.d * Math.sin(parsed.a) };
+  }
+  if (parsed.mode === 'dist' && lastAngle !== undefined) {
+    return { x: lastX + parsed.d * Math.cos(lastAngle),
+             y: lastY + parsed.d * Math.sin(lastAngle) };
+  }
+  return null;
+}
+
+// Handle KOMMAND input keydown
+kInput.addEventListener('keydown', function(e) {
+  const raw = kInput.value.trim().toUpperCase();
+
+  if (e.key === 'Escape') {
+    e.stopPropagation();
+    kommandClear();
+    cancelTool();
+    render();
+    kecho('Cancelled');
+    return;
+  }
+
+  if (e.key === 'Enter' || e.key === 'Tab') {
+    e.preventDefault();
+    if (!raw) return;
+
+    // Check command words first
+    if (KOMMANDS[raw]) {
+      KOMMANDS[raw]();
+      kommandClear();
+      return;
+    }
+
+    // Try coordinate parse
+    const parsed = parseKommandCoord(kInput.value.trim());
+    if (parsed) {
+      applyKommandCoord(parsed);
+      kommandClear();
+      return;
+    }
+
+    kecho('Unknown: ' + raw, 'err');
+    return;
+  }
+
+  // Live prefix update
+  setTimeout(() => {
+    const v = kInput.value.trim();
+    if (!kPrefix) return;
+    if (v.startsWith('@') && v.includes('<')) kPrefix.textContent = 'POL';
+    else if (v.startsWith('@'))               kPrefix.textContent = 'REL';
+    else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'CMD';
+    else if (v.match(/^[0-9+\-]/))           kPrefix.textContent = 'ABS';
+    else                                      kPrefix.textContent = '≫';
+  }, 0);
+});
+
+// Apply a resolved coordinate to the current tool state
+function applyKommandCoord(parsed) {
+  // Get last point from current tool state
+  let lastX = 0, lastY = 0, lastAngle = 0;
+  if (activeTool === 'line' && lineState && lineState.active) {
+    lastX = lineState.x1; lastY = lineState.y1;
+    if (lineChain && lineChain.length >= 2) {
+      const a = lineChain[lineChain.length-2], b = lineChain[lineChain.length-1];
+      lastAngle = Math.atan2(b.y-a.y, b.x-a.x);
+    }
+  }
+  const pt = resolveCoord(parsed, lastX, lastY, lastAngle);
+  if (!pt) { kecho('Could not resolve coordinate', 'err'); return; }
+
+  // Simulate a click at the resolved world point
+  simulateWorldClick(pt.x, pt.y);
+  kecho(fmtU(pt.x) + ', ' + fmtU(pt.y), 'ok');
+}
+
+// Simulate a drawing click at world coordinates
+function simulateWorldClick(wx, wy) {
+  const sp = worldToScreen(wx, wy);
+  const fakeEvent = {
+    clientX: sp.x + canvas.getBoundingClientRect().left,
+    clientY: sp.y + canvas.getBoundingClientRect().top,
+    button: 0, shiftKey: false, altKey: false, ctrlKey: false,
+    preventDefault: ()=>{}, stopPropagation: ()=>{}
+  };
+  // Use existing mousedown handler
+  if (typeof onMouseDown === 'function') onMouseDown(fakeEvent);
+}
+
+// Keep canvas from stealing focus from kommand bar unless clicking canvas
+canvas.addEventListener('mousedown', () => {
+  // When user clicks canvas, let canvas handle it — refocus kommand after
+  setTimeout(() => { if(document.activeElement !== kInput) kInput.focus(); }, 100);
+});
+
+// Focus kommand on load
+window.addEventListener('load', () => { setTimeout(()=>kInput.focus(), 500); });
 </script>
 </body>
 </html>
