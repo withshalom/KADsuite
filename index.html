@@ -1716,6 +1716,71 @@ footer {
 #kommand-hint em { color: var(--green);  font-style: normal; }
 
 
+
+
+
+.tool-icon svg { width:16px; height:16px; stroke:#7ee8ff; color:#7ee8ff; }
+.tool-btn:hover .tool-icon svg { stroke:#a8f0ff; color:#a8f0ff; }
+.tool-btn.active .tool-icon svg { stroke:var(--accent); color:var(--accent); filter:drop-shadow(0 0 3px var(--accent)); }
+
+/* ── LIGHT MODE ─────────────────────────────────────────────────────────────
+   Toggled via body.light-mode — all UI vars flip, accent stays cyan
+   ─────────────────────────────────────────────────────────────────────────── */
+body.light-mode {
+  --void:       #d0d8e0;
+  --panel:      #f0f4f8;
+  --panel2:     #e4eaf0;
+  --hover:      #d8e4ee;
+  --border:     #b0c4d8;
+  --border-hi:  #80a8c8;
+  --accent:     #0088aa;      /* darker cyan — readable on light */
+  --accent-dim: #006888;
+  --accent-glow: rgba(0,136,170,0.15);
+  --t1:  #0a1520;             /* near black */
+  --t2:  #2a4a6a;             /* dark blue-grey */
+  --t3:  #4a6a8a;             /* mid */
+}
+/* Icons: invert to dark cyan on light bg */
+body.light-mode .tool-icon svg {
+  stroke: #007a99;
+  color:  #007a99;
+}
+body.light-mode .tool-btn:hover .tool-icon svg {
+  stroke: #005577;
+  color:  #005577;
+}
+body.light-mode .tool-btn.active .tool-icon svg {
+  stroke: var(--accent);
+  color:  var(--accent);
+  filter: drop-shadow(0 0 3px var(--accent));
+}
+
+#theme-toggle {
+  background: var(--panel2);
+  border: 1px solid var(--border-hi);
+  border-radius: 4px;
+  color: var(--t2);
+  width: 28px; height: 24px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  font-size: 13px;
+  padding: 0;
+}
+
+.tool-icon svg {
+  stroke: #007a99;
+  color:  #007a99;
+}
+body.light-mode .tool-btn:hover .tool-icon svg {
+  stroke: #005577;
+  color:  #005577;
+}
+body.light-mode .tool-btn.active .tool-icon svg {
+  stroke: var(--accent);
+  color:  var(--accent);
+  filter: drop-shadow(0 0 3px var(--accent));
+}
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -2807,7 +2872,11 @@ document.addEventListener('keydown', function(e) {
   </div>
   <div class="tb-right">
     <span class="tb-badge">v0.0</span>
-    <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
+<button id="theme-toggle" onclick="toggleTheme()" title="Toggle dark / light mode">
+      <span id="theme-icon-dark" style="font-size:13px;">☾</span>
+      <span id="theme-icon-light" style="font-size:13px;display:none;">☀</span>
+    </button>
+        <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
       <span class="unit-divider"></span>
       <span class="unit-seg" id="unit-seg-in">in</span>
@@ -5288,8 +5357,7 @@ function openCtxMenu(cx, cy) {
   ctxMenu.style.left=cx+'px'; ctxMenu.style.top=cy+'px';
   ctxMenu.classList.add('open');
   // Clamp
-
-requestAnimationFrame(()=>{
+  requestAnimationFrame(()=>{
     const r=ctxMenu.getBoundingClientRect();
     if(r.right>window.innerWidth)  ctxMenu.style.left=(cx-r.width)+'px';
     if(r.bottom>window.innerHeight) ctxMenu.style.top=(cy-r.height)+'px';
@@ -5369,11 +5437,23 @@ function updateGridLabel() {
 }
 
 // ── RENDER ──────────────────────────────────────────────
-const C={
-  bg:'#080a0e', grid:'#141c28', gridMaj:'#1c2535', axis:'#1e3348',
-  entity:'#00d4ff', entitySel:'#ffaa00', point:'#ffaa00',
-  rubberLine:'#00d4ff', startPt:'#00ff9d',
-};
+// C is a live getter — returns correct colors for current theme
+const C = new Proxy({}, {
+  get(_, key) {
+    const light = document.body.classList.contains('light-mode');
+    const dark = {
+      bg:'#080a0e', grid:'#1a2840', gridMaj:'#253a58', axis:'#2a5080',
+      entity:'#00d4ff', entitySel:'#ffaa00', point:'#ffaa00',
+      rubberLine:'#00d4ff', startPt:'#00ff9d',
+    };
+    const lt = {
+      bg:'#f8fbff', grid:'#d0dde8', gridMaj:'#b8ccd8', axis:'#a0b8cc',
+      entity:'#0077aa', entitySel:'#cc6600', point:'#cc6600',
+      rubberLine:'#0077aa', startPt:'#007755',
+    };
+    return (light ? lt : dark)[key];
+  }
+});
 
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -5680,7 +5760,7 @@ function drawGrid(W,H) {
   for(let y=y0;y<=y1;y+=spacing){ if(Math.round(y/spacing)%major!==0){ const sy=worldToScreen(0,y).y; ctx.moveTo(0,sy); ctx.lineTo(W,sy); } }
   ctx.stroke();
 
-  ctx.strokeStyle=C.gridMaj; ctx.beginPath();
+  ctx.lineWidth=1.2; ctx.strokeStyle=C.gridMaj; ctx.beginPath();
   for(let x=x0;x<=x1;x+=spacing){ if(Math.round(x/spacing)%major===0){ const sx=worldToScreen(x,0).x; ctx.moveTo(sx,0); ctx.lineTo(sx,H); } }
   for(let y=y0;y<=y1;y+=spacing){ if(Math.round(y/spacing)%major===0){ const sy=worldToScreen(0,y).y; ctx.moveTo(0,sy); ctx.lineTo(W,sy); } }
   ctx.stroke();
@@ -6559,7 +6639,8 @@ function showToast(msg) {
 }
 
 // ── INIT ────────────────────────────────────────────────
-// ── Drafting mode (KADsuite: KAD enters foreground) ────────────────────────
+
+// ── Drafting mode ──────────────────────────────────────────────────────────
 function openDraftingMode() {
   document.body.classList.add('drafting-mode');
   setTimeout(() => {
@@ -7791,6 +7872,33 @@ function positionDynInput() { /* no-op — kommand is fixed */ }
 document.addEventListener('DOMContentLoaded', () => {
   if (kContext) kContext.textContent = (activeTool||'SELECT').toUpperCase();
 });
+
+// ── Theme toggle ─────────────────────────────────────────────────────────────
+let _lightMode = false;
+function toggleTheme() {
+  _lightMode = !_lightMode;
+  document.body.classList.toggle('light-mode', _lightMode);
+  // Swap icon
+  document.getElementById('theme-icon-dark').style.display  = _lightMode ? 'none'   : '';
+  document.getElementById('theme-icon-light').style.display = _lightMode ? '' : 'none';
+  // Persist preference
+  try { localStorage.setItem('kad-theme', _lightMode ? 'light' : 'dark'); } catch(e) {}
+  // Redraw canvas background
+  if (typeof render === 'function') render();
+}
+// Restore preference on load
+(function() {
+  try {
+    if (localStorage.getItem('kad-theme') === 'light') {
+      _lightMode = true;
+      document.body.classList.add('light-mode');
+      const di = document.getElementById('theme-icon-dark');
+      const li = document.getElementById('theme-icon-light');
+      if (di) di.style.display = 'none';
+      if (li) li.style.display = '';
+    }
+  } catch(e) {}
+})();
 
 </script>
 </body>
