@@ -1199,14 +1199,7 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 }
 .dlg-btn.commit:hover { background: #33ddff; box-shadow: 0 0 18px rgba(0,212,255,0.4); }
 /* ── STARTUP UNIT SPLASH ── */
-#splash-overlay {
-  position: fixed; inset: 0;
-  background: rgba(4,6,10,0.92);
-  backdrop-filter: blur(6px);
-  z-index: 900;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: all;
-}
+
 #splash-dialog {
   background: var(--panel);
   border: 1px solid var(--border-hi);
@@ -1595,6 +1588,10 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 
   
   --konstruct:   #4a8fd4;  /* blueprint technical blue */
+  --kloud:       #7ec8e3;  /* sky blue — lighter, distinct from KAD cyan */
+  --kloud-g:     rgba(126,200,227,0.10);
+  --kodex:       #e8a020;  /* machinist amber */
+  --kodex-g:     rgba(232,160,32,0.10);
   --konstruct-g: rgba(74,143,212,0.12);
 
   --ff-display: 'Syne', sans-serif;
@@ -1978,6 +1975,8 @@ nav {
   .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
   .flow-icon.kode      { background: linear-gradient(135deg,#2a0800,#882000,#e03800); }
   .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
+.flow-icon.kloud    { background: linear-gradient(135deg,#0d2235,#5ab3d0,#b8e4f5); }
+.flow-icon.kodex    { background: linear-gradient(135deg,#2a1800,#e8a020,#ff6820); }
 .flow-icon.kanvas    { background: linear-gradient(135deg,#001c28,#005878,#0090a8,#6030c8,#8b5cf6); }
 .flow-icon.kultivate { background: linear-gradient(135deg,#201008,#2e5818,#6ab830); }
 .flow-icon.konnector { background: linear-gradient(135deg,#1a2838,#3a5870,#b8c8d8); }
@@ -2098,6 +2097,16 @@ footer {
 }
 
 /* ── KID ── */
+.card-kloud { --card-color: var(--kloud); --card-glow: var(--kloud-g); }
+.card-kloud .card-mark {
+  background: linear-gradient(135deg, #0d2235, #5ab3d0, #b8e4f5);
+  box-shadow: 0 0 20px rgba(126,200,227,0.30);
+}
+.card-kodex { --card-color: var(--kodex); --card-glow: var(--kodex-g); }
+.card-kodex .card-mark {
+  background: linear-gradient(135deg, #2a1800, #e8a020, #ff6820);
+  box-shadow: 0 0 20px rgba(232,160,32,0.40);
+}
 .card-kid { --card-color: #ff8800; --card-glow: rgba(255,136,0,0.10); }
 .card-kid .card-mark {
   background: linear-gradient(135deg, #3a1800, #cc5500, #ff8800);
@@ -2588,6 +2597,31 @@ body.light-mode .tool-btn.active .tool-icon svg {
   color:  var(--accent);
   filter: drop-shadow(0 0 3px var(--accent));
 }
+
+/* ── BETA corner wrap — full ribbon across the corner ────────────────────── */
+.card { overflow: hidden; }
+.card-beta-stamp {
+  position: absolute;
+  top: 48px;
+  right: -80px;
+  width: 280px;
+  padding: 8px 0;
+  text-align: center;
+  background: rgba(10, 5, 2, 0.92);
+  border-top: 1.5px solid #ff8c00;
+  border-bottom: 1.5px solid #ff8c00;
+  color: #ff8c00;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  transform: rotate(35deg);
+  transform-origin: center;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 10;
+  text-shadow: 0 0 6px rgba(255,140,0,0.45);
+}
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -2672,7 +2706,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
 <!-- PROGRAM GRID -->
 <div class="page">
   <section class="programs" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;padding-bottom:60px;">
+
     <div class="programs-grid">
+
+      <!-- KAD -->
 
       <!-- KAD -->
       <div class="card card-kad" onclick="openDraftingMode()" style="cursor:pointer;">
@@ -2694,7 +2731,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
       </div>
 
       <!-- KAM -->
-      <a class="card card-kam" href="https://withshalom.github.io/KAM" target="_blank">
+
+      <!-- KAM -->
+      <a class="card card-kam" href="https://kam.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
         
         <div class="card-mark">KM</div>
         <div class="card-name">.KAM</div>
@@ -2714,7 +2754,52 @@ body.light-mode .tool-btn.active .tool-icon svg {
       </a>
 
       <!-- KUBE -->
-      <a class="card card-kube" href="https://withshalom.github.io/KUBE" target="_blank">
+
+      <!-- KLOUD -->
+      <a class="card card-kloud" href="https://kloud.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
+        <div class="card-mark">KL</div>
+        <div class="card-name">.KLOUD</div>
+        <div class="card-full">Kernel Live Optimized Universal Development</div>
+        <div class="card-preview">
+          <canvas id="kloud-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          KADsuite in the cloud. Sign in with Google, save files to cloud storage,
+          and collaborate in real time with your team. All KADsuite programs,
+          shared file library, live cursors, and version history.
+          Subscription required — Solo, Team, and Studio plans available.
+        </div>
+        <div class="card-cta">
+          <span>Open KLOUD</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KID -->
+      <a class="card card-kid" href="https://kid.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
+        <div class="card-mark">KD</div>
+        <div class="card-name">.KID</div>
+        <div class="card-full">Kernel-Instructed Design</div>
+        <div class="card-preview">
+          <canvas id="kid-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Learn to draft through play. Age-adaptive line weights, four color-coded
+          drafting layers — solid, hidden, center, and dimension — and mission-based
+          tutorials that unlock as you draw. The right tool for future designers
+          of any age.
+        </div>
+        <div class="card-cta">
+          <span>Open KID</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KUBE -->
+      <a class="card card-kube" href="https://kube.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KB</div>
         <div class="card-name">.KUBE</div>
         <div class="card-full">Kernel-Unified Build Environment</div>
@@ -2734,7 +2819,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
 
       <!-- KARVE -->
-      <a class="card card-karve" href="https://withshalom.github.io/KARVE/" target="_blank">
+
+      <!-- KARVE -->
+      <a class="card card-karve" href="https://karve.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KV</div>
         <div class="card-name">.KARVE</div>
         <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
@@ -2754,7 +2842,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
       </a>
 
             <!-- KONSTRUCT -->
-      <a class="card card-konstruct" href="https://withshalom.github.io/KONSTRUCT" target="_blank">
+
+      <!-- KONSTRUCT -->
+      <a class="card card-konstruct" href="https://konstruct.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KON</div>
         <div class="card-name">.KONSTRUCT</div>
         <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
@@ -2773,7 +2864,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
       </a>
 
       <!-- KULTIVATE -->
-      <a class="card card-kultivate" href="https://withshalom.github.io/KULTIVATE/" target="_blank">
+
+      <!-- KULTIVATE -->
+      <a class="card card-kultivate" href="https://kultivate.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KLT</div>
         <div class="card-name">.KULTIVATE</div>
         <div class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</div>
@@ -2793,7 +2887,48 @@ body.light-mode .tool-btn.active .tool-icon svg {
       </a>
 
       <!-- KANVAS -->
-      <a class="card card-kanvas" href="https://withshalom.github.io/KANVAS/" target="_blank">
+
+      <!-- KONNECTOR -->
+      <a class="card card-konnector" href="https://konnector.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
+        <div class="card-mark">KN</div>
+        <div class="card-name">.KONNECTOR</div>
+        <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
+        <div class="card-desc">
+          Structural steel detailing and connection design. Imports geometry
+          from KAD, KUBE, and KONSTRUCT. AISC section database, bolt group
+          placement, weld tagging, piece marking, and export to KAM for
+          cutting and nesting.
+        </div>
+        <div class="card-cta">
+          <span>Open KONNECTOR</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KODEX -->
+      <a class="card card-kodex" href="https://kodex.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
+        <div class="card-mark">KX</div>
+        <div class="card-name">.KODEX</div>
+        <div class="card-full">Machinist's Reference Bible</div>
+        <div class="card-preview">
+          <canvas id="kodex-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          The machinist's reference on every workstation. Tap, drill, and clearance
+          charts. Thread engagement calculations. Material hardness tables. Speeds
+          and feeds. Tolerance grades and fits. Always at hand, always accurate.
+        </div>
+        <div class="card-cta">
+          <span>Open KODEX</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KANVAS -->
+      <a class="card card-kanvas" href="https://kanvas.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KNV</div>
         <div class="card-name">KANVAS</div>
         <div class="card-full">Kernel-Aided Node Vector Art Suite</div>
@@ -2811,7 +2946,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
         </div>
       </a>
       <!-- KODE -->
-      <a class="card card-kode" href="https://withshalom.github.io/KODE" target="_blank">
+
+      <!-- KODE -->
+      <a class="card card-kode" href="https://kode.kadsuite.com" target="_blank">
+        <div class="card-beta-stamp">Beta</div>
         
         <div class="card-mark">GK</div>
         <div class="card-name">.KODE</div>
@@ -2831,76 +2969,48 @@ body.light-mode .tool-btn.active .tool-icon svg {
         </div>
       </a>
 
-      <a class="card card-konnector" href="https://withshalom.github.io/KONNECTOR/" target="_blank">
-        <div class="card-mark">KN</div>
-        <div class="card-name">.KONNECTOR</div>
-        <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
-        <div class="card-desc">
-          Structural steel detailing and connection design. Imports geometry
-          from KAD, KUBE, and KONSTRUCT. AISC section database, bolt group
-          placement, weld tagging, piece marking, and export to KAM for
-          cutting and nesting.
-        </div>
-        <div class="card-cta">
-          <span>Open KONNECTOR</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
-      <a class="card card-kid" href="https://withshalom.github.io/KID/" target="_blank">
-        <div class="card-mark">KD</div>
-        <div class="card-name">.KID</div>
-        <div class="card-full">Kernel-Instructed Design</div>
-        <div class="card-desc">
-          Learn to draft through play. Age-adaptive line weights, four color-coded
-          drafting layers — solid, hidden, center, and dimension — and mission-based
-          tutorials that unlock as you draw. The right tool for future designers
-          of any age.
-        </div>
-        <div class="card-cta">
-          <span>Open KID</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
     </div>
   </section>
 
   <!-- FLOW DIAGRAM -->
   <section class="diagram" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
-    <div class="diagram-title">The manufacturing sequence</div>
+    <div class="diagram-title">The KADsuite programs</div>
     <div class="diagram-flow">
       <div class="flow-row">
-        <div class="flow-node"><div class="flow-icon kad">KD</div><div class="flow-label">Draw</div></div>
+        <div class="flow-node"><div class="flow-icon kad">KD</div><div class="flow-label">.KAD</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kam">KM</div><div class="flow-label">Manufacture</div></div>
+        <div class="flow-node"><div class="flow-icon kam">KM</div><div class="flow-label">KAM</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kube">KB</div><div class="flow-label">Build</div></div>
+        <div class="flow-node"><div class="flow-icon kloud">KL</div><div class="flow-label">KLOUD</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon karve">KV</div><div class="flow-label">Machine</div></div>
-        <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon konstruct">KON</div><div class="flow-label">Structure</div></div>
+        <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">KID</div></div>
       </div>
       <div class="flow-row">
-        <div class="flow-node"><div class="flow-icon kultivate">KLT</div><div class="flow-label">Plan</div></div>
+        <div class="flow-node"><div class="flow-icon kube">KB</div><div class="flow-label">KUBE</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kanvas">KNV</div><div class="flow-label">Illustrate</div></div>
+        <div class="flow-node"><div class="flow-icon karve">KV</div><div class="flow-label">KARVE</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kode">GK</div><div class="flow-label">Verify</div></div>
+        <div class="flow-node"><div class="flow-icon konstruct">KON</div><div class="flow-label">KONSTRUCT</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon konnector">KN</div><div class="flow-label">Connect</div></div>
+        <div class="flow-node"><div class="flow-icon kultivate">KLT</div><div class="flow-label">KULTIVATE</div></div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-node"><div class="flow-icon konnector">KN</div><div class="flow-label">KONNECTOR</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">Learn</div></div>
+        <div class="flow-node"><div class="flow-icon kodex">KX</div><div class="flow-label">KODEX</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon kanvas">KNV</div><div class="flow-label">KANVAS</div></div>
+        <div class="flow-arrow">──→</div>
+        <div class="flow-node"><div class="flow-icon kode">GK</div><div class="flow-label">KODE</div></div>
       </div>
     </div>
       </div>
     </div>
     <p class="flow-desc">
-      Each program has one job and does it completely. KAD draws, KAM manufactures, KUBE models, KARVE machines,
-      KONSTRUCT builds, KULTIVATE plans the site it sits on.
-      Files flow forward: <code style="font-family:var(--ff-mono);font-size:11px;color:var(--text2)">.kad .kam .nc</code>
-      and KAM sends directly to KODE without managing files manually.
-      AGPL-3.0 open source — use it for anything, share it with everyone, keep forks open.
+      Twelve programs. One suite. Each does one job completely —
+      draw, manufacture, cloud sync, learn, model, machine, structure, plan, connect, reference, illustrate, verify.
+      Native formats: <code style="font-family:var(--fm,monospace);font-size:11px;color:var(--accent)">.kad .kam .nc .dxf</code> ·
+      AGPL-3.0 open source.
     </p>
   </section>
 
@@ -3123,6 +3233,36 @@ function initPreview(id, drawFn) {
 }
 
 // KAD preview — technical drawing lines + grid
+// ── Beta stamp — drawn on preview canvas for non-KAD programs ────────────────
+function drawBetaStamp(ctx, W, H) {
+  ctx.save();
+  // Rotate around top-right area
+  const cx = W * 0.78, cy = H * 0.22;
+  ctx.translate(cx, cy);
+  ctx.rotate(Math.PI / 6); // 30° diagonal
+
+  // Background pill
+  const pw = 48, ph = 14;
+  ctx.fillStyle = 'rgba(255,140,0,0.18)';
+  ctx.beginPath();
+  ctx.roundRect(-pw/2, -ph/2, pw, ph, 4);
+  ctx.fill();
+
+  // Border
+  ctx.strokeStyle = 'rgba(255,140,0,0.55)';
+  ctx.lineWidth = 0.9;
+  ctx.stroke();
+
+  // Text
+  ctx.fillStyle = '#ff8c00';
+  ctx.font = 'bold 8px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('BETA', 0, 0);
+
+  ctx.restore();
+}
+
 initPreview('kad-preview', (ctx, W, H) => {
   ctx.clearRect(0, 0, W, H);
   // Grid
@@ -3589,6 +3729,127 @@ initPreview('konstruct-preview', (ctx, W, H) => {
   ctx.fillText('KON',3,10);
 });
 
+// ── KLOUD preview ──────────────────────────────────────────────────────────────
+initPreview('kloud-preview', (ctx, W, H) => {
+  // White drafting paper — KLOUD is light mode
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+  // Subtle blueprint grid on white
+  ctx.strokeStyle='rgba(42,143,173,0.10)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=16){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=16){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Part geometry — dark on white, like a real drawing
+  const pts=[[W*.22,H*.28],[W*.22,H*.68],[W*.78,H*.68],[W*.78,H*.28]];
+  ctx.strokeStyle='#1a3a52'; ctx.lineWidth=1.4; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+  pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
+  ctx.closePath(); ctx.stroke();
+  // Centerlines — yellow/gold on white
+  ctx.strokeStyle='rgba(180,140,0,0.5)'; ctx.lineWidth=0.7; ctx.setLineDash([8,3,2,3]);
+  ctx.beginPath(); ctx.moveTo(W*.5,H*.16); ctx.lineTo(W*.5,H*.78); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W*.12,H*.48); ctx.lineTo(W*.88,H*.48); ctx.stroke();
+  ctx.setLineDash([]);
+  // User A cursor — sky blue on white
+  ctx.fillStyle='#2a8fad'; ctx.shadowColor='rgba(42,143,173,0.3)'; ctx.shadowBlur=4;
+  ctx.beginPath(); ctx.moveTo(W*.24,H*.24); ctx.lineTo(W*.24+8,H*.24+5); ctx.lineTo(W*.24+2,H*.24+11); ctx.closePath(); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.font='bold 7px monospace'; ctx.fillStyle='#2a8fad'; ctx.fillText('User A',W*.33,H*.22);
+  // User B cursor — lighter sky
+  ctx.fillStyle='#5ab3d0'; ctx.shadowColor='rgba(90,179,208,0.3)'; ctx.shadowBlur=4;
+  ctx.beginPath(); ctx.moveTo(W*.68,H*.64); ctx.lineTo(W*.68+8,H*.64+5); ctx.lineTo(W*.68+2,H*.64+11); ctx.closePath(); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#5ab3d0'; ctx.fillText('User B',W*.55,H*.72);
+  // Sync line — faint sky dashes
+  ctx.strokeStyle='rgba(42,143,173,0.15)'; ctx.lineWidth=0.7; ctx.setLineDash([3,4]);
+  ctx.beginPath(); ctx.moveTo(W*.28,H*.3); ctx.lineTo(W*.68,H*.65); ctx.stroke();
+  ctx.setLineDash([]);
+  // ── Coming soon stamp — bottom of canvas ─────────────────────────────────
+  const stampY = H * 0.88;
+  const stampW = W * 0.72;
+  const stampX = (W - stampW) / 2;
+  // Pill background
+  ctx.fillStyle = 'rgba(42,143,173,0.10)';
+  const r = 10;
+  ctx.beginPath();
+  ctx.moveTo(stampX+r, stampY-10);
+  ctx.lineTo(stampX+stampW-r, stampY-10);
+  ctx.quadraticCurveTo(stampX+stampW, stampY-10, stampX+stampW, stampY);
+  ctx.lineTo(stampX+stampW, stampY+10);
+  ctx.quadraticCurveTo(stampX+stampW, stampY+20, stampX+stampW-r, stampY+20);
+  ctx.lineTo(stampX+r, stampY+20);
+  ctx.quadraticCurveTo(stampX, stampY+20, stampX, stampY+10);
+  ctx.lineTo(stampX, stampY);
+  ctx.quadraticCurveTo(stampX, stampY-10, stampX+r, stampY-10);
+  ctx.closePath(); ctx.fill();
+  // Pill border
+  ctx.strokeStyle='rgba(42,143,173,0.35)'; ctx.lineWidth=0.8; ctx.setLineDash([]);
+  ctx.stroke();
+  // Stamp text
+  ctx.font = 'bold 8px monospace';
+  ctx.fillStyle = '#2a8fad';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('✦  .KAD LIVE  ·  MORE COMING  ✦', W/2, stampY+5);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+});
+
+// ── KODEX preview ─────────────────────────────────────────────────────────────
+initPreview('kodex-preview', (ctx, W, H) => {
+  ctx.fillStyle='#0a0700'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(232,160,32,0.15)'; ctx.lineWidth=0.6;
+  for(let y=H*0.2;y<H*0.9;y+=H*0.14){ctx.beginPath();ctx.moveTo(W*.08,y);ctx.lineTo(W*.92,y);ctx.stroke();}
+  ctx.beginPath();ctx.moveTo(W*.35,H*.18);ctx.lineTo(W*.35,H*.88);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(W*.62,H*.18);ctx.lineTo(W*.62,H*.88);ctx.stroke();
+  ctx.fillStyle='rgba(232,160,32,0.12)'; ctx.fillRect(W*.08,H*.14,W*.84,H*.1);
+  ctx.fillStyle='#e8a020'; ctx.font='bold 9px monospace'; ctx.textBaseline='middle';
+  ctx.fillText('SIZE',W*.13,H*.19); ctx.fillText('DRILL',W*.40,H*.19); ctx.fillText('PITCH',W*.66,H*.19);
+  const rows=[['#4-40','#43','0.032'],['#6-32','#36','0.031'],['#8-32','#29','0.036'],['1/4-20','F','0.050']];
+  ctx.font='8px monospace';
+  rows.forEach((row,i)=>{
+    const y=H*(0.29+i*0.14);
+    ctx.fillStyle=i%2===0?'rgba(232,160,32,0.6)':'rgba(232,160,32,0.4)';
+    ctx.fillText(row[0],W*.10,y); ctx.fillText(row[1],W*.39,y); ctx.fillText(row[2],W*.66,y);
+  });
+});
+
+// ── KONNECTOR preview ─────────────────────────────────────────────────────────
+initPreview('konnector-preview', (ctx, W, H) => {
+  ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#b8c8d8'; ctx.lineWidth=1.4; ctx.setLineDash([]);
+  const bx=W*.3,by=H*.25,bw=W*.4,bh=H*.5,tf=H*.08,tw=W*.06;
+  ctx.strokeRect(bx,by,bw,tf);
+  ctx.strokeRect(bx+bw/2-tw/2,by+tf,tw,bh-tf*2);
+  ctx.strokeRect(bx,by+bh-tf,bw,tf);
+  ctx.strokeStyle='rgba(184,200,216,0.4)'; ctx.lineWidth=0.8;
+  [[bx+bw*.2,by+tf/2],[bx+bw*.8,by+tf/2],[bx+bw*.2,by+bh-tf/2],[bx+bw*.8,by+bh-tf/2]].forEach(([x,y])=>{
+    ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2); ctx.stroke();
+  });
+  ctx.fillStyle='rgba(184,200,216,0.45)'; ctx.font='8px monospace'; ctx.fillText('W8x31',W*.35,H*.88);
+});
+
+// ── KID preview ───────────────────────────────────────────────────────────────
+initPreview('kid-preview', (ctx, W, H) => {
+  ctx.fillStyle='#f4f6fb'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=16){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=16){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const draws=[
+    {c:'#00d4ff',lw:2.5,d:null,pts:[[.15,.3],[.85,.3]]},
+    {c:'#ff4444',lw:2,d:[6,4],pts:[[.15,.5],[.85,.5]]},
+    {c:'#ffdd00',lw:1.5,d:[10,4,2,4],pts:[[.15,.65],[.85,.65]]},
+    {c:'#39ff14',lw:1.8,d:null,pts:[[.3,.2],[.3,.8],[.7,.8],[.7,.2]]},
+  ];
+  draws.forEach(({c:col,lw,d,pts})=>{
+    ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.setLineDash(d||[]);
+    ctx.beginPath(); ctx.moveTo(pts[0][0]*W,pts[0][1]*H);
+    pts.slice(1).forEach(p=>ctx.lineTo(p[0]*W,p[1]*H)); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  ctx.fillStyle='#ff8800'; ctx.beginPath(); ctx.arc(W*.5,H*.5,5,0,Math.PI*2); ctx.fill();
+});
+
+
+
 // ── LICENSE MODAL ─────────────────────────────────────────────────────────────
 
 
@@ -3708,6 +3969,16 @@ document.addEventListener('keydown', function(e) {
 
 <!-- SIDEBAR -->
 <div id="sidebar">
+  <!-- ── LAYERS ────────────────────────────────────────────────────── -->
+  <div id="layer-panel">
+    <div class="section-head" style="display:flex;align-items:center;justify-content:space-between;padding-right:8px;">
+      <span>LAYERS</span>
+      <span id="active-layer-indicator" style="color:var(--accent);font-size:8px;">SOLID</span>
+    </div>
+    <div id="layer-list"></div>
+    <button class="layer-add-btn" onclick="addCustomLayer()">+ New Layer</button>
+  </div>
+
   <div class="section-head">Draw Tools</div>
   <div class="tool-grid">
     <button class="tool-btn active" id="btn-select" onclick="setTool('select')">
@@ -3758,9 +4029,9 @@ document.addEventListener('keydown', function(e) {
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="2 2"/><polyline points="3,7 9,12 3,17"/><polyline points="21,7 15,12 21,17"/></svg></div>
       <span class="tool-label">MIRROR</span>
     </button>
-    <button class="tool-btn" id="btn-measure" onclick="setTool('measure')">
-      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="9" x2="4" y2="15"/><line x1="20" y1="9" x2="20" y2="15"/><line x1="12" y1="10" x2="12" y2="14"/></svg></div>
-      <span class="tool-label">MEASURE</span>
+    <button class="tool-btn" id="btn-dim" onclick="setTool('dim')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="17" x2="21" y2="17"/><line x1="3" y1="14" x2="3" y2="20"/><line x1="21" y1="14" x2="21" y2="20"/><line x1="8" y1="12" x2="8" y2="17"/><line x1="16" y1="12" x2="16" y2="17"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="10" y1="9" x2="8" y2="7"/><line x1="14" y1="5" x2="16" y2="7"/><line x1="14" y1="9" x2="16" y2="7"/></svg></div>
+      <span class="tool-label">DIM</span>
     </button>
     <button class="tool-btn" id="btn-trim" onclick="setTool('trim')">
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="12" x2="20" y2="12"/><line x1="12" y1="4" x2="12" y2="10"/><line x1="12" y1="14" x2="12" y2="20" stroke-dasharray="2 2" opacity="0.4"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></div>
@@ -4100,10 +4371,11 @@ document.addEventListener('keydown', function(e) {
 <!-- ═══ KOMMAND LINE ════════════════════════════════════════════════════════ -->
 <div id="kommand-bar">
   <div id="kommand-context">SELECT</div>
-  <div id="kommand-echo">Type a command or coordinate</div>
+  <div id="kommand-label" style="flex-shrink:0;padding:0 8px;font-family:var(--fm);font-size:9px;font-weight:700;color:var(--accent);letter-spacing:0.14em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;">KOMMAND</div>
+  <div id="kommand-echo">ready</div>
   <div id="kommand-prefix">≫</div>
   <input id="kommand-input" type="text" spellcheck="false" autocomplete="off"
-    placeholder="X,Y  @dX,dY  @D&lt;A°  or command…"
+    placeholder="K → type: L line · 10,25 · @50,0 · @100&lt;45° · COPY · PASTE"
     tabindex="1"/>
   <div id="kommand-hint">
     <b>X,Y</b> abs &nbsp;·&nbsp;
@@ -4136,7 +4408,7 @@ document.addEventListener('keydown', function(e) {
     <div class="sb-item"><span class="sb-val ok">.KAD v0.0</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
-      <span>© <span id="cc-year"></span> KADsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener" class="cc-link">Source on GitHub</a> · withshalom</span>
+      <span>© <span id="cc-year"></span> KERFsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener" class="cc-link">Source on GitHub</a> · withshalom</span>
     </div>
   </div>
 </div>
@@ -4243,38 +4515,7 @@ document.addEventListener('keydown', function(e) {
 </div>
 
 <!-- STARTUP UNIT SPLASH -->
-<div id="splash-overlay" onclick="event.stopPropagation()">
-  <div id="splash-dialog">
-    <div class="dlg-head">
-      <div class="splash-brand"><div class="splash-brand-dot"></div>.KAD</div>
-      <div class="splash-sub">Kernel-Aided Design · v0.0</div>
-    </div>
-    <div class="dlg-body">
-      <div class="splash-prompt">
-        <strong>Choose your working units.</strong><br>
-        All coordinates, inputs, and dimensions will use this unit.<br>
-        You can switch at any time with the <span style="color:var(--accent)">mm·in</span> toggle in the toolbar.
-      </div>
-      <div class="splash-unit-grid">
-        <button class="splash-unit-btn mm-btn" onclick="splashSelectUnit('mm')">
-          <span class="sub-unit">mm</span>
-          <span class="sub-name">Millimeters</span>
-          <span class="sub-example">ISO · Metric · International</span>
-        </button>
-        <button class="splash-unit-btn in-btn" onclick="splashSelectUnit('in')">
-          <span class="sub-unit">in</span>
-          <span class="sub-name">Inches</span>
-          <span class="sub-example">Imperial · US Customary</span>
-        </button>
-      </div>
-      <div class="splash-note">
-        This preference is saved locally and won't appear again.<br>
-        AGPL-3.0 · Open source · withshalom<br>
-        © <span id="splash-year"></span> KADsuite™ · .KAD Kernel-Aided Design
-      </div>
-    </div>
-  </div>
-</div>
+<!-- splash removed in KADsuite — units default to inches -->
 
 <!-- OFFSET DISTANCE POPUP -->
 <div id="offset-popup-overlay">
@@ -4447,10 +4688,11 @@ function splashSelectUnit(unit) {
 }
 
 function initSplash() {
-  // KADsuite — no unit splash, default inches
-  document.getElementById('splash-overlay').style.display = 'none';
-  canvas.style.pointerEvents = 'auto';
-  if (unitMode !== 'in') splashSelectUnit('in');
+  // KADsuite — no unit splash, default inches for plasma workflow
+  unitMode = 'in';
+  document.getElementById('unit-seg-in').classList.add('active');
+  document.getElementById('unit-seg-mm').classList.remove('active');
+  updateGridLabel();
 }
 
 function toggleUnits() {
@@ -4993,7 +5235,7 @@ function commitLineChain(closed) {
   }
   if(lineChain.length === 2 && !closed) {
     // Two points = one line segment — store as LINE for simplicity
-    GeoMemory.addLine(lineChain[0].x, lineChain[0].y, lineChain[1].x, lineChain[1].y);
+    GeoMemory.addLine(lineChain[0].x, lineChain[0].y, lineChain[1].x, lineChain[1].y, activeLayer||'Layer_0');
     showToast('Line segment committed');
   } else {
     GeoMemory.addPolyline([...lineChain], closed);
@@ -5477,6 +5719,7 @@ function drawRotatePreview() {
 // ── TOOL MANAGEMENT ─────────────────────────────────────
 function cancelTool() {
   lineState   = {active:false};
+  if(typeof dimState!=='undefined') dimState={active:false,p1:null};
   lineChain   = [];
   rectState   = {active:false};
   polyState   = {active:false};
@@ -5507,7 +5750,7 @@ function setTool(tool) {
   activeTool = tool;
 
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',chamfer:'btn-chamfer',mirror:'btn-mirror',measure:'btn-measure',trim:'btn-trim',extend:'btn-extend',break:'btn-break',scale:'btn-scale',stretch:'btn-stretch',text:'btn-text'};
+  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',chamfer:'btn-chamfer',mirror:'btn-mirror',dim:'btn-dim',trim:'btn-trim',extend:'btn-extend',break:'btn-break',scale:'btn-scale',stretch:'btn-stretch',text:'btn-text'};
   if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
 
   document.getElementById('sb-mode').textContent=tool.toUpperCase();
@@ -5519,6 +5762,7 @@ function setTool(tool) {
   document.getElementById('mirror-bar').style.display  = tool==='mirror'?'flex':'none';
   document.getElementById('measure-bar').style.display = tool==='measure'?'flex':'none';
   if (tool !== 'measure') { measureState = {active:false,p1:null}; }
+  if (tool !== 'dim' && typeof dimState !== 'undefined') { dimState = {active:false,p1:null}; }
   // Rotate bar — show when rotate tool OR when something is selected
   const rotateBar = document.getElementById('rotate-bar');
   if (tool === 'rotate') rotateBar.classList.add('visible');
@@ -5849,6 +6093,16 @@ function onMouseDown(e) {
     if(activeTool==='text')    { placeTextAt(wp.x,wp.y); return; }
     if(activeTool==='stretch'&&stretchState.endpt){ stretchState.active=true; return; }
     if(activeTool==='scale'||activeTool==='array'){ return; } // handled by dialog
+    if(activeTool==='dim') {
+      if(!dimState.active) {
+        dimState = {active:true, p1:{x:wp.x,y:wp.y}};
+        kecho('DIM: click second point', 'dim');
+      } else {
+        drawDimension(dimState.p1, wp, true);
+        dimState = {active:false, p1:wp}; // chain dims from last point
+      }
+      return;
+    }
     if(activeTool==='fillet') {
       const hit=pickLine(mouseScreen.x,mouseScreen.y);
       if(!hit){showToast('Click closer to a line');return;}
@@ -6129,7 +6383,7 @@ function onKeyDown(e) {
     if(k==='o'||k==='O') setTool('offset');
     if(k==='t'||k==='T') setTool('rotate');
     if(k==='m'||k==='M') setTool('mirror');
-    if(k==='d'||k==='D') setTool('measure');
+    if(k==='d'||k==='D') setTool('dim');
     if(k==='j'||k==='J') joinSelected();
     if(k==='x'||k==='X') explodeSelected();
     if(k==='q'||k==='Q') setTool('trim');      // Q = quick trim
@@ -6146,11 +6400,16 @@ function onKeyDown(e) {
     if(k==='u'||k==='U') toggleUnits();
     if(k==='?')          showCoordHelp();
   }
-  if(e.ctrlKey){
+  if(e.ctrlKey||e.metaKey){
     if(k==='s'){ e.preventDefault(); saveKAD(); }
     if(k==='n'){ e.preventDefault(); newDocument(); }
     if(k==='e' && e.shiftKey){ e.preventDefault(); exportSCAD(); }
     else if(k==='e'){ e.preventDefault(); exportDXF(); }
+    if(k==='c'){ e.preventDefault(); copySelected(); }
+    if(k==='v'){ e.preventDefault(); pasteSelected(); }
+    if(k==='d'){ e.preventDefault(); copySelected(); _pasteCount=0; pasteSelected(); }
+    if(k==='z'){ e.preventDefault(); if(typeof undo==='function') undo(); }
+    if(k==='y'){ e.preventDefault(); if(typeof redo==='function') redo(); }
   }
 }
 
@@ -6537,6 +6796,185 @@ function drawNewToolPreviews(){
 }
 
 
+
+// ── LAYER SYSTEM ─────────────────────────────────────────────────────────────
+// Linetype definitions
+const LINETYPES = {
+  continuous: { dash: [],           label: '—————' },
+  dashed:     { dash: [8,4],        label: '- - - -' },
+  center:     { dash: [16,4,4,4],   label: '—·—·—' },
+  phantom:    { dash: [16,4,4,4,4,4], label: '——·——' },
+};
+
+// Default 4 layers + custom
+const LAYERS = {
+  'SOLID':  { name:'SOLID',  color:'#00d4ff', ltype:'continuous', weight:1.4, visible:true, locked:false },
+  'HIDDEN': { name:'HIDDEN', color:'#ff4444', ltype:'dashed',     weight:1.0, visible:true, locked:false },
+  'CENTER': { name:'CENTER', color:'#ffdd00', ltype:'center',     weight:0.8, visible:true, locked:false },
+  'LEADER': { name:'LEADER', color:'#39ff14', ltype:'continuous', weight:0.7, visible:true, locked:false },
+  'DIM':    { name:'DIM',    color:'#39ff14', ltype:'continuous', weight:0.7, visible:true, locked:false },
+  'Layer_0':{ name:'Layer_0',color:'#00d4ff', ltype:'continuous', weight:1.2, visible:true, locked:false },
+};
+let activeLayer = 'SOLID'; // default active layer
+
+function getLayer(name) {
+  return LAYERS[name] || LAYERS['Layer_0'];
+}
+
+function setActiveLayer(name) {
+  if (!LAYERS[name]) return;
+  activeLayer = name;
+  // Update layer UI
+  document.querySelectorAll('.layer-row').forEach(el => {
+    el.classList.toggle('active', el.dataset.layer === name);
+  });
+  const indicator = document.getElementById('active-layer-indicator');
+  const lay = getLayer(name);
+  if (indicator) {
+    indicator.textContent = lay.name;
+    indicator.style.color = lay.color;
+  }
+  showToast('Layer: ' + lay.name);
+}
+
+function addCustomLayer() {
+  const name = prompt('Layer name:');
+  if (!name || !name.trim()) return;
+  const key = name.trim().toUpperCase();
+  if (LAYERS[key]) { showToast('Layer already exists'); return; }
+  LAYERS[key] = { name:key, color:'#ffffff', ltype:'continuous', weight:1.0, visible:true, locked:false };
+  buildLayerPanel();
+  setActiveLayer(key);
+}
+
+function toggleLayerVisibility(name) {
+  if (!LAYERS[name]) return;
+  LAYERS[name].visible = !LAYERS[name].visible;
+  render();
+  buildLayerPanel();
+}
+
+function applyLayerStyle(layerName) {
+  const lay = getLayer(layerName);
+  if (!lay.visible) { ctx.globalAlpha = 0; return false; }
+  ctx.globalAlpha  = 1;
+  ctx.strokeStyle  = lay.color;
+  ctx.fillStyle    = lay.color;
+  ctx.lineWidth    = lay.weight;
+  const lt = LINETYPES[lay.ltype] || LINETYPES.continuous;
+  ctx.setLineDash(lt.dash.map(d => d * cam.zoom * 0.3));
+  return true;
+}
+
+function buildLayerPanel() {
+  const panel = document.getElementById('layer-list');
+  if (!panel) return;
+  panel.innerHTML = '';
+  for (const [key, lay] of Object.entries(LAYERS)) {
+    const row = document.createElement('div');
+    row.className = 'layer-row' + (key === activeLayer ? ' active' : '');
+    row.dataset.layer = key;
+    row.innerHTML =
+      '<span class="layer-vis" onclick="toggleLayerVisibility(\''+key+'\');event.stopPropagation()" title="Toggle visibility">'
+        + (lay.visible ? '👁' : '○') + '</span>'
+      + '<span class="layer-swatch" style="background:'+lay.color+';"></span>'
+      + '<span class="layer-name">' + lay.name + '</span>'
+      + '<span class="layer-ltype">' + (LINETYPES[lay.ltype]?.label || '—') + '</span>';
+    row.onclick = () => setActiveLayer(key);
+    panel.appendChild(row);
+  }
+}
+
+
+// ── MODEL-SPACE DIMENSION TOOL ───────────────────────────────────────────────
+let dimState = { active:false, p1:null };
+
+function drawDimension(p1w, p2w, commit=false) {
+  // Draw a linear dimension between two world points
+  const lay  = (typeof LAYERS!=='undefined' && LAYERS['DIM']) || {color:'#39ff14',weight:0.7};
+  const col  = lay.color;
+  const dx = p2w.x - p1w.x, dy = p2w.y - p1w.y;
+  const dist = Math.hypot(dx, dy);
+  const label = unitMode==='in'
+    ? (dist/25.4).toFixed(3) + '"'
+    : dist.toFixed(2) + ' mm';
+  const ang     = Math.atan2(dy, dx);
+  const perpAng = ang + Math.PI/2;
+  const OFFSET  = 8; // mm offset from geometry
+  const offX    = Math.cos(perpAng)*OFFSET, offY = Math.sin(perpAng)*OFFSET;
+
+  const p1s = worldToScreen(p1w.x,p1w.y);
+  const p2s = worldToScreen(p2w.x,p2w.y);
+  const d1s = worldToScreen(p1w.x+offX, p1w.y+offY);
+  const d2s = worldToScreen(p2w.x+offX, p2w.y+offY);
+
+  ctx.save();
+  ctx.strokeStyle = col; ctx.fillStyle = col;
+  ctx.lineWidth   = lay.weight; ctx.setLineDash([]);
+
+  // Extension lines
+  const GAP = 3*cam.zoom, EXT = 5*cam.zoom;
+  const cos = Math.cos(perpAng), sin = Math.sin(perpAng);
+  ctx.beginPath();
+  ctx.moveTo(p1s.x+cos*GAP, p1s.y+sin*GAP); ctx.lineTo(d1s.x+cos*EXT, d1s.y+sin*EXT);
+  ctx.moveTo(p2s.x+cos*GAP, p2s.y+sin*GAP); ctx.lineTo(d2s.x+cos*EXT, d2s.y+sin*EXT);
+  ctx.stroke();
+
+  // Dimension line
+  ctx.beginPath(); ctx.moveTo(d1s.x,d1s.y); ctx.lineTo(d2s.x,d2s.y); ctx.stroke();
+
+  // Arrows
+  const AL = 8, AW = 3;
+  const adx = d2s.x-d1s.x, ady = d2s.y-d1s.y, alen = Math.hypot(adx,ady);
+  if(alen > 1) {
+    const ux = adx/alen, uy = ady/alen;
+    [[d1s.x,d1s.y,1],[d2s.x,d2s.y,-1]].forEach(([ax,ay,dir])=>{
+      ctx.beginPath();
+      ctx.moveTo(ax,ay);
+      ctx.lineTo(ax+dir*ux*AL - uy*AW, ay+dir*uy*AL + ux*AW);
+      ctx.lineTo(ax+dir*ux*AL + uy*AW, ay+dir*uy*AL - ux*AW);
+      ctx.closePath(); ctx.fill();
+    });
+  }
+
+  // Label
+  const mx = (d1s.x+d2s.x)/2, my = (d1s.y+d2s.y)/2;
+  const fontSize = Math.max(10, 3.5*cam.zoom);
+  ctx.font = `${fontSize}px Fira Code,monospace`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const textAng = Math.atan2(d2s.y-d1s.y, d2s.x-d1s.x);
+  ctx.save();
+  ctx.translate(mx,my);
+  // Keep text right-side up
+  let rot = textAng;
+  if(rot > Math.PI/2 || rot < -Math.PI/2) rot += Math.PI;
+  ctx.rotate(rot);
+  ctx.fillStyle = C.bg; ctx.fillRect(-ctx.measureText(label).width/2-2, -fontSize/2-1, ctx.measureText(label).width+4, fontSize+2);
+  ctx.fillStyle = col; ctx.fillText(label, 0, 0);
+  ctx.restore();
+  ctx.restore();
+
+  if(commit) {
+    // Store as a DIM entity in GeoMemory
+    GeoMemory.objects.push({
+      id: GeoMemory.nextId++, type:'DIM',
+      x1:p1w.x,y1:p1w.y, x2:p2w.x,y2:p2w.y,
+      layer:'DIM', label
+    });
+    updateProps(); render();
+  }
+}
+
+function drawDimPreview() {
+  if(activeTool!=='dim' || !dimState.p1) return;
+  drawDimension(dimState.p1, mouseWorld, false);
+  // Draw crosshair at first point
+  const sp = worldToScreen(dimState.p1.x, dimState.p1.y);
+  ctx.save(); ctx.strokeStyle='#39ff14'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.arc(sp.x,sp.y,5,0,Math.PI*2); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+}
+
 function render() {
   const W=canvas.width, H=canvas.height;
   ctx.clearRect(0,0,W,H);
@@ -6584,22 +7022,31 @@ function drawGrid(W,H) {
 function drawEntities() {
   ctx.save();
   for(const o of GeoMemory.objects){
-    const sel=selectedIds.has(o.id);
+    const sel = selectedIds.has(o.id);
+    // Layer visibility
+    const _lay = (typeof LAYERS !== 'undefined') && LAYERS[o.layer];
+    if(_lay && !_lay.visible && !sel) continue;
+    // Layer style
+    const _col = sel ? C.entitySel : (_lay ? _lay.color : C.entity);
+    const _lw  = sel ? 2.5 : (_lay ? _lay.weight : 1.4);
+    const _lt  = (!sel && _lay && typeof LINETYPES !== 'undefined')
+                   ? LINETYPES[_lay.ltype] || LINETYPES.continuous
+                   : LINETYPES && LINETYPES.continuous || {dash:[]};
+    ctx.setLineDash(_lt.dash.map(d => d * cam.zoom * 0.3));
     if(o.type==='LINE'){
       const a=worldToScreen(o.x1,o.y1), b=worldToScreen(o.x2,o.y2);
       if(sel){ ctx.shadowColor='rgba(255,170,0,0.5)'; ctx.shadowBlur=8; }
-      ctx.strokeStyle=sel?C.entitySel:C.entity;
-      ctx.lineWidth=sel?2:1.2;
+      ctx.strokeStyle=_col;
+      ctx.lineWidth=_lw;
       ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
       ctx.shadowBlur=0;
-      drawDot(a.x,a.y,sel?C.entitySel:C.entity);
-      drawDot(b.x,b.y,sel?C.entitySel:C.entity);
+      drawDot(a.x,a.y,_col);
+      drawDot(b.x,b.y,_col);
 
     } else if(o.type==='POLYLINE'){
       if(o.pts.length < 2) continue;
       if(sel){ ctx.shadowColor='rgba(255,170,0,0.5)'; ctx.shadowBlur=10; }
-      ctx.strokeStyle=sel?C.entitySel:C.entity;
-      ctx.lineWidth=sel?2:1.2;
+      ctx.strokeStyle=_col; ctx.lineWidth=_lw;
       ctx.beginPath();
       const p0=worldToScreen(o.pts[0].x, o.pts[0].y);
       ctx.moveTo(p0.x, p0.y);
@@ -6614,9 +7061,11 @@ function drawEntities() {
       for(let i=0;i<o.pts.length;i++){
         const p=worldToScreen(o.pts[i].x,o.pts[i].y);
         const isEndpoint = !o.closed && (i===0 || i===o.pts.length-1);
-        drawDot(p.x,p.y,sel?C.entitySel:C.entity, isEndpoint?2.5:1.5);
+        drawDot(p.x,p.y,_col, isEndpoint?2.5:1.5);
       }
 
+    } else if(o.type==='DIM'){
+      drawDimension({x:o.x1,y:o.y1},{x:o.x2,y:o.y2},false);
     } else if(o.type==='TEXT'){
       const sp=worldToScreen(o.x,o.y);
       const px=Math.max(8,o.height*cam.zoom);
@@ -7448,23 +7897,20 @@ function showToast(msg) {
 
 // ── INIT ────────────────────────────────────────────────
 
-// ── Drafting mode ──────────────────────────────────────────────────────────
+// ── KADsuite drafting mode ───────────────────────────────────────────────────
 function openDraftingMode() {
   document.body.classList.add('drafting-mode');
-  setTimeout(() => {
-    const cv = document.getElementById('main-canvas');
-    if (cv) { resizeCanvas(); render(); cv.focus(); }
-  }, 50);
+  setTimeout(() => { resizeCanvas(); render(); }, 50);
 }
 function closeDraftingMode() {
   document.body.classList.remove('drafting-mode');
 }
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && document.body.classList.contains('drafting-mode')) {
+// Escape key closes drafting mode
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === 'Escape' && document.body.classList.contains('drafting-mode')) {
     closeDraftingMode();
   }
 });
-
 requestAnimationFrame(()=>{
   requestAnimationFrame(()=>{
     _patchSetTool();
@@ -7544,40 +7990,37 @@ function drawChamferPreview() {
   ctx.restore();
 }
 
-// ── COPY / DUPLICATE ──────────────────────────────────────────────────────────
-let copyOffset = {x:10, y:-10}; // default offset in mm
+// ── CLIPBOARD ────────────────────────────────────────────────────────────────
+let _clipboard  = [];
+let _pasteCount = 0;
+const PASTE_STEP = 10;
 
 function copySelected() {
-  const ids = [...selectedIds];
-  if (!ids.length) { showToast('Select objects first'); return; }
-  const copies = [];
-  for (const id of ids) {
-    const o = GeoMemory.objects.find(x=>x.id===id);
-    if (!o) continue;
-    if (o.type==='LINE') {
-      copies.push({type:'LINE',x1:o.x1+copyOffset.x,y1:o.y1+copyOffset.y,
-                                x2:o.x2+copyOffset.x,y2:o.y2+copyOffset.y});
-    } else if (o.type==='CIRCLE') {
-      copies.push({type:'CIRCLE',cx:o.cx+copyOffset.x,cy:o.cy+copyOffset.y,r:o.r});
-    } else if (o.type==='ARC') {
-      copies.push({type:'ARC',cx:o.cx+copyOffset.x,cy:o.cy+copyOffset.y,
-                   r:o.r,startAngle:o.startAngle,endAngle:o.endAngle,ccw:o.ccw});
-    } else if (o.type==='POLYLINE') {
-      copies.push({type:'POLYLINE',pts:o.pts.map(p=>({x:p.x+copyOffset.x,y:p.y+copyOffset.y})),
-                   closed:o.closed});
-    }
+  if (!selectedIds.size) { showToast('Select objects first'); return; }
+  _clipboard = []; _pasteCount = 0;
+  for (const id of selectedIds) {
+    const o = GeoMemory.objects.find(x => x.id === id);
+    if (o) _clipboard.push(JSON.parse(JSON.stringify(o)));
   }
-  for (const c of copies) {
-    if (c.type==='LINE') GeoMemory.addLine(c.x1,c.y1,c.x2,c.y2);
-    else if (c.type==='CIRCLE') GeoMemory.addCircle(c.cx,c.cy,c.r);
-    else if (c.type==='ARC') GeoMemory.addArc(c.cx,c.cy,c.r,c.startAngle,c.endAngle,c.ccw);
-    else if (c.type==='POLYLINE') {
-      const id = GeoMemory.nextId++;
-      GeoMemory.objects.push({...c, id});
-    }
+  showToast('Copied ' + _clipboard.length + ' object' + (_clipboard.length!==1?'s':'') + ' · Ctrl+V to paste');
+}
+
+function pasteSelected() {
+  if (!_clipboard.length) { showToast('Nothing to paste · Ctrl+C first'); return; }
+  _pasteCount++;
+  const dx = PASTE_STEP * _pasteCount, dy = -PASTE_STEP * _pasteCount;
+  selectedIds.clear();
+  for (const o of _clipboard) {
+    let n; const lay = o.layer || 'Layer_0';
+    if      (o.type==='LINE')     n = GeoMemory.addLine(o.x1+dx,o.y1+dy,o.x2+dx,o.y2+dy,lay);
+    else if (o.type==='CIRCLE')   n = GeoMemory.addCircle(o.cx+dx,o.cy+dy,o.r,lay);
+    else if (o.type==='ARC')      n = GeoMemory.addArc(o.cx+dx,o.cy+dy,o.r,o.startA,o.endA,o.ccw,lay);
+    else if (o.type==='POLYLINE') n = GeoMemory.addPolyline(o.pts.map(p=>({x:p.x+dx,y:p.y+dy})),o.closed,lay);
+    else if (o.type==='TEXT')     n = GeoMemory.addText(o.x+dx,o.y+dy,o.text,o.height,lay);
+    if (n) selectedIds.add(n.id);
   }
-  render();
-  showToast(`Copied ${copies.length} object${copies.length>1?'s':''}`);
+  updateProps(); render();
+  showToast('Pasted ' + _clipboard.length + ' object' + (_clipboard.length!==1?'s':''));
 }
 
 
@@ -8486,7 +8929,8 @@ const KOMMANDS = {
   'OFFSET':  () => setTool('offset'),
   'M':       () => setTool('mirror'),
   'MIRROR':  () => setTool('mirror'),
-  'D':       () => setTool('measure'),
+  'D':       () => setTool('dim'),
+  'DIM':     () => setTool('dim'),
   'MEASURE': () => setTool('measure'),
   'TR':      () => setTool('trim'),
   'TRIM':    () => setTool('trim'),
@@ -8513,6 +8957,10 @@ const KOMMANDS = {
   'S':       () => { toggleSnap();  kecho('Snap toggled'); },
   'U':       () => { toggleUnits(); kecho('Units: ' + unitMode); },
   'UNDO':    () => { if(typeof undo==='function') undo(); else { GeoMemory.objects.pop && GeoMemory.objects.pop(); render(); } kecho('Undo'); },
+  'COPY':    () => copySelected(),
+  'CP':      () => copySelected(),
+  'PASTE':   () => pasteSelected(),
+  'PA':      () => pasteSelected(),
   'REDO':    () => { if(typeof redo==='function') redo(); kecho('Redo'); },
   'CLEAR':   () => { if(confirm('Clear all?')){ GeoMemory.clear(); render(); kecho('Cleared'); } },
   'NEW':     () => { if(confirm('New document?')){ GeoMemory.clear(); render(); kecho('New document'); } },
@@ -8647,16 +9095,33 @@ canvas.addEventListener('mousedown', () => {
   if (document.activeElement === kInput) kInput.blur();
 });
 
-// K key focuses KOMMAND line
+// KOMMAND focus — K key, OR any coord-start character while a draw tool is active
+const DRAW_TOOLS = new Set(['line','rect','polygon','offset','rotate','circle','arc',
+                             'fillet','chamfer','mirror','trim','extend','break',
+                             'scale','stretch','text','dim']);
 document.addEventListener('keydown', function(ev) {
-  if ((ev.key==='k'||ev.key==='K') && !ev.ctrlKey && !ev.metaKey &&
-      document.activeElement !== kInput &&
-      !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
+  if(document.activeElement === kInput) return;
+  if(ev.ctrlKey || ev.metaKey || ev.altKey) return;
+
+  // K always focuses KOMMAND
+  if(ev.key==='k'||ev.key==='K') {
     ev.preventDefault();
-    kInput.focus();
-    kInput.select();
+    kInput.focus(); kInput.select();
     if(kContext) kContext.style.color='var(--accent)';
     return;
+  }
+
+  // Auto-focus KOMMAND when typing coord chars while a draw tool is active
+  const isCoordChar = /^[@0-9\.\-]$/.test(ev.key);
+  if(isCoordChar && DRAW_TOOLS.has(activeTool)) {
+    ev.preventDefault();
+    kInput.focus();
+    kInput.value = ev.key === '.' ? '0.' : ev.key; // seed with typed char
+    kInput.setSelectionRange(kInput.value.length, kInput.value.length);
+    if(kContext) kContext.style.color='var(--accent)';
+    // Trigger prefix update
+    kInput.dispatchEvent(new Event('input'));
   }
 });
 
@@ -8683,33 +9148,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Theme toggle ─────────────────────────────────────────────────────────────
 let _lightMode = false;
-function toggleTheme() {
-  _lightMode = !_lightMode;
+
+function _applyTheme(light) {
+  _lightMode = light;
   document.body.classList.toggle('light-mode', _lightMode);
-  // Swap icon
-  document.getElementById('theme-icon-dark').style.display  = _lightMode ? 'none' : '';
-  document.getElementById('theme-icon-light').style.display = _lightMode ? ''     : 'none';
-  const lbl = document.getElementById('theme-label');
-  if(lbl) lbl.textContent = _lightMode ? 'LIGHT' : 'DARK';
-  // Persist preference
-  try { localStorage.setItem('kad-theme', _lightMode ? 'light' : 'dark'); } catch(e) {}
-  // Redraw canvas background
-  if (typeof render === 'function') render();
+  const di = document.getElementById('theme-icon-dark');
+  const li = document.getElementById('theme-icon-light');
+  const lb = document.getElementById('theme-label');
+  if(di) di.style.display = _lightMode ? 'none' : '';
+  if(li) li.style.display = _lightMode ? ''     : 'none';
+  if(lb) lb.textContent   = _lightMode ? 'LIGHT' : 'DARK';
+  if(typeof render === 'function') render();
 }
-// Restore preference on load
+
+function toggleTheme() {
+  // User explicitly chose — save preference and override OS setting
+  const next = !_lightMode;
+  try { localStorage.setItem('kad-theme', next ? 'light' : 'dark'); } catch(e) {}
+  _applyTheme(next);
+}
+
+// Init: prefer saved user choice, fall back to OS/device setting
 (function() {
-  try {
-    if (localStorage.getItem('kad-theme') === 'light') {
-      _lightMode = true;
-      document.body.classList.add('light-mode');
-      const di = document.getElementById('theme-icon-dark');
-      const li = document.getElementById('theme-icon-light');
-      const lb = document.getElementById('theme-label');
-      if (di) di.style.display = 'none';
-      if (li) li.style.display = '';
-      if (lb) lb.textContent = 'LIGHT';
-    }
-  } catch(e) {}
+  let saved = null;
+  try { saved = localStorage.getItem('kad-theme'); } catch(e) {}
+
+  if(saved === 'light') {
+    _applyTheme(true);
+  } else if(saved === 'dark') {
+    _applyTheme(false);
+  } else {
+    // No saved preference — follow OS/device prefers-color-scheme
+    const prefersDark = window.matchMedia &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches;
+    _applyTheme(!prefersDark); // OS dark → our dark mode (light-mode class OFF)
+  }
+
+  // Live-update if OS theme changes while app is open (no saved preference)
+  if(window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      let pref = null;
+      try { pref = localStorage.getItem('kad-theme'); } catch(ex) {}
+      if(!pref) _applyTheme(!e.matches); // only follow OS if user hasn't overridden
+    });
+  }
 })();
 
 </script>
