@@ -103,7 +103,7 @@ body.light-mode #main-canvas { background: #f8fbff; }
 html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; background:var(--void); color:var(--t1); font-family:var(--fd); font-size:13px; }
 
 /* ── LAYOUT ── */
-#app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr 28px var(--status-h); width:100vw; height:100vh; overflow:hidden; transition:opacity 0.3s; }
+#app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr 28px var(--status-h); width:100vw; height:100vh; overflow:hidden; }
 
 /* ── TOPBAR ── */
 #topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
@@ -370,17 +370,30 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
   background: var(--panel2);
   border: 1px solid var(--border-hi);
   border-radius: 4px;
-  color: var(--t2);
-  width: 28px; height: 24px;
+  color: var(--t1);
+  height: 28px;
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 10px 0 8px;
   transition: all 0.15s;
-  font-size: 13px;
-  padding: 0;
+  font-family: var(--fm);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 #theme-toggle:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+#theme-toggle .t-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+#theme-toggle .t-label {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 #unit-toggle {
   font-family: var(--fm);
@@ -2560,18 +2573,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
   filter: drop-shadow(0 0 3px var(--accent));
 }
 
-#theme-toggle {
-  background: var(--panel2);
-  border: 1px solid var(--border-hi);
-  border-radius: 4px;
-  color: var(--t2);
-  width: 28px; height: 24px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
-  font-size: 13px;
-  padding: 0;
-}
+
 
 .tool-icon svg {
   stroke: #007a99;
@@ -3678,8 +3680,9 @@ document.addEventListener('keydown', function(e) {
   <div class="tb-right">
     <span class="tb-badge">v0.0</span>
 <button id="theme-toggle" onclick="toggleTheme()" title="Toggle dark / light mode">
-      <span id="theme-icon-dark" style="font-size:13px;">☾</span>
-      <span id="theme-icon-light" style="font-size:13px;display:none;">☀</span>
+      <span class="t-icon" id="theme-icon-dark">☾</span>
+      <span class="t-icon" id="theme-icon-light" style="display:none;">☀</span>
+      <span class="t-label" id="theme-label">DARK</span>
     </button>
         <button id="unit-toggle" onclick="toggleUnits()" title="Toggle mm / inches (U)">
       <span class="unit-seg active" id="unit-seg-mm">mm</span>
@@ -8684,8 +8687,10 @@ function toggleTheme() {
   _lightMode = !_lightMode;
   document.body.classList.toggle('light-mode', _lightMode);
   // Swap icon
-  document.getElementById('theme-icon-dark').style.display  = _lightMode ? 'none'   : '';
-  document.getElementById('theme-icon-light').style.display = _lightMode ? '' : 'none';
+  document.getElementById('theme-icon-dark').style.display  = _lightMode ? 'none' : '';
+  document.getElementById('theme-icon-light').style.display = _lightMode ? ''     : 'none';
+  const lbl = document.getElementById('theme-label');
+  if(lbl) lbl.textContent = _lightMode ? 'LIGHT' : 'DARK';
   // Persist preference
   try { localStorage.setItem('kad-theme', _lightMode ? 'light' : 'dark'); } catch(e) {}
   // Redraw canvas background
@@ -8699,8 +8704,10 @@ function toggleTheme() {
       document.body.classList.add('light-mode');
       const di = document.getElementById('theme-icon-dark');
       const li = document.getElementById('theme-icon-light');
+      const lb = document.getElementById('theme-label');
       if (di) di.style.display = 'none';
       if (li) li.style.display = '';
+      if (lb) lb.textContent = 'LIGHT';
     }
   } catch(e) {}
 })();
