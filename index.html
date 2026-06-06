@@ -103,7 +103,7 @@ body.light-mode #main-canvas { background: #f8fbff; }
 html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; background:var(--void); color:var(--t1); font-family:var(--fd); font-size:13px; }
 
 /* ── LAYOUT ── */
-#app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr 28px var(--status-h); width:100vw; height:100vh; overflow:hidden; }
+#app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr 28px var(--status-h); width:100vw; height:100vh; overflow:hidden; background:var(--void); }
 
 /* ── TOPBAR ── */
 #topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
@@ -887,7 +887,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 #unit-seg-in.active { background: #ffaa00; color: #060e08; font-weight:700; }
 
 
-#suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; transition:opacity 0.35s; background:rgba(6,10,16,0.92); }
+#suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; background:rgba(6,10,16,0.92); }
 #kad-escape-bar { position:fixed; top:0; left:0; right:0; z-index:999; height:36px; display:none; align-items:center; justify-content:space-between; padding:0 16px; background:rgba(4,6,10,0.97); border-bottom:1px solid var(--accent); font-family:var(--fm); font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(12px); }
 body.drafting-mode #kad-escape-bar { display:flex; }
 body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
@@ -5074,24 +5074,25 @@ function commitDynInput() {
 
 function parseDynCoord(str) {
   str=str.trim();
-  const base = lineState.active ? {x:lineState.x1,y:lineState.y1} : {x:0,y:0};
-  // base is in mm; for relative/polar inputs, the delta is typed in display units
+  const relBase = lineState.active ? {x:lineState.x1,y:lineState.y1} : {x:0,y:0};
 
-  // @dist<angle  polar — dist is in display units
+  // @dist<angle  polar relative — from last point
   let m = str.match(/^@([+\-]?[\d.eE]+)<([+\-]?[\d.eE]+)$/);
   if(m){
     const d=fromDisplay(parseFloat(m[1])), a=parseFloat(m[2])*Math.PI/180;
     if(isNaN(d)||isNaN(a)) return null;
-    return { x:parseFloat((base.x+d*Math.cos(a)).toFixed(6)), y:parseFloat((base.y+d*Math.sin(a)).toFixed(6)) };
+    return { x:parseFloat((relBase.x+d*Math.cos(a)).toFixed(6)),
+             y:parseFloat((relBase.y+d*Math.sin(a)).toFixed(6)) };
   }
-  // @dx,dy  relative — deltas in display units
+  // @dx,dy  relative — from last point
   m = str.match(/^@([+\-]?[\d.eE]+)[, ]([+\-]?[\d.eE]+)$/);
   if(m){
     const dx=fromDisplay(parseFloat(m[1])), dy=fromDisplay(parseFloat(m[2]));
     if(isNaN(dx)||isNaN(dy)) return null;
-    return { x:parseFloat((base.x+dx).toFixed(6)), y:parseFloat((base.y+dy).toFixed(6)) };
+    return { x:parseFloat((relBase.x+dx).toFixed(6)),
+             y:parseFloat((relBase.y+dy).toFixed(6)) };
   }
-  // x,y  absolute — coordinates in display units
+  // x,y  absolute — always from world origin (0,0)
   m = str.match(/^([+\-]?[\d.eE]+)[, ]([+\-]?[\d.eE]+)$/);
   if(m){
     const x=fromDisplay(parseFloat(m[1])), y=fromDisplay(parseFloat(m[2]));
@@ -6110,9 +6111,29 @@ function onMouseDown(e) {
     if(activeTool==='fillet') {
       const hit=pickLine(mouseScreen.x,mouseScreen.y);
       if(!hit){showToast('Click closer to a line');return;}
-      if(!filletState.firstLine){filletState={active:true,firstLine:hit};showToast('First line selected — click second line');}
-      else{if(hit.id===filletState.firstLine.id){showToast('Click a different line');return;}commitFillet(filletState.firstLine,hit);filletState={active:false,firstLine:null};}
-      render();return;
+      if(!filletState.firstLine){
+        filletState={active:true,firstLine:hit};
+        showToast('Fillet: first line selected — click second line');
+      } else {
+        if(hit.id===filletState.firstLine.id){showToast('Click a different line');return;}
+        commitFillet(filletState.firstLine,hit);
+        filletState={active:false,firstLine:null};
+      }
+      render(); return;
+    }
+
+    if(activeTool==='chamfer') {
+      const hit=pickLine(mouseScreen.x,mouseScreen.y);
+      if(!hit){showToast('Click closer to a line');return;}
+      if(!chamferState.line1){
+        chamferState={active:true,line1:hit.id,line2:null};
+        showToast('Chamfer: first line selected — click second line');
+      } else {
+        if(hit.id===chamferState.line1){showToast('Click a different line');return;}
+        commitChamfer(chamferState.line1, hit.id);
+        chamferState={active:false,line1:null,line2:null};
+      }
+      render(); return;
     }
 
     if(activeTool==='rotate') {
@@ -6357,7 +6378,12 @@ function onKeyDown(e) {
   }
   if(k==='Enter'){
     if(activeTool==='line'&&lineState.active){
-      commitLineChain(false); // open polyline (or single line)
+      if(lineChain.length>=2){
+        commitLineChain(false);
+      } else {
+        cancelTool();
+      }
+      render(); return;
     }
     if(activeTool==='rect'&&rectState.active){
       const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
@@ -6444,7 +6470,14 @@ document.addEventListener('mousedown', e=>{
 function ctxCancelCommit() {
   closeCtxMenu();
   if(activeTool==='line'&&lineState.active){
-    lineState={active:false}; render(); return;
+    // Right-click "Commit Line" — commit whatever chain exists
+    if(lineChain.length>=2){
+      commitLineChain(false); // open polyline
+    } else {
+      lineState={active:false};
+      lineChain=[];
+    }
+    render(); return;
   }
   cancelTool(); render();
 }
@@ -7024,6 +7057,27 @@ function drawGrid(W,H) {
 }
 
 function drawEntities() {
+  (function drawOrigin() {
+    const o = worldToScreen(0, 0);
+    const sz = 8;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,212,255,0.35)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(o.x-sz,o.y); ctx.lineTo(o.x+sz,o.y);
+    ctx.moveTo(o.x,o.y-sz); ctx.lineTo(o.x,o.y+sz);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(o.x,o.y,3,0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,212,255,0.5)'; ctx.setLineDash([]);
+    ctx.stroke();
+    ctx.fillStyle='rgba(0,212,255,0.4)';
+    ctx.font='9px Fira Code,monospace';
+    ctx.fillText('0,0',o.x+6,o.y-5);
+    ctx.restore();
+  })();
+
   ctx.save();
   for(const o of GeoMemory.objects){
     const sel = selectedIds.has(o.id);
@@ -7903,17 +7957,36 @@ function showToast(msg) {
 
 // ── KADsuite drafting mode ───────────────────────────────────────────────────
 function openDraftingMode() {
+  // Hide suite immediately — no transition frame overlap
+  const ss = document.getElementById('suite-scroll');
+  if (ss) ss.style.visibility = 'hidden';
   document.body.classList.add('drafting-mode');
-  setTimeout(() => { resizeCanvas(); render(); }, 50);
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    render();
+  });
 }
 function closeDraftingMode() {
   document.body.classList.remove('drafting-mode');
+  const ss = document.getElementById('suite-scroll');
+  if (ss) ss.style.visibility = '';
 }
-// Escape key closes drafting mode
+// Escape key — only close drafting mode if no drawing is in progress
 document.addEventListener('keydown', function(ev) {
-  if (ev.key === 'Escape' && document.body.classList.contains('drafting-mode')) {
+  if (ev.key !== 'Escape') return;
+  if (!document.body.classList.contains('drafting-mode')) return;
+  // Let the drawing engine handle Escape first if a tool is active
+  const toolActive = (typeof activeTool !== 'undefined' && activeTool !== 'select');
+  const lineActive  = (typeof lineState  !== 'undefined' && lineState.active);
+  const polyActive  = (typeof polyState  !== 'undefined' && polyState && polyState.active);
+  const arcActive   = (typeof arcState   !== 'undefined' && arcState.active);
+  const rectActive  = (typeof rectState  !== 'undefined' && rectState.active);
+  const drawInProgress = lineActive || polyActive || arcActive || rectActive;
+  // Only exit to suite if no draw tool is mid-stroke and select tool is active
+  if (!drawInProgress && !toolActive) {
     closeDraftingMode();
   }
+  // Otherwise let KAD's own keydown handler cancel the current stroke
 });
 requestAnimationFrame(()=>{
   requestAnimationFrame(()=>{
