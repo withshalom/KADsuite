@@ -9128,7 +9128,7 @@ kInput.addEventListener('keydown', function(e) {
     if (!kPrefix) return;
     if (v.startsWith('@') && v.includes('<')) kPrefix.textContent = 'POL';
     else if (v.startsWith('@'))               kPrefix.textContent = 'REL';
-    else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'CMD';
+    else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'KMD';
     else if (v.match(/^[0-9+\-]/))           kPrefix.textContent = 'ABS';
     else                                      kPrefix.textContent = '≫';
   }, 0);
