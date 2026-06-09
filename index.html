@@ -7631,10 +7631,15 @@ function commitDxfImport() {
 }
 
 // ── DXF EXPORT ──────────────────────────────────────────
-function buildDXF(objects) {
-  const f=n=>n.toFixed(4), lines=[];
+function buildDXF(objects, units) {
+  // units: 'mm' (default) or 'in'
+  // $INSUNITS: 4 = mm, 1 = inches
+  const insunits = (units === 'in') ? '1' : '4';
+  const cvt = (mm) => (units === 'in') ? mm / MM_PER_IN : mm;
+  const f = n => cvt(n).toFixed(6);
+  const lines=[];
   // AC1014 = R14, minimum version that supports LWPOLYLINE
-  lines.push('0','SECTION','2','HEADER','9','$ACADVER','1','AC1014','9','$INSUNITS','70','4','0','ENDSEC');
+  lines.push('0','SECTION','2','HEADER','9','$ACADVER','1','AC1014','9','$INSUNITS','70',insunits,'0','ENDSEC');
   lines.push('0','SECTION','2','TABLES','0','TABLE','2','LAYER','70','1','0','LAYER','2','Layer_0','70','0','62','7','6','CONTINUOUS','0','ENDTAB','0','ENDSEC');
   lines.push('0','SECTION','2','ENTITIES');
   for(const o of objects){
@@ -7771,8 +7776,8 @@ function loadKAD(event) {
 function exportDXF() {
   const objs=GeoMemory.objects;
   if(!objs.length){ showToast('No geometry to export'); return; }
-  downloadText(buildDXF(objs),'drawing.dxf','text/plain');
-  showToast(`Exported ${objs.length} entities`);
+  downloadText(buildDXF(objs, unitMode),'drawing.dxf','text/plain');
+  showToast(`Exported ${objs.length} entities (${unitMode})`);
 }
 
 // ── SCAD EXPORT ─────────────────────────────────────────
