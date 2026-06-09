@@ -9155,14 +9155,19 @@ function applyKommandCoord(parsed) {
 
 // Simulate a drawing click at world coordinates
 function simulateWorldClick(wx, wy) {
-  const sp = worldToScreen(wx, wy);
+  // Set the globals onMouseDown reads — clientX/clientY are never used by the handler
+  mouseWorld  = { x: wx, y: wy };
+  const sp    = worldToScreen(wx, wy);
+  mouseScreen = { x: sp.x, y: sp.y };
+  snapActive  = false;  // disable snap so exact typed coordinate is used as-is
+  snapPoint   = null;
+
   const fakeEvent = {
     clientX: sp.x + canvas.getBoundingClientRect().left,
     clientY: sp.y + canvas.getBoundingClientRect().top,
     button: 0, shiftKey: false, altKey: false, ctrlKey: false,
     preventDefault: ()=>{}, stopPropagation: ()=>{}
   };
-  // Use existing mousedown handler
   if (typeof onMouseDown === 'function') onMouseDown(fakeEvent);
 }
 
