@@ -1592,6 +1592,10 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --kloud-g:     rgba(126,200,227,0.10);
   --kodex:       #e8a020;  /* machinist amber */
   --kodex-g:     rgba(232,160,32,0.10);
+  --kampus:      #E8600A;  /* construction cone orange */
+  --kubic:       #20e8c0;  /* solid modeling teal */
+  --kraft:       #c0c0c0;  /* brushed steel */
+  --kampus-g:    rgba(232,96,10,0.12);
   --konstruct-g: rgba(74,143,212,0.12);
 
   --ff-display: 'Syne', sans-serif;
@@ -1977,6 +1981,9 @@ nav {
   .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
 .flow-icon.kloud    { background: linear-gradient(135deg,#0d2235,#5ab3d0,#b8e4f5); }
 .flow-icon.kodex    { background: linear-gradient(135deg,#2a1800,#e8a020,#ff6820); }
+.flow-icon.kubic    { background: linear-gradient(135deg,#001c18,#20e8c0,#18c8a0); }
+.flow-icon.kampus   { background: linear-gradient(135deg,#3a1200,#E8600A,#ffaa40); }
+.flow-icon.kraft    { background: linear-gradient(135deg,#404040,#999999,#e0e0e0); }
 .flow-icon.kanvas    { background: linear-gradient(135deg,#001c28,#005878,#0090a8,#6030c8,#8b5cf6); }
 .flow-icon.kultivate { background: linear-gradient(135deg,#201008,#2e5818,#6ab830); }
 .flow-icon.konnector { background: linear-gradient(135deg,#1a2838,#3a5870,#b8c8d8); }
@@ -2103,6 +2110,26 @@ footer {
   box-shadow: 0 0 20px rgba(126,200,227,0.30);
 }
 .card-kodex { --card-color: var(--kodex); --card-glow: var(--kodex-g); }
+.card-kubic { --card-color: var(--kubic); --card-glow: rgba(32,232,192,0.12); }
+.card-kubic .card-mark {
+  background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40);
+  box-shadow: 0 0 20px rgba(32,232,192,0.45);
+}
+.card-kampus { --card-color: var(--kampus); --card-glow: var(--kampus-g); }
+.card-kraft { --card-color: #999999; --card-glow: rgba(192,192,192,0.12); }
+.card-kraft .card-mark {
+  background: linear-gradient(135deg, #404040 0%, #999999 50%, #cccccc 100%);
+  box-shadow: 0 0 16px rgba(192,192,192,0.25);
+}
+.card-kampus .card-mark {
+  background: linear-gradient(135deg, #7a2800 0%, #E8600A 60%, #ff9040 100%);
+  box-shadow: 0 0 18px rgba(232,96,10,0.35);
+}
+.card-kampus .card-beta-stamp {
+  background: rgba(232,96,10,0.15);
+  border-color: rgba(232,96,10,0.3);
+  color: var(--kampus);
+}
 .card-kodex .card-mark {
   background: linear-gradient(135deg, #2a1800, #e8a020, #ff6820);
   box-shadow: 0 0 20px rgba(232,160,32,0.40);
@@ -2622,6 +2649,29 @@ body.light-mode .tool-btn.active .tool-icon svg {
   z-index: 10;
   text-shadow: 0 0 6px rgba(255,140,0,0.45);
 }
+/* Alpha stamp — amber spectrum, earlier stage signal */
+.card-alpha-stamp {
+  position: absolute;
+  top: 48px;
+  right: -80px;
+  width: 280px;
+  padding: 8px 0;
+  text-align: center;
+  background: rgba(10, 6, 1, 0.94);
+  border-top: 1.5px solid #c87820;
+  border-bottom: 1.5px solid #c87820;
+  color: #e8a040;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  transform: rotate(35deg);
+  transform-origin: center;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 10;
+  text-shadow: 0 0 8px rgba(200,120,20,0.5);
+}
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -2737,7 +2787,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
       <!-- KAM -->
       <a class="card card-kam" href="https://kam.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
+        <div class="card-alpha-stamp">Alpha</div>
         
         <div class="card-mark">KM</div>
         <div class="card-name">.KAM</div>
@@ -2779,7 +2829,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         </div>
       </a>
 
-      <!-- KID -->
+            <!-- KID -->
       <a class="card card-kid" href="https://kid.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KD</div>
@@ -2801,11 +2851,11 @@ body.light-mode .tool-btn.active .tool-icon svg {
       </a>
 
       <!-- KUBE -->
-      <a class="card card-kube" href="https://kube.kadsuite.com">
+      <a class="card card-kubic" href="https://kubic.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KB</div>
-        <div class="card-name">.KUBE</div>
-        <div class="card-full">Kernel-Unified Build Environment</div>
+        <div class="card-name">.KUBIC</div>
+        <div class="card-full">Kernel Unified Building Informatics Control</div>
         <div class="card-preview">
           <canvas id="kube-preview"></canvas>
         </div>
@@ -2825,7 +2875,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
       <!-- KARVE -->
       <a class="card card-karve" href="https://karve.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
+        <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KV</div>
         <div class="card-name">.KARVE</div>
         <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
@@ -2848,7 +2898,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
       <!-- KONSTRUCT -->
       <a class="card card-konstruct" href="https://konstruct.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
+        <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KON</div>
         <div class="card-name">.KONSTRUCT</div>
         <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
@@ -2893,7 +2943,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
       <!-- KONNECTOR -->
       <a class="card card-konnector" href="https://konnector.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
+        <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KN</div>
         <div class="card-name">.KONNECTOR</div>
         <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
@@ -2909,22 +2959,22 @@ body.light-mode .tool-btn.active .tool-icon svg {
         </div>
       </a>
 
-      <!-- KODEX -->
-      <a class="card card-kodex" href="https://kodex.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
-        <div class="card-mark">KX</div>
-        <div class="card-name">.KODEX</div>
-        <div class="card-full">Machinist's Reference Bible</div>
+      <!-- KAMPUS -->
+      <a class="card card-kampus" href="https://kampus.kadsuite.com">
+        <div class="card-alpha-stamp">Alpha</div>
+        <div class="card-mark">KMP</div>
+        <div class="card-name">.KAMPUS</div>
+        <div class="card-full">Kernel-Aided Map Plan Unified Site</div>
         <div class="card-preview">
-          <canvas id="kodex-preview"></canvas>
+          <canvas id="kampus-preview"></canvas>
         </div>
         <div class="card-desc">
-          The machinist's reference on every workstation. Tap, drill, and clearance
-          charts. Thread engagement calculations. Material hardness tables. Speeds
-          and feeds. Tolerance grades and fits. Always at hand, always accurate.
+          Browser-native civil site engineering. Survey point import, TIN surface
+          generation, contour extraction, cut and fill volume calculations, road
+          centerline layout, and DXF export — all without leaving the browser.
         </div>
         <div class="card-cta">
-          <span>Open KODEX</span>
+          <span>Open KAMPUS</span>
           <span class="card-cta-arrow">→</span>
         </div>
       </a>
@@ -3000,7 +3050,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <div class="flow-row">
         <div class="flow-node"><div class="flow-icon konnector">KN</div><div class="flow-label">KONNECTOR</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kodex">KX</div><div class="flow-label">KODEX</div></div>
+        <div class="flow-node"><div class="flow-icon kampus">KMP</div><div class="flow-label">KAMPUS</div></div>
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kanvas">KNV</div><div class="flow-label">KANVAS</div></div>
         <div class="flow-arrow">──→</div>
@@ -3047,7 +3097,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         <div class="lc-subtitle">withshalom / KADsuite</div>
         <div class="lc-divider"></div>
         <ul class="lc-items">
-          <li>KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KODEX™, and KID™ are trademarks of withshalom / KADsuite</li>
+          <li>KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, and KID™ are trademarks of withshalom / KADsuite</li>
           <li>Trademark rights are independent of and not transferred by the AGPL-3.0 license</li>
           <li>Forks and derivative works may not use these marks without express written permission</li>
           <li>Forks must remain open source under AGPL</li>
@@ -3101,7 +3151,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         KADsuite.proton.me
       </a>
     </div>
-    <div class="footer-copy">© 2025 KADsuite™ · KAD™ · KAM™ · KUBE™ · KARVE™ · KONSTRUCT™ · KULTIVATE™ · KODE™ · KANVAS™ · KONNECTOR™ · KODEX™ · KID™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · kadsuite.com</div>
+    <div class="footer-copy">© 2025 KADsuite™ · KAD™ · KAM™ · KUBIC™ · KARVE™ · KONSTRUCT™ · KULTIVATE™ · KODE™ · KANVAS™ · KONNECTOR™ · KAMPUS™ · KID™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · kadsuite.com</div>
   </footer>
 </div>
 
@@ -3797,23 +3847,59 @@ initPreview('kloud-preview', (ctx, W, H) => {
   ctx.textBaseline = 'alphabetic';
 });
 
-// ── KODEX preview ─────────────────────────────────────────────────────────────
-initPreview('kodex-preview', (ctx, W, H) => {
-  ctx.fillStyle='#0a0700'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(232,160,32,0.15)'; ctx.lineWidth=0.6;
-  for(let y=H*0.2;y<H*0.9;y+=H*0.14){ctx.beginPath();ctx.moveTo(W*.08,y);ctx.lineTo(W*.92,y);ctx.stroke();}
-  ctx.beginPath();ctx.moveTo(W*.35,H*.18);ctx.lineTo(W*.35,H*.88);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W*.62,H*.18);ctx.lineTo(W*.62,H*.88);ctx.stroke();
-  ctx.fillStyle='rgba(232,160,32,0.12)'; ctx.fillRect(W*.08,H*.14,W*.84,H*.1);
-  ctx.fillStyle='#e8a020'; ctx.font='bold 9px monospace'; ctx.textBaseline='middle';
-  ctx.fillText('SIZE',W*.13,H*.19); ctx.fillText('DRILL',W*.40,H*.19); ctx.fillText('PITCH',W*.66,H*.19);
-  const rows=[['#4-40','#43','0.032'],['#6-32','#36','0.031'],['#8-32','#29','0.036'],['1/4-20','F','0.050']];
-  ctx.font='8px monospace';
-  rows.forEach((row,i)=>{
-    const y=H*(0.29+i*0.14);
-    ctx.fillStyle=i%2===0?'rgba(232,160,32,0.6)':'rgba(232,160,32,0.4)';
-    ctx.fillText(row[0],W*.10,y); ctx.fillText(row[1],W*.39,y); ctx.fillText(row[2],W*.66,y);
+// ── KRAFT preview ────────────────────────────────────────────────────────────
+initPreview('kraft-preview', (ctx, W, H) => {
+  // Layer stack visualization
+  ctx.fillStyle='#1a1a1a'; ctx.fillRect(0,0,W,H);
+  const layers=8;
+  for(let i=0;i<layers;i++){
+    const y=H*0.2+i*(H*0.6/layers);
+    ctx.fillStyle=`rgba(200,200,200,${0.3+i*0.05})`;
+    ctx.fillRect(W*0.1, y, W*0.8, H*0.6/layers-2);
+  }
+  // Nozzle indicator at top
+  ctx.fillStyle='#ff8800'; ctx.beginPath(); ctx.arc(W*0.5, H*0.1, 6, 0, Math.PI*2); ctx.fill();
+  // Label
+  ctx.fillStyle='#999999'; ctx.font='bold 8px monospace';
+  ctx.textAlign='center'; ctx.fillText(layers+' LAYERS', W*0.5, H*0.88);
+});
+
+// ── KAMPUS preview ────────────────────────────────────────────────────────────
+initPreview('kampus-preview', (ctx, W, H) => {
+  // Dark earth background
+  ctx.fillStyle='#0e110a'; ctx.fillRect(0,0,W,H);
+  // Topo contour lines — concentric closed curves simulating a hill
+  const cx=W*0.5, cy=H*0.48;
+  const contourColors=['rgba(100,140,60,0.5)','rgba(120,160,70,0.6)','rgba(150,190,80,0.65)','rgba(200,190,80,0.7)','rgba(232,200,90,0.8)'];
+  const radii=[W*0.38,W*0.30,W*0.22,W*0.14,W*0.07];
+  for(let i=0;i<radii.length;i++){
+    ctx.strokeStyle=i===4?'#e8c870':contourColors[i];
+    ctx.lineWidth=i===4?1.4:0.9;
+    ctx.beginPath();
+    // Slightly irregular ellipses for natural look
+    ctx.ellipse(cx+W*0.04*(i%2?1:-1), cy-H*0.03*(i%3?1:0),
+      radii[i], radii[i]*0.72, 0.2, 0, Math.PI*2);
+    ctx.stroke();
+    // Elevation labels on index (every 2nd)
+    if(i%2===0 && i>0){
+      ctx.fillStyle=i===4?'#e8c870':'rgba(200,190,80,0.7)';
+      ctx.font='6px monospace';
+      ctx.fillText(String((5-i)*5)+'m', cx+radii[i]+2, cy-2);
+    }
+  }
+  // Survey points
+  const pts=[[W*.2,H*.7],[W*.75,H*.65],[W*.15,H*.35],[W*.82,H*.28],[W*.5,H*.82],[W*.6,H*.2]];
+  pts.forEach(([px,py])=>{
+    ctx.fillStyle='#E8600A';
+    ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fill();
   });
+  // Site boundary — dashed orange
+  ctx.strokeStyle='rgba(232,96,10,0.7)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.strokeRect(W*0.1,H*0.12,W*0.82,H*0.8);
+  ctx.setLineDash([]);
+  // KAMPUS label
+  ctx.fillStyle='rgba(232,96,10,0.5)'; ctx.font='bold 8px monospace';
+  ctx.fillText('KAMPUS', W*0.12, H*0.1);
 });
 
 // ── KONNECTOR preview ─────────────────────────────────────────────────────────
@@ -9133,7 +9219,7 @@ kInput.addEventListener('keydown', function(e) {
     if (!kPrefix) return;
     if (v.startsWith('@') && v.includes('<')) kPrefix.textContent = 'POL';
     else if (v.startsWith('@'))               kPrefix.textContent = 'REL';
-    else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'KMD';
+    else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'CMD';
     else if (v.match(/^[0-9+\-]/))           kPrefix.textContent = 'ABS';
     else                                      kPrefix.textContent = '≫';
   }, 0);
