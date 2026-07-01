@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   KADsuite™ — Kernel-Aided Design Suite
-  Copyright (C) 2024-2025 KADsuite / withshalom
+  Copyright (C) 2026 KADsuite / withshalom
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Affero General Public License as published
@@ -17,8 +17,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
   SPDX-License-Identifier: AGPL-3.0-or-later
-  KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™,
-  KODE™, and KANVAS™ are trademarks of withshalom / KADsuite.
+  KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™,
+  KONNECTOR™, KAMPUS™, KLOUD™, KID™, and KODEX™ are trademarks of withshalom / KADsuite.
   Trademark rights are independent of and not transferred by this
   AGPL-3.0 license. Forks and derivative works may not use these
   marks or any confusingly similar names without express written
@@ -34,9 +34,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="copyright" content="Copyright (C) 2024-2025 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBE™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, and KANVAS™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
+<meta name="copyright" content="Copyright (C) 2026 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, KLOUD™, KID™, and KODEX™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KADsuite — Kernel-Aided Design Suite</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0c1824">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KADsuite">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
 
@@ -108,7 +115,6 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 /* ── TOPBAR ── */
 #topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
 .brand { display:flex; align-items:center; gap:8px; margin-right:20px; font-family:var(--fm); font-weight:700; font-size:14px; color:var(--accent); letter-spacing:0.04em; user-select:none; }
-.brand-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); }
 .brand-sub { font-size:9px; color:var(--t3); letter-spacing:0.12em; text-transform:uppercase; font-weight:400; }
 .tb-menu { display:flex; align-items:center; }
 .tb-menu-item { padding:0 12px; height:var(--toolbar-h); display:flex; align-items:center; font-size:12px; color:var(--t2); cursor:pointer; transition:color 0.15s,background 0.15s; letter-spacing:0.02em; position:relative; }
@@ -551,10 +557,6 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
   font-size: 22px; font-weight: 700; color: var(--accent);
   letter-spacing: 0.06em; margin-bottom: 6px;
 }
-.splash-brand-dot {
-  width: 10px; height: 10px; background: var(--accent);
-  border-radius: 50%; box-shadow: 0 0 10px var(--accent);
-}
 .splash-sub {
   font-size: 10px; color: var(--t3);
   letter-spacing: 0.14em; text-transform: uppercase;
@@ -721,7 +723,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 .scad-hint code { color: var(--accent); font-family: var(--fm); }
 .scad-hint b { color: var(--amber); }
 
-/* ── KERFsuite suite tokens (override/align) ── */
+/* ── KADsuite suite tokens (override/align) ── */
 :root {
   --fm: 'Fira Code', monospace;
   --fd: 'Syne', sans-serif;
@@ -901,7 +903,6 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 /* ── TOPBAR ── */
 #topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
 .brand { display:flex; align-items:center; gap:8px; margin-right:20px; font-family:var(--fm); font-weight:700; font-size:14px; color:var(--accent); letter-spacing:0.04em; user-select:none; }
-.brand-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); }
 .brand-sub { font-size:9px; color:var(--t3); letter-spacing:0.12em; text-transform:uppercase; font-weight:400; }
 .tb-menu { display:flex; align-items:center; }
 .tb-menu-item { padding:0 12px; height:var(--toolbar-h); display:flex; align-items:center; font-size:12px; color:var(--t2); cursor:pointer; transition:color 0.15s,background 0.15s; letter-spacing:0.02em; position:relative; }
@@ -1220,10 +1221,6 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
   display: flex; align-items: center; gap: 10px;
   font-size: 22px; font-weight: 700; color: var(--accent);
   letter-spacing: 0.06em; margin-bottom: 6px;
-}
-.splash-brand-dot {
-  width: 10px; height: 10px; background: var(--accent);
-  border-radius: 50%; box-shadow: 0 0 10px var(--accent);
 }
 .splash-sub {
   font-size: 10px; color: var(--t3);
@@ -1571,7 +1568,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 
   --kad:   #00d4ff;
   --kam:   #ffaa00;
-  --kube:  #20e8c0;
+  --kubic:  #20e8c0;
   --karve: #d4aa40;
   --kode:  #e03800;
   
@@ -1579,7 +1576,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 
   --kad-g:  rgba(0,212,255,0.12);
   --kam-g:  rgba(255,170,0,0.12);
-  --kube-g: rgba(32,232,192,0.12);
+  --kubic-g: rgba(32,232,192,0.12);
   --karve-g:rgba(212,170,64,0.12);
   --kode-g: rgba(224,56,0,0.12);
   --kultivate: #6ab830;  /* fresh growth green */
@@ -1813,7 +1810,7 @@ nav {
 
 .card-kad  { --card-color: var(--kad);  --card-glow: var(--kad-g); }
 .card-kam  { --card-color: var(--kam);  --card-glow: var(--kam-g); }
-.card-kube  { --card-color: var(--kube);  --card-glow: var(--kube-g);  }
+.card-kubic  { --card-color: var(--kubic);  --card-glow: var(--kubic-g);  }
 .card-karve { --card-color: var(--karve); --card-glow: var(--karve-g); }
 .card-karve .card-mark { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); box-shadow: 0 0 20px rgba(212,170,64,0.45); }
 .card-kode { --card-color: var(--kode); --card-glow: var(--kode-g); }
@@ -1836,7 +1833,7 @@ nav {
 }
 .card-kad  .card-mark { background: linear-gradient(135deg, #00d4ff, #0088bb); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
 .card-kam  .card-mark { background: linear-gradient(135deg, #ffaa00, #ff6b00); box-shadow: 0 0 20px rgba(255,170,0,0.4); }
-.card-kube .card-mark { background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40); box-shadow: 0 0 20px rgba(32,232,192,0.45); }
+.card-kubic .card-mark { background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40); box-shadow: 0 0 20px rgba(32,232,192,0.45); }
   .card-kode .card-mark { background: linear-gradient(135deg, #2a0800, #882000, #e03800); box-shadow: 0 0 20px rgba(224,56,0,0.45); }
 
   
@@ -1975,7 +1972,7 @@ nav {
 }
 .flow-icon.kad       { background: linear-gradient(135deg,#006080,#00a8cc,#00d4ff); }
 .flow-icon.kam       { background: linear-gradient(135deg,#804800,#cc8000,#ffaa00); }
-.flow-icon.kube      { background: linear-gradient(135deg,#001c18,#20e8c0,#d4aa40); }
+.flow-icon.kubic      { background: linear-gradient(135deg,#001c18,#20e8c0,#d4aa40); }
   .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
   .flow-icon.kode      { background: linear-gradient(135deg,#2a0800,#882000,#e03800); }
   .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
@@ -2720,7 +2717,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
     <p class="hero-tagline">The cutting edge of design software.</p>
     <p class="hero-mission">
       <strong>Next-generation web-hosted drafting software</strong> giving everyone
-      access to technical design. KAD draws, KAM manufactures, KUBE builds, KARVE machines,
+      access to technical design. KAD draws, KAM manufactures, KUBIC builds, KARVE machines,
       KONSTRUCT structures, KULTIVATE plans the site it sits on, KODE verifies, and KANVAS illustrates.
     </p>
   </section>
@@ -2767,7 +2764,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <!-- KAD -->
       <div class="card card-kad" onclick="openDraftingMode()" style="cursor:pointer;">
         <div class="card-mark">KD</div>
-        <div class="card-name">.KAD</div>
+        <div class="card-name">KAD</div>
         <div class="card-full">Kernel-Aided Design</div>
         <div class="card-preview">
           <canvas id="kad-preview"></canvas>
@@ -2790,7 +2787,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         <div class="card-alpha-stamp">Alpha</div>
         
         <div class="card-mark">KM</div>
-        <div class="card-name">.KAM</div>
+        <div class="card-name">KAM</div>
         <div class="card-full">Kernel-Aided Manufacturing</div>
         <div class="card-preview">
           <canvas id="kam-preview"></canvas>
@@ -2806,13 +2803,13 @@ body.light-mode .tool-btn.active .tool-icon svg {
         </div>
       </a>
 
-      <!-- KUBE -->
+      <!-- KUBIC -->
 
       <!-- KLOUD -->
       <a class="card card-kloud" href="https://kloud.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KL</div>
-        <div class="card-name">.KLOUD</div>
+        <div class="card-name">KLOUD</div>
         <div class="card-full">Kernel Live Optimized Universal Development</div>
         <div class="card-preview">
           <canvas id="kloud-preview"></canvas>
@@ -2833,7 +2830,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <a class="card card-kid" href="https://kid.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KD</div>
-        <div class="card-name">.KID</div>
+        <div class="card-name">KID</div>
         <div class="card-full">Kernel-Instructed Design</div>
         <div class="card-preview">
           <canvas id="kid-preview"></canvas>
@@ -2850,11 +2847,11 @@ body.light-mode .tool-btn.active .tool-icon svg {
         </div>
       </a>
 
-      <!-- KUBE -->
+      <!-- KUBIC -->
       <a class="card card-kubic" href="https://kubic.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KB</div>
-        <div class="card-name">.KUBIC</div>
+        <div class="card-name">KUBIC</div>
         <div class="card-full">Kernel Unified Building Informatics Control</div>
         <div class="card-preview">
           <canvas id="kube-preview"></canvas>
@@ -2865,7 +2862,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
           Exports STL and STEP — imports back to KAM as flat cut profiles.
         </div>
         <div class="card-cta">
-          <span>Open KUBE</span>
+          <span>Open KUBIC</span>
           <span class="card-cta-arrow">→</span>
         </div>
       </a>
@@ -2877,14 +2874,14 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <a class="card card-karve" href="https://karve.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KV</div>
-        <div class="card-name">.KARVE</div>
+        <div class="card-name">KARVE</div>
         <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
         <div class="card-preview">
           <canvas id="karve-preview"></canvas>
         </div>
         <div class="card-desc">
           Lathe and mill G-code generator for subtractive machining. Define raw
-          stock, import .KBE part geometry from KUBE, and KARVE computes the
+          stock, import .KBE part geometry from KUBIC, and KARVE computes the
           cutting operations needed. Outputs RS-274 G-code directly to KODE
           for review and editing.
         </div>
@@ -2900,7 +2897,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <a class="card card-konstruct" href="https://konstruct.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KON</div>
-        <div class="card-name">.KONSTRUCT</div>
+        <div class="card-name">KONSTRUCT</div>
         <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
         <div class="card-preview">
           <canvas id="konstruct-preview"></canvas>
@@ -2922,7 +2919,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <a class="card card-kultivate" href="https://kultivate.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KLT</div>
-        <div class="card-name">.KULTIVATE</div>
+        <div class="card-name">KULTIVATE</div>
         <div class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</div>
         <div class="card-preview">
           <canvas id="kultivate-preview"></canvas>
@@ -2945,11 +2942,11 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <a class="card card-konnector" href="https://konnector.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KN</div>
-        <div class="card-name">.KONNECTOR</div>
+        <div class="card-name">KONNECTOR</div>
         <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
         <div class="card-desc">
           Structural steel detailing and connection design. Imports geometry
-          from KAD, KUBE, and KONSTRUCT. AISC section database, bolt group
+          from KAD, KUBIC, and KONSTRUCT. AISC section database, bolt group
           placement, weld tagging, piece marking, and export to KAM for
           cutting and nesting.
         </div>
@@ -2963,7 +2960,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
       <a class="card card-kampus" href="https://kampus.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KMP</div>
-        <div class="card-name">.KAMPUS</div>
+        <div class="card-name">KAMPUS</div>
         <div class="card-full">Kernel-Aided Map Plan Unified Site</div>
         <div class="card-preview">
           <canvas id="kampus-preview"></canvas>
@@ -3005,7 +3002,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         <div class="card-beta-stamp">Beta</div>
         
         <div class="card-mark">GK</div>
-        <div class="card-name">.KODE</div>
+        <div class="card-name">KODE</div>
         <div class="card-full">Kernel-Oriented Development Environment</div>
         <div class="card-preview">
           <canvas id="kode-preview"></canvas>
@@ -3030,7 +3027,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
     <div class="diagram-title">The KADsuite programs</div>
     <div class="diagram-flow">
       <div class="flow-row">
-        <div class="flow-node"><div class="flow-icon kad">KD</div><div class="flow-label">.KAD</div></div>
+        <div class="flow-node"><div class="flow-icon kad">KD</div><div class="flow-label">KAD</div></div>
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kam">KM</div><div class="flow-label">KAM</div></div>
         <div class="flow-arrow">──→</div>
@@ -3039,7 +3036,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">KID</div></div>
       </div>
       <div class="flow-row">
-        <div class="flow-node"><div class="flow-icon kube">KB</div><div class="flow-label">KUBE</div></div>
+        <div class="flow-node"><div class="flow-icon kubic">KB</div><div class="flow-label">KUBIC</div></div>
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon karve">KV</div><div class="flow-label">KARVE</div></div>
         <div class="flow-arrow">──→</div>
@@ -3097,7 +3094,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         <div class="lc-subtitle">withshalom / KADsuite</div>
         <div class="lc-divider"></div>
         <ul class="lc-items">
-          <li>KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, and KID™ are trademarks of withshalom / KADsuite</li>
+          <li>KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, KLOUD™, KID™, and KODEX™ are trademarks of withshalom / KADsuite</li>
           <li>Trademark rights are independent of and not transferred by the AGPL-3.0 license</li>
           <li>Forks and derivative works may not use these marks without express written permission</li>
           <li>Forks must remain open source under AGPL</li>
@@ -3108,7 +3105,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
       <!-- KLOUD Cloud -->
       <div class="license-card" style="--lc-color:rgba(126,200,227,0.6);--lc-glow:rgba(126,200,227,0.08);">
-        <div class="lc-tag" style="background:rgba(126,200,227,0.10);color:#7ec8e3;border-color:rgba(126,200,227,0.3);">.KLOUD</div>
+        <div class="lc-tag" style="background:rgba(126,200,227,0.10);color:#7ec8e3;border-color:rgba(126,200,227,0.3);">KLOUD</div>
         <div class="lc-title" style="color:#7ec8e3;">KLOUD Subscription</div>
         <div class="lc-subtitle">Sync · Collaborate · Share</div>
         <div class="lc-price" style="color:#7ec8e3;">from $19.99 <span>/ mo</span></div>
@@ -3151,7 +3148,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
         KADsuite.proton.me
       </a>
     </div>
-    <div class="footer-copy">© 2025 KADsuite™ · KAD™ · KAM™ · KUBIC™ · KARVE™ · KONSTRUCT™ · KULTIVATE™ · KODE™ · KANVAS™ · KONNECTOR™ · KAMPUS™ · KID™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · kadsuite.com</div>
+    <div class="footer-copy">© 2026 KADsuite™ · KAD™ · KAM™ · KUBIC™ · KARVE™ · KONSTRUCT™ · KULTIVATE™ · KODE™ · KANVAS™ · KONNECTOR™ · KAMPUS™ · KID™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · kadsuite.com</div>
   </footer>
 </div>
 
@@ -3378,7 +3375,7 @@ initPreview('kam-preview', (ctx, W, H) => {
 
 // KODE preview — G-KODE mode (green toolpath, amber M-codes)
 
-// KUBE preview — green 3D solid with extrude metaphor
+// KUBIC preview — green 3D solid with extrude metaphor
 initPreview('kube-preview', (ctx, W, H) => {
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle='rgba(0,10,6,0.55)'; ctx.fillRect(0,0,W,H);
@@ -3842,7 +3839,7 @@ initPreview('kloud-preview', (ctx, W, H) => {
   ctx.fillStyle = '#2a8fad';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('✦  .KAD LIVE  ·  MORE COMING  ✦', W/2, stampY+5);
+  ctx.fillText('✦  KAD LIVE  ·  MORE COMING  ✦', W/2, stampY+5);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
 });
@@ -3955,7 +3952,7 @@ document.addEventListener('keydown', function(e) {
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div class="brand"><div class="brand-dot"></div><span>.KAD</span><div class="brand-sub" id="brand-sub">Kernel-Aided Design</div></div>
+  <div class="brand"><span>KAD</span><div class="brand-sub" id="brand-sub">Kernel-Aided Design</div></div>
   <div class="tb-sep"></div>
   <div class="tb-menu">
     <div class="tb-menu-item" id="menu-file" onmouseenter="openMenu('file')" onmouseleave="scheduleClose()">File
@@ -4495,10 +4492,10 @@ document.addEventListener('keydown', function(e) {
     <div class="sb-item"><span>U</span><span class="sb-val">units</span></div>
     <div class="sb-item"><span>M</span><span class="sb-val">mirror</span></div>
     <div class="sb-item"><span>D</span><span class="sb-val">measure</span></div>
-    <div class="sb-item"><span class="sb-val ok">.KAD v0.0</span></div>
+    <div class="sb-item"><span class="sb-val ok">KAD v0.0</span></div>
     <div class="sb-cc">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0;opacity:0.7"><circle cx="12" cy="12" r="9"/><path d="M10 9.5A2.5 2.5 0 0 0 7.5 12a2.5 2.5 0 0 0 2.5 2.5"/><path d="M16 9.5A2.5 2.5 0 0 0 13.5 12a2.5 2.5 0 0 0 2.5 2.5"/></svg>
-      <span>© <span id="cc-year"></span> KERFsuite™ · .KAD Kernel-Aided Design · AGPL-3.0 · <a href="https://kadsuite.com" target="_blank" rel="noopener" class="cc-link">kadsuite.com</a> · withshalom</span>
+      <span>© <span id="cc-year"></span> KADsuite™ · KAD Kernel-Aided Design · AGPL-3.0 · <a href="https://kadsuite.com" target="_blank" rel="noopener" class="cc-link">kadsuite.com</a> · withshalom</span>
     </div>
   </div>
 </div>
@@ -4673,7 +4670,7 @@ document.addEventListener('keydown', function(e) {
 
 'use strict';
 // ═══════════════════════════════════════════════════════════
-//  .KAD v0.0  — Kernel-Aided Design
+//  KAD v0.0  — Kernel-Aided Design
 // ═══════════════════════════════════════════════════════════
 
 // ── CANVAS ──────────────────────────────────────────────
@@ -9367,6 +9364,49 @@ function toggleTheme() {
   }
 })();
 
+</script>
+<script>
+// ── PWA: service worker registration ────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch((err) => {
+      console.warn('Service worker registration failed:', err);
+    });
+  });
+}
+
+// ── PWA: launch handling for file_handlers / share_target ──────────
+// When installed and the OS launches KADsuite because the user opened
+// a .kad or .dxf file (or shared one into the app), pick it up here
+// and route it into the existing GeoMemory/parseDXF pipeline.
+if ('launchQueue' in window) {
+  window.launchQueue.setConsumer(async (launchParams) => {
+    if (!launchParams.files || !launchParams.files.length) return;
+    const fileHandle = launchParams.files[0];
+    const file = await fileHandle.getFile();
+    const text = await file.text();
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      openDraftingMode();
+      if (file.name.toLowerCase().endsWith('.dxf')) {
+        // Feed the launched file through the real DXF input element so
+        // the existing importDXF() pipeline runs exactly as it does for
+        // a manual upload — including its unit-selection dialog. This
+        // avoids re-implementing that logic (and re-introducing the
+        // kind of drift we've been fixing elsewhere in this project).
+        const input = document.getElementById('load-dxf');
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        input.dispatchEvent(new Event('change'));
+      } else {
+        const ok = GeoMemory.deserialize(text); // existing .kad load path
+        if (ok) render();
+        showToast(ok ? `Opened ${file.name}` : `Could not open ${file.name}`);
+      }
+    }));
+  });
+}
 </script>
 </body>
 </html>
