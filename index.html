@@ -6383,6 +6383,97 @@ canvas.addEventListener('touchcancel', function(e) {
   pinchState.active = false;
 }, {passive:false});
 
+// ── TOUCH: SINGLE-FINGER SWIPE ───────────────────────────
+// Gesture map: two-finger = pinch zoom/pan · single tap = place/pick
+// (browser click synthesis) · single-finger DRAG was unclaimed — with
+// touch-action:none, browsers never synthesize mousemove for drags, so
+// the selection box and crosshairs were unreachable on touch.
+//
+// Swipe drives the existing mouse pipeline with synthetic events:
+//   SELECT / ROTATE  → full down/move/up injection → selection box
+//                      (window/crossing) and pivot dragging, exactly as
+//                      desktop left-drag behaves.
+//   Draw tools       → move-only injection → live crosshair, snap ring,
+//                      coordinate readout, and rubber-band previews
+//                      while the finger moves. Release places nothing;
+//                      tap remains the way to commit a point.
+// Engagement starts only after a slop threshold so quick taps still
+// fall through untouched to the browser's tap→click synthesis. A second
+// finger landing mid-swipe aborts cleanly and hands over to pinch.
+const SWIPE_SLOP = 8; // px of movement before a touch becomes a swipe
+let swipeState = { tracking:false, engaged:false, full:false, startX:0, startY:0 };
+
+function fakeMouseEvent(clientX, clientY) {
+  return { clientX, clientY, button:0, buttons:1,
+           shiftKey:false, altKey:false, ctrlKey:false,
+           preventDefault(){}, stopPropagation(){} };
+}
+
+canvas.addEventListener('touchstart', function(e) {
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    swipeState.tracking = true;
+    swipeState.engaged  = false;
+    swipeState.startX   = t.clientX;
+    swipeState.startY   = t.clientY;
+    // No preventDefault — taps must keep synthesizing clicks.
+  } else if (swipeState.engaged) {
+    // Second finger landed mid-swipe: abort without committing, pinch takes over.
+    if (swipeState.full) {
+      selBox.active = false; selBox.pending = false;
+      canvas.style.cursor = 'default';
+      render();
+    }
+    swipeState.tracking = false;
+    swipeState.engaged  = false;
+  } else {
+    swipeState.tracking = false;
+  }
+}, {passive:false});
+
+canvas.addEventListener('touchmove', function(e) {
+  if (!swipeState.tracking || e.touches.length !== 1) return;
+  const t = e.touches[0];
+
+  if (!swipeState.engaged) {
+    const moved = Math.hypot(t.clientX - swipeState.startX, t.clientY - swipeState.startY);
+    if (moved <= SWIPE_SLOP) return;
+    // Engage. Freeze the injection mode at engage time so a mid-drag
+    // tool change can't strand a half-open state machine.
+    swipeState.engaged = true;
+    swipeState.full = (activeTool === 'select' || activeTool === 'rotate');
+    // Seed mouseScreen/mouseWorld at the swipe ORIGIN before pressing,
+    // so the box anchors where the finger first landed, not where it
+    // crossed the slop threshold.
+    onMouseMove(fakeMouseEvent(swipeState.startX, swipeState.startY));
+    if (swipeState.full) onMouseDown(fakeMouseEvent(swipeState.startX, swipeState.startY));
+  }
+
+  e.preventDefault(); // engaged: this drag belongs to us, not the browser
+  onMouseMove(fakeMouseEvent(t.clientX, t.clientY));
+}, {passive:false});
+
+canvas.addEventListener('touchend', function(e) {
+  if (swipeState.engaged) {
+    e.preventDefault(); // suppress any residual synthesized click
+    // onMouseUp reads the position from mouseScreen/mouseWorld, which the
+    // last onMouseMove already set — the fake event only supplies button.
+    if (swipeState.full) onMouseUp(fakeMouseEvent(swipeState.startX, swipeState.startY));
+  }
+  swipeState.tracking = false;
+  swipeState.engaged  = false;
+}, {passive:false});
+
+canvas.addEventListener('touchcancel', function() {
+  if (swipeState.engaged && swipeState.full) {
+    selBox.active = false; selBox.pending = false;
+    canvas.style.cursor = 'default';
+    render();
+  }
+  swipeState.tracking = false;
+  swipeState.engaged  = false;
+}, {passive:false});
+
 // ── MOBILE MODE: sidebar drawer + keyboard-aware KOMMAND bar ────
 function toggleMobileSidebar(force) {
   const open = typeof force === 'boolean' ? force : !document.body.classList.contains('sidebar-open');
