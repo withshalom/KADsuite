@@ -221,22 +221,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
   overflow: hidden;
   z-index: 30;
 }
-#kommand-context {
-  flex-shrink: 0;
-  padding: 0 10px;
-  font-family: var(--fu);
-  font-size: 12px;
-  color: var(--accent);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  border-right: 1px solid var(--border);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  min-width: 80px;
-  white-space: nowrap;
-  user-select: none;
-}
+/* #kommand-context is now a <button> — styled as the tool button further down */
 #kommand-echo {
   flex-shrink: 0;
   padding: 0 6px;
@@ -2505,99 +2490,37 @@ footer {
   overflow: hidden;
   z-index: 30;
 }
+/* #kommand-context styling superseded by the button-based rule below.
+   Icon + name travel together so identity never disappears from the
+   left edge of KOMMAND; tapping/clicking anywhere on the pill opens
+   the Draw menu on mobile, and the whole pill glows when a draw tool
+   is active (managed by setTool()). */
 #kommand-context {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 0 10px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  height: 100%;
   font-family: var(--fu);
   font-size: 12px;
   color: var(--accent);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  border-right: 1px solid var(--border);
-  height: 100%;
-  display: flex;
-  align-items: center;
   min-width: 80px;
   white-space: nowrap;
-  user-select: none;
-}
-#kommand-echo {
-  flex-shrink: 0;
-  padding: 0 8px;
-  font-family: var(--fu);
-  font-size: 12px;
-  color: var(--t3);
-  letter-spacing: 0.04em;
-  border-right: 1px solid var(--border);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  min-width: 180px;
-  max-width: 280px;
-  overflow: hidden;
-  white-space: nowrap;
-  user-select: none;
-}
-#kommand-prefix {
-  flex-shrink: 0;
-  padding: 0 8px;
-  font-family: var(--fu);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  border-right: 1px solid var(--border);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  min-width: 40px;
-  user-select: none;
-}
-#kommand-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  padding: 0 10px;
-  font-family: var(--fu);
-  font-size: 13px;
-  color: var(--t1);
-  caret-color: var(--accent);
-  height: 100%;
-}
-#kommand-input::placeholder { color: var(--t3); font-size: 11px; }
-#kommand-hint {
-  flex-shrink: 0;
-  padding: 0 10px;
-  font-family: var(--fu);
-  font-size: 12px;
-  color: var(--t3);
-  white-space: nowrap;
-  letter-spacing: 0.04em;
-  user-select: none;
-}
-#kommand-hint b  { color: var(--accent); font-weight: 600; }
-#kommand-hint i  { color: var(--amber);  font-style: normal; }
-#kommand-hint em { color: var(--green);  font-style: normal; }
-
-/* ── TOOL BUTTON ICON – toggles draw tools on mobile, highlights on desktop ── */
-#kommand-tool-btn {
-  flex-shrink: 0;
-  background: var(--panel2);
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
   cursor: pointer;
-  height: 100%;
-  width: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: background 0.15s, box-shadow 0.15s;
 }
-#kommand-tool-btn:hover { background: var(--hover); }
-#kommand-tool-btn.active { box-shadow: inset 0 0 0 1px var(--accent); }
-#kommand-tool-btn svg { width: 16px; height: 16px; stroke: #7ee8ff; color: #7ee8ff; }
-#kommand-tool-btn:hover svg { stroke: #b0f0ff; color: #b0f0ff; }
-#kommand-tool-btn.active svg { stroke: var(--accent); color: var(--accent); filter: drop-shadow(0 0 3px var(--accent)); }
+#kommand-context:hover { background: var(--hover); }
+#kommand-context.active { box-shadow: inset 0 0 0 1px var(--accent); }
+#kommand-context-icon { width: 15px; height: 15px; flex-shrink: 0; stroke: #7ee8ff; color: #7ee8ff; }
+#kommand-context:hover #kommand-context-icon { stroke: #b0f0ff; color: #b0f0ff; }
+#kommand-context.active #kommand-context-icon { stroke: var(--accent); color: var(--accent); filter: drop-shadow(0 0 3px var(--accent)); }
+#kommand-context-label { user-select: none; }
 
 
 .tool-icon svg { width:16px; height:16px; stroke:#7ee8ff; color:#7ee8ff; }
@@ -2772,7 +2695,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 .mobile-mode #kommand-hint { display: none; } /* no room for the hotkey legend on small screens */
 .mobile-mode #kommand-input { font-size: 16px; -webkit-user-select: text; } /* 16px prevents iOS Safari auto-zoom-on-focus */
 .mobile-mode #kommand-input:focus { outline: 1px solid var(--accent); }
-.mobile-mode #kommand-tool-btn { display: flex; border-left: 1px solid var(--border-hi); border-right: 1px solid var(--border-hi); }
+.mobile-mode #kommand-context { border-right-color: var(--border-hi); }
 #kommand-go-btn {
   display: none;
   flex-shrink: 0;
@@ -4620,15 +4543,15 @@ document.addEventListener('keydown', function(e) {
 <!-- STATUS BAR -->
 <!-- ═══ KOMMAND LINE ════════════════════════════════════════════════════════ -->
 <div id="kommand-bar">
-  <div id="kommand-context">SELECT</div>
-  <div id="kommand-label" style="flex-shrink:0;padding:0 6px;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.12em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;min-width:35px;">KMD</div>
-  <div id="kommand-echo">ready</div>
-  <button id="kommand-tool-btn" onclick="toggleToolsMenu()" aria-label="Draw tools" title="Draw tools">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <button id="kommand-context" type="button" onclick="toggleToolsMenu()" aria-label="Draw tools — shows active tool" title="Draw tools">
+    <svg id="kommand-context-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 20h9"/>
       <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
     </svg>
+    <span id="kommand-context-label">SELECT</span>
   </button>
+  <div id="kommand-label" style="flex-shrink:0;padding:0 6px;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.12em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;min-width:35px;">KMD</div>
+  <div id="kommand-echo">ready</div>
   <div id="kommand-prefix">≫</div>
   <input id="kommand-input" type="text" spellcheck="false" autocomplete="off"
     placeholder="K → type: L line · 10,25 · @50,0 · @100&lt;45° · COPY · PASTE"
@@ -6052,13 +5975,12 @@ function setTool(tool) {
   const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',chamfer:'btn-chamfer',mirror:'btn-mirror',dim:'btn-dim',trim:'btn-trim',extend:'btn-extend',break:'btn-break',scale:'btn-scale',stretch:'btn-stretch',text:'btn-text'};
   if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
   
-  // Update KOMMAND bar tool button active state (highlight on desktop)
-  const toolBtn = document.getElementById('kommand-tool-btn');
-  if (toolBtn && tool !== 'select') {
-    toolBtn.classList.add('active');
-  } else if (toolBtn) {
-    toolBtn.classList.remove('active');
-  }
+  // Update KOMMAND bar context button — shows the active tool's name so
+  // identity never disappears from the left edge, and glows to match.
+  const ctxBtn = document.getElementById('kommand-context');
+  const ctxLbl = document.getElementById('kommand-context-label');
+  if (ctxLbl) ctxLbl.textContent = tool.toUpperCase();
+  if (ctxBtn) ctxBtn.classList.toggle('active', tool !== 'select');
 
   document.getElementById('sb-mode').textContent=tool.toUpperCase();
 
@@ -6400,17 +6322,17 @@ function submitKommandFromButton() {
 // the menu is open would close it and instantly reopen it, making the
 // button unable to dismiss the menu.
 let _toolsMenuWasOpen = false;
-document.getElementById('kommand-tool-btn').addEventListener('mousedown', () => {
+document.getElementById('kommand-context').addEventListener('mousedown', () => {
   _toolsMenuWasOpen = document.getElementById('ctx-menu').classList.contains('open');
 });
 
 function toggleToolsMenu() {
-  // Opens the Quick Actions / Draw menu anchored to the tool button.
-  // The button's highlight state is managed exclusively by setTool() —
-  // it reflects the tool in use, so we never toggle it manually here.
+  // Opens the Quick Actions / Draw menu anchored to the context button.
+  // The button's highlight + label are managed exclusively by setTool() —
+  // they reflect the tool in use, so we never touch them manually here.
   if (_toolsMenuWasOpen) { _toolsMenuWasOpen = false; return; }
-  const toolBtn = document.getElementById('kommand-tool-btn');
-  const rect = toolBtn.getBoundingClientRect();
+  const ctxBtn = document.getElementById('kommand-context');
+  const rect = ctxBtn.getBoundingClientRect();
   // Anchor at the button's top edge: openCtxMenu's clamp flips the menu
   // upward when it would overflow the bottom — which is always the case
   // for the mobile floating bar pinned near the bottom of the screen.
@@ -6422,14 +6344,15 @@ function toggleToolsMenu() {
   const small  = window.innerWidth <= 900;
   if (coarse || small) document.body.classList.add('mobile-mode');
 
-  // Tap-to-focus: the bar is mostly non-interactive labels (context, KMD,
-  // echo) — on touch, taps land on those and the input never focuses, so
-  // the on-screen keyboard never appears. Route any tap on the bar's dead
-  // space into the input. Because this runs inside the user's tap gesture,
-  // mobile browsers will raise the keyboard.
+  // Tap-to-focus: KMD label and echo text are non-interactive — on touch,
+  // taps landing there would never focus the input, so the on-screen
+  // keyboard would never appear. Route any tap on the bar's dead space
+  // into the input. Because this runs inside the user's tap gesture,
+  // mobile browsers will raise the keyboard. The context button and GO
+  // button keep their own tap behavior and are excluded.
   const kBar = document.getElementById('kommand-bar');
   kBar.addEventListener('click', (e) => {
-    if (e.target.closest('#kommand-tool-btn') ||
+    if (e.target.closest('#kommand-context') ||
         e.target.closest('#kommand-go-btn')   ||
         e.target.id === 'kommand-input') return;
     const inp = document.getElementById('kommand-input');
@@ -9465,7 +9388,7 @@ kvInit();
 // ════════════════════════════════════════════════════════════════════════════
 
 const kInput   = document.getElementById('kommand-input');
-const kContext = document.getElementById('kommand-context');
+const kContext = document.getElementById('kommand-context-label'); // text-only target — kommand-context is a <button> with an icon child; writing textContent there would delete the icon
 const kEcho    = document.getElementById('kommand-echo');
 const kPrefix  = document.getElementById('kommand-prefix');
 
