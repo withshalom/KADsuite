@@ -224,21 +224,22 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 /* #kommand-context is now a <button> — styled as the tool button further down */
 #kommand-echo {
   flex-shrink: 0;
-  padding: 0 6px;
+  padding: 0;
   font-family: var(--fu);
   font-size: 11px;
   color: var(--t3);
   letter-spacing: 0.04em;
-  border-right: 1px solid var(--border);
   height: 100%;
   display: flex;
   align-items: center;
-  min-width: 60px;
+  min-width: 0;
   max-width: 100px;
   overflow: hidden;
   white-space: nowrap;
   user-select: none;
 }
+#kommand-echo:empty { border-right: none; }
+#kommand-echo:not(:empty) { padding: 0 6px; border-right: 1px solid var(--border); }
 #kommand-prefix {
   flex-shrink: 0;
   padding: 0 5px;
@@ -2673,6 +2674,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
   transition: transform 0.22s ease;
   box-shadow: 10px 0 30px rgba(0,0,0,0.45);
   pointer-events: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .mobile-mode.sidebar-open #sidebar { transform: translateX(0); }
 
@@ -4550,8 +4555,8 @@ document.addEventListener('keydown', function(e) {
     </svg>
     <span id="kommand-context-label">SELECT</span>
   </button>
-  <div id="kommand-label" style="flex-shrink:0;padding:0 6px;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.12em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;min-width:35px;">KMD</div>
-  <div id="kommand-echo">ready</div>
+  <div id="kommand-label" style="flex-shrink:0;padding:0 8px;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.1em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;min-width:72px;white-space:nowrap;">KOMMAND</div>
+  <div id="kommand-echo"></div>
   <div id="kommand-prefix">≫</div>
   <input id="kommand-input" type="text" spellcheck="false" autocomplete="off"
     placeholder="K → type: L line · 10,25 · @50,0 · @100&lt;45° · COPY · PASTE"
@@ -6344,12 +6349,12 @@ function toggleToolsMenu() {
   const small  = window.innerWidth <= 900;
   if (coarse || small) document.body.classList.add('mobile-mode');
 
-  // Tap-to-focus: KMD label and echo text are non-interactive — on touch,
-  // taps landing there would never focus the input, so the on-screen
-  // keyboard would never appear. Route any tap on the bar's dead space
-  // into the input. Because this runs inside the user's tap gesture,
-  // mobile browsers will raise the keyboard. The context button and GO
-  // button keep their own tap behavior and are excluded.
+  // Tap-to-focus: the KOMMAND label and echo text are non-interactive —
+  // on touch, taps landing there would never focus the input, so the
+  // on-screen keyboard would never appear. Route any tap on the bar's
+  // dead space into the input. Because this runs inside the user's tap
+  // gesture, mobile browsers will raise the keyboard. The context button
+  // and GO button keep their own tap behavior and are excluded.
   const kBar = document.getElementById('kommand-bar');
   kBar.addEventListener('click', (e) => {
     if (e.target.closest('#kommand-context') ||
