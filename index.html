@@ -2682,6 +2682,99 @@ body.light-mode .tool-btn.active .tool-icon svg {
   z-index: 10;
   text-shadow: 0 0 8px rgba(200,120,20,0.5);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE / TABLET DRAFTING MODE
+   Activated by adding class="mobile-mode" to <body> — either
+   auto-detected (pointer:coarse) or toggled manually via the
+   sidebar-toggle button's long-press (see JS init).
+   ═══════════════════════════════════════════════════════════ */
+
+/* Sidebar toggle button — hamburger/close, top-left of canvas area */
+#sidebar-toggle-btn {
+  display: none;
+  position: fixed;
+  top: calc(var(--toolbar-h) + 10px);
+  left: 10px;
+  z-index: 210;
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  color: var(--t1);
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.mobile-mode #sidebar-toggle-btn { display: flex; }
+
+/* Backdrop scrim behind the open drawer */
+#sidebar-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 199;
+}
+.mobile-mode.sidebar-open #sidebar-scrim { display: block; }
+
+/* Sidebar becomes a sliding drawer instead of a grid column */
+.mobile-mode #app { grid-template-columns: 0 1fr; }
+.mobile-mode #sidebar {
+  position: fixed;
+  top: var(--toolbar-h);
+  bottom: var(--status-h);
+  left: 0;
+  width: min(300px, 84vw);
+  z-index: 200;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+  box-shadow: 10px 0 30px rgba(0,0,0,0.45);
+  pointer-events: auto;
+}
+.mobile-mode.sidebar-open #sidebar { transform: translateX(0); }
+
+/* KOMMAND becomes a floating, keyboard-aware pill instead of a docked grid row */
+.mobile-mode #kommand-bar {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px; /* JS updates this to track the on-screen keyboard */
+  grid-column: unset;
+  border: 1px solid var(--border-hi);
+  border-radius: 12px;
+  border-top: 1px solid var(--border-hi);
+  height: 48px;
+  padding: 0 4px 0 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  z-index: 220;
+  transition: bottom 0.1s ease;
+}
+.mobile-mode #kommand-hint { display: none; } /* no room for the hotkey legend on small screens */
+.mobile-mode #kommand-input { font-size: 16px; } /* 16px prevents iOS Safari auto-zoom-on-focus */
+#kommand-go-btn {
+  display: none;
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  margin-right: 5px;
+  border-radius: 8px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--fu);
+  font-weight: 700;
+  font-size: 13px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.mobile-mode #kommand-go-btn { display: flex; }
+
+/* Canvas: hand touch gestures fully to our own JS handlers rather than
+   fighting the browser's native scroll/pinch — required for clean pinch-zoom */
+.mobile-mode #main-canvas { touch-action: none; }
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -3963,6 +4056,9 @@ document.addEventListener('keydown', function(e) {
 
 <div id="app">
 
+<button id="sidebar-toggle-btn" onclick="toggleMobileSidebar()" aria-label="Toggle tools">☰</button>
+<div id="sidebar-scrim" onclick="toggleMobileSidebar(false)"></div>
+
 <!-- TOPBAR -->
 <div id="topbar">
   <div class="brand"><span>KAD</span><div class="brand-sub" id="brand-sub">Kernel-Aided Design</div></div>
@@ -4477,6 +4573,7 @@ document.addEventListener('keydown', function(e) {
   <input id="kommand-input" type="text" spellcheck="false" autocomplete="off"
     placeholder="K → type: L line · 10,25 · @50,0 · @100&lt;45° · COPY · PASTE"
     tabindex="1"/>
+  <button id="kommand-go-btn" onclick="submitKommandFromButton()" aria-label="Submit command">GO</button>
   <div id="kommand-hint">
     <b>X,Y</b> abs &nbsp;·&nbsp;
     <i>@dX,dY</i> rel &nbsp;·&nbsp;
@@ -4516,6 +4613,48 @@ document.addEventListener('keydown', function(e) {
 </div><!-- end #app -->
 
 <div id="toast"></div>
+
+<!-- Shape Prompt Modal — Rectangle and Circle dimension input -->
+<div id="shape-prompt-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; z-index:998; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
+  <div style="background:var(--panel); border:1px solid var(--border-hi); border-radius:8px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.8); min-width:280px; font-family:var(--fu);">
+    
+    <!-- Rectangle Prompt -->
+    <div id="rect-prompt" style="display:none;">
+      <div style="font-size:16px; font-weight:700; color:var(--t1); margin-bottom:16px;">Rectangle Dimensions</div>
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+        <div>
+          <label style="display:block; font-size:12px; color:var(--t2); margin-bottom:4px; letter-spacing:0.05em; text-transform:uppercase;">Width</label>
+          <input id="rect-width-input" type="number" value="100" step="0.1" style="width:100%; background:var(--panel2); border:1px solid var(--border-hi); border-radius:4px; color:var(--accent); font-family:var(--fm); font-size:14px; padding:6px 8px; outline:none; text-align:right;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:12px; color:var(--t2); margin-bottom:4px; letter-spacing:0.05em; text-transform:uppercase;">Height</label>
+          <input id="rect-height-input" type="number" value="50" step="0.1" style="width:100%; background:var(--panel2); border:1px solid var(--border-hi); border-radius:4px; color:var(--accent); font-family:var(--fm); font-size:14px; padding:6px 8px; outline:none; text-align:right;" />
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button onclick="closeShapePrompt()" style="flex:1; padding:8px; background:var(--panel2); border:1px solid var(--border); border-radius:4px; color:var(--t2); font-family:var(--fu); font-size:13px; cursor:pointer; transition:all 0.15s;">Cancel</button>
+        <button onclick="applyRectPrompt()" style="flex:1; padding:8px; background:var(--accent-glow); border:1px solid var(--accent); border-radius:4px; color:var(--accent); font-family:var(--fu); font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s;">Apply</button>
+      </div>
+    </div>
+
+    <!-- Circle Prompt -->
+    <div id="circle-prompt" style="display:none;">
+      <div style="font-size:16px; font-weight:700; color:var(--t1); margin-bottom:16px;">Circle Radius</div>
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+        <div>
+          <label style="display:block; font-size:12px; color:var(--t2); margin-bottom:4px; letter-spacing:0.05em; text-transform:uppercase;">Radius</label>
+          <input id="circle-radius-input" type="number" value="50" step="0.1" min="0.01" style="width:100%; background:var(--panel2); border:1px solid var(--border-hi); border-radius:4px; color:var(--accent); font-family:var(--fm); font-size:14px; padding:6px 8px; outline:none; text-align:right;" />
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button onclick="closeShapePrompt()" style="flex:1; padding:8px; background:var(--panel2); border:1px solid var(--border); border-radius:4px; color:var(--t2); font-family:var(--fu); font-size:13px; cursor:pointer; transition:all 0.15s;">Cancel</button>
+        <button onclick="applyCirclePrompt()" style="flex:1; padding:8px; background:var(--accent-glow); border:1px solid var(--accent); border-radius:4px; color:var(--accent); font-family:var(--fu); font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s;">Apply</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- RIGHT-CLICK CONTEXT MENU — lives on body, outside canvas-wrap -->
 <div id="ctx-menu">
@@ -5303,6 +5442,12 @@ function commitRect(x1,y1,x2,y2) {
   showToast(`Rect ${fmtU(Math.abs(x2-x1))} × ${fmtU(Math.abs(y2-y1))}`);
 }
 
+function commitCircle(cx,cy,r) {
+  if(r<1e-6){ showToast('Circle too small'); return; }
+  GeoMemory.addCircle(cx,cy,r);
+  showToast('Circle r='+fmtU(r));
+}
+
 // ── POLYGON TOOL ────────────────────────────────────────
 function getPolySides()     { return Math.max(3,parseInt(document.getElementById('poly-sides-input').value)||6); }
 function getPolyInscribed() { return document.getElementById('poly-inscribed').checked; }
@@ -5884,9 +6029,87 @@ function setTool(tool) {
   };
   document.getElementById('hint').innerHTML = hintMap[tool]||'';
 
+  if (document.body.classList.contains('mobile-mode')) toggleMobileSidebar(false);
+
   updateCursor();
   render();
 }
+
+// ── SHAPE PROMPT MODAL ───────────────────────────────────────────
+// Shows dimension input dialogs for Rectangle and Circle after first click
+
+function openRectPrompt() {
+  document.getElementById('rect-width-input').value = '100';
+  document.getElementById('rect-height-input').value = '50';
+  document.getElementById('rect-prompt').style.display = 'block';
+  document.getElementById('circle-prompt').style.display = 'none';
+  document.getElementById('shape-prompt-modal').style.display = 'flex';
+  document.getElementById('rect-width-input').focus();
+  document.getElementById('rect-width-input').select();
+}
+
+function openCirclePrompt() {
+  document.getElementById('circle-radius-input').value = '50';
+  document.getElementById('circle-prompt').style.display = 'block';
+  document.getElementById('rect-prompt').style.display = 'none';
+  document.getElementById('shape-prompt-modal').style.display = 'flex';
+  document.getElementById('circle-radius-input').focus();
+  document.getElementById('circle-radius-input').select();
+}
+
+function closeShapePrompt() {
+  document.getElementById('shape-prompt-modal').style.display = 'none';
+  cancelTool();
+  render();
+}
+
+function applyRectPrompt() {
+  const width = parseFloat(document.getElementById('rect-width-input').value) || 0;
+  const height = parseFloat(document.getElementById('rect-height-input').value) || 0;
+  
+  if (width <= 0 || height <= 0) {
+    kecho('Width and height must be positive', 'err');
+    return;
+  }
+  
+  if (!rectState.active) {
+    kecho('No rectangle started', 'err');
+    return;
+  }
+  
+  const x1 = rectState.x1, y1 = rectState.y1;
+  const x2 = x1 + width, y2 = y1 + height;
+  
+  commitRect(x1, y1, x2, y2);
+  document.getElementById('shape-prompt-modal').style.display = 'none';
+  rectState = {active: false};
+  kecho('Rectangle ' + fmtU(width) + ' × ' + fmtU(height), 'ok');
+  render();
+}
+
+function applyCirclePrompt() {
+  const radius = parseFloat(document.getElementById('circle-radius-input').value) || 0;
+  
+  if (radius <= 0) {
+    kecho('Radius must be positive', 'err');
+    return;
+  }
+  
+  if (!circleState.active) {
+    kecho('No circle started', 'err');
+    return;
+  }
+  
+  const cx = circleState.cx, cy = circleState.cy;
+  const edge_x = cx + radius, edge_y = cy;
+  
+  commitCircle(cx, cy, radius);
+  document.getElementById('shape-prompt-modal').style.display = 'none';
+  circleState = {active: false};
+  kecho('Circle r=' + fmtU(radius), 'ok');
+  render();
+}
+
 
 function updateCursor() {
   if(activeTool==='select') { canvas.style.cursor='default'; }
@@ -6044,6 +6267,96 @@ canvas.addEventListener('mousemove',  onMouseMove);
 canvas.addEventListener('mouseup',    onMouseUp);
 canvas.addEventListener('wheel',      onWheel, {passive:false});
 
+// ── TOUCH: PINCH-TO-ZOOM ─────────────────────────────────
+// Phase 1 of mobile/tablet support. Two-finger pinch only — deliberately does
+// NOT claim single-finger touch (that's reserved for the tap-to-place-point /
+// two-tap select-box work, so it isn't fought over between phases). Single
+// finger taps are left alone and fall through to the browser's normal
+// touch→mouse-event synthesis, which already drives the existing click-to-draw
+// tool logic (onMouseDown) without any changes needed here.
+let pinchState = { active:false, startDist:0, startZoom:1, startPanX:0, startPanY:0, midX:0, midY:0 };
+
+function touchDist(t0, t1) { return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY); }
+function touchMid(t0, t1, rect) {
+  return { x: (t0.clientX + t1.clientX) / 2 - rect.left, y: (t0.clientY + t1.clientY) / 2 - rect.top };
+}
+
+canvas.addEventListener('touchstart', function(e) {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    pinchState.active = true;
+    pinchState.startDist = touchDist(e.touches[0], e.touches[1]);
+    pinchState.startZoom = cam.zoom;
+    pinchState.startPanX = cam.panX;
+    pinchState.startPanY = cam.panY;
+    const mid = touchMid(e.touches[0], e.touches[1], rect);
+    pinchState.midX = mid.x; pinchState.midY = mid.y;
+  }
+}, {passive:false});
+
+canvas.addEventListener('touchmove', function(e) {
+  if (pinchState.active && e.touches.length === 2) {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const dist = touchDist(e.touches[0], e.touches[1]);
+    const mid = touchMid(e.touches[0], e.touches[1], rect);
+    const f = dist / pinchState.startDist;
+    const nz = Math.max(cam.minZoom, Math.min(cam.maxZoom, pinchState.startZoom * f));
+    // Same anchor-at-point math as onWheel, anchored at the pinch midpoint
+    // (using the midpoint's current position, so the drawing under your
+    // fingers stays under your fingers even as they drift apart while pinching)
+    cam.panX = mid.x - (pinchState.midX - pinchState.startPanX) * (nz / pinchState.startZoom);
+    cam.panY = mid.y - (pinchState.midY - pinchState.startPanY) * (nz / pinchState.startZoom);
+    cam.zoom = nz;
+    document.getElementById('prop-zoom').textContent = cam.zoom.toFixed(2) + '×';
+    updateGridLabel(); render();
+  }
+}, {passive:false});
+
+canvas.addEventListener('touchend', function(e) {
+  if (e.touches.length < 2) pinchState.active = false;
+}, {passive:false});
+canvas.addEventListener('touchcancel', function(e) {
+  pinchState.active = false;
+}, {passive:false});
+
+// ── MOBILE MODE: sidebar drawer + keyboard-aware KOMMAND bar ────
+function toggleMobileSidebar(force) {
+  const open = typeof force === 'boolean' ? force : !document.body.classList.contains('sidebar-open');
+  document.body.classList.toggle('sidebar-open', open);
+  document.getElementById('sidebar-toggle-btn').textContent = open ? '✕' : '☰';
+}
+
+function submitKommandFromButton() {
+  const inp = document.getElementById('kommand-input');
+  inp.focus();
+  inp.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true, cancelable:true}));
+}
+
+(function initMobileMode() {
+  const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  const small  = window.innerWidth <= 900;
+  if (coarse || small) document.body.classList.add('mobile-mode');
+
+  // Keep the floating KOMMAND bar pinned just above the on-screen keyboard.
+  // visualViewport is the reliable signal for keyboard height — window.innerHeight
+  // does not reliably shrink when the keyboard opens on iOS Safari.
+  if (window.visualViewport) {
+    function repositionKommand() {
+      if (!document.body.classList.contains('mobile-mode')) return;
+      const vv = window.visualViewport;
+      const overlap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.getElementById('kommand-bar').style.bottom = (overlap + 10) + 'px';
+    }
+    window.visualViewport.addEventListener('resize', repositionKommand);
+    window.visualViewport.addEventListener('scroll', repositionKommand);
+    const kInputEl = document.getElementById('kommand-input');
+    kInputEl.addEventListener('focus', () => setTimeout(repositionKommand, 50));
+    kInputEl.addEventListener('blur',  () => setTimeout(repositionKommand, 50));
+  }
+})();
+
 // RIGHT-CLICK: attach to document to guarantee firing
 document.addEventListener('contextmenu', e=>{
   if(e.target===canvas || canvas.contains(e.target)){
@@ -6115,10 +6428,8 @@ function onMouseDown(e) {
       if(dynVisible) return;
       if(!rectState.active){
         rectState={active:true, x1:wp.x, y1:wp.y};
-      } else {
-        commitRect(rectState.x1,rectState.y1,wp.x,wp.y);
-        rectState={active:false};
         document.getElementById('rect-preview').style.display='none';
+        openRectPrompt();
       }
       render(); return;
     }
@@ -6178,12 +6489,9 @@ function onMouseDown(e) {
     if(activeTool==='circle') {
       if(dynVisible)return;
       const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
-      if(!circleState.active){circleState={active:true,cx:wp.x,cy:wp.y};}
-      else{
-        const r=Math.hypot(wp.x-circleState.cx,wp.y-circleState.cy);
-        if(r<1e-6){showToast('Circle too small');return;}
-        GeoMemory.addCircle(circleState.cx,circleState.cy,r);
-        showToast('Circle r='+fmtU(r));circleState={active:false};
+      if(!circleState.active){
+        circleState={active:true,cx:wp.x,cy:wp.y};
+        openCirclePrompt();
       }
       render();return;
     }
