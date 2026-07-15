@@ -320,7 +320,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* ── DYNAMIC INPUT ── */
-#dyn-input-wrap { display:none !important; pointer-events:none; }
+#dyn-input-wrap { display:none !important; pointer-events:none !important; visibility:hidden !important; }
 #dyn-input-box { background:var(--panel); border:1px solid var(--accent); border-radius:3px; box-shadow:0 0 12px rgba(0,212,255,0.3),0 2px 8px rgba(0,0,0,0.7); display:flex; align-items:center; min-width:170px; overflow:hidden; }
 #dyn-input-prefix { background:var(--panel2); border-right:1px solid var(--border); padding:5px 7px; font-family:var(--fm); font-size:12px; color:var(--accent); letter-spacing:0.05em; white-space:nowrap; flex-shrink:0; min-width:42px; text-align:center; }
 #dyn-input-field { background:transparent; border:none; outline:none; padding:5px 8px; font-family:var(--fm); font-size:13px; color:var(--t1); width:130px; caret-color:var(--accent); }
@@ -5247,18 +5247,11 @@ const dynPrefix = document.getElementById('dyn-input-prefix');
 let dynVisible  = false;
 
 function openDynInput(seed) {
-  dynVisible = true;
-  dynField.value = seed||'';
-  dynWrap.style.display = 'block';
-  positionDynInput();
-  dynField.focus();
-  updateDynPrefix();
+  // DEPRECATED: old floating coordinate input. Use KOMMAND bar instead.
+  // This function is here only to prevent errors if old code tries to call it.
 }
 function closeDynInput() {
-  dynVisible = false;
-  dynWrap.style.display = 'none';
-  dynField.value = '';
-  canvas.focus();
+  // DEPRECATED: old floating coordinate input. Use KOMMAND bar instead.
 }
 function positionDynInput() {
   let sx = mouseScreen.x + 18, sy = mouseScreen.y + 22;
@@ -6688,7 +6681,7 @@ function onMouseMove(e) {
   if(activeTool==='extend')  updateExtendHover(mouseWorld.x,mouseWorld.y);
   if(activeTool==='stretch') updateStretchHover(mouseWorld.x,mouseWorld.y);
   if(activeTool==='stretch'&&stretchState.active&&stretchState.obj) applyStretch(mouseWorld.x,mouseWorld.y);
-  if(dynVisible) positionDynInput();
+  // OLD DYN-INPUT DISABLED: use KOMMAND bar instead
   render();
   if(typeof drawNewToolPreviews==='function') drawNewToolPreviews();
 }
