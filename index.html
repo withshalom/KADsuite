@@ -2757,6 +2757,22 @@ body.light-mode .tool-btn.active .tool-icon svg {
 .mobile-mode .tb-right { gap: 4px; flex-shrink: 0; }
 .mobile-mode .tb-badge { display: none; }        /* v0.0 badge — no room */
 .mobile-mode #theme-toggle .t-label { display: none; }  /* icon only */
+
+/* Dropdowns are position:absolute inside .tb-menu-item, but that item
+   sits in a horizontally-scrolling strip on mobile (overflow-x:auto
+   clips the paired y-axis too) — so an open dropdown would get cut off
+   instead of floating over the canvas. Pull it out of that flow with
+   position:fixed; openMenu() in JS sets top/left per-tap so it appears
+   directly under whichever header was tapped, rather than a fixed spot. */
+.mobile-mode .tb-dropdown {
+  position: fixed;
+  min-width: 200px;
+  max-width: calc(100vw - 12px);
+  max-height: calc(100vh - var(--toolbar-h) - 20px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-mode .tb-dd-item { padding: 10px 14px; font-size: 14px; }  /* larger tap targets */
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -5178,7 +5194,27 @@ function openMenu(name) {
   closeMenus();
   const item = document.getElementById('menu-'+name);
   const dd   = document.getElementById('dd-'+name);
-  if(item&&dd){ item.classList.add('open'); dd.classList.add('open'); }
+  if(!item||!dd) return;
+  item.classList.add('open'); dd.classList.add('open');
+
+  // On mobile the dropdown is position:fixed (see .mobile-mode .tb-dropdown)
+  // so it can escape the topbar's horizontal-scroll clipping — but that
+  // means CSS alone can't anchor it under whichever header was tapped.
+  // Position it here, under the actual tapped item, clamped so it never
+  // runs off the right edge of the screen.
+  if (document.body.classList.contains('mobile-mode')) {
+    const rect = item.getBoundingClientRect();
+    dd.style.left = rect.left + 'px';
+    dd.style.top  = rect.bottom + 'px';
+    // Clamp after layout so we can measure the dropdown's real width.
+    requestAnimationFrame(() => {
+      const ddRect = dd.getBoundingClientRect();
+      const overflowRight = ddRect.right - window.innerWidth;
+      if (overflowRight > 0) {
+        dd.style.left = Math.max(6, rect.left - overflowRight - 6) + 'px';
+      }
+    });
+  }
 }
 function scheduleClose() { menuCloseTimer = setTimeout(closeMenus, 180); }
 function cancelClose()   { if(menuCloseTimer){ clearTimeout(menuCloseTimer); menuCloseTimer=null; } }
@@ -5188,6 +5224,44 @@ function closeMenus() {
 }
 document.addEventListener('click', (e)=>{
   if(!e.target.closest('#topbar')) closeMenus();
+});
+
+// File/Edit/View/Draw/Tools menus open on mouseenter — which never fires
+// on touch. On real touch hardware, browsers still dispatch a "ghost"
+// mouseenter immediately before the click on first tap. That ghost event
+// was reaching the inline onmouseenter="openMenu(...)" handler and
+// opening the menu a beat before our click handler ran — so click saw
+// wasOpen=true and immediately closed what mouseenter had just opened,
+// requiring a second tap to actually see it. Fix: on mobile, click is
+// the only thing allowed to open a menu. We stop the ghost mouseenter
+// from doing anything by checking mobile-mode inside openMenu's callers
+// isn't enough (openMenu is also called by other code), so instead we
+// swallow the *event* at the source — capture mouseenter on the item in
+// mobile-mode and prevent it reaching the inline handler.
+document.querySelectorAll('.tb-menu-item').forEach(item => {
+  item.addEventListener('mouseenter', (e) => {
+    // Only intercept mouseenter targeting the header itself — capture-phase
+    // listeners also see events targeting descendants (like the nested
+    // .tb-dropdown), and we must never block the dropdown's own
+    // cancelClose() on hybrid touch+mouse devices.
+    if (e.target !== item) return;
+    if (document.body.classList.contains('mobile-mode')) {
+      e.stopImmediatePropagation();
+    }
+  }, true); // capture phase — runs before the inline onmouseenter handler
+
+  item.addEventListener('click', (e) => {
+    if (!document.body.classList.contains('mobile-mode')) return;
+    // Let taps on dropdown items fall through to their own onclick.
+    if (e.target.closest('.tb-dropdown')) return;
+    e.stopPropagation();
+    const wasOpen = item.classList.contains('open');
+    closeMenus();
+    if (!wasOpen) {
+      const name = item.id.replace('menu-', '');
+      openMenu(name);
+    }
+  });
 });
 
 // ── COORD PANEL TOGGLE ──────────────────────────────────
