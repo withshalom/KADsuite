@@ -239,33 +239,33 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 }
 #kommand-echo {
   flex-shrink: 0;
-  padding: 0 8px;
+  padding: 0 6px;
   font-family: var(--fu);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--t3);
   letter-spacing: 0.04em;
   border-right: 1px solid var(--border);
   height: 100%;
   display: flex;
   align-items: center;
-  min-width: 180px;
-  max-width: 280px;
+  min-width: 60px;
+  max-width: 100px;
   overflow: hidden;
   white-space: nowrap;
   user-select: none;
 }
 #kommand-prefix {
   flex-shrink: 0;
-  padding: 0 8px;
+  padding: 0 5px;
   font-family: var(--fu);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--accent);
   border-right: 1px solid var(--border);
   height: 100%;
   display: flex;
   align-items: center;
-  min-width: 40px;
+  min-width: 28px;
   user-select: none;
 }
 #kommand-input {
@@ -273,14 +273,14 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
   background: transparent;
   border: none;
   outline: none;
-  padding: 0 10px;
+  padding: 0 8px;
   font-family: var(--fu);
   font-size: 13px;
   color: var(--t1);
   caret-color: var(--accent);
   height: 100%;
 }
-#kommand-input::placeholder { color: var(--t3); font-size: 13px; }
+#kommand-input::placeholder { color: var(--t3); font-size: 11px; }
 #kommand-hint {
   flex-shrink: 0;
   padding: 0 10px;
@@ -2564,7 +2564,7 @@ footer {
   caret-color: var(--accent);
   height: 100%;
 }
-#kommand-input::placeholder { color: var(--t3); font-size: 13px; }
+#kommand-input::placeholder { color: var(--t3); font-size: 11px; }
 #kommand-hint {
   flex-shrink: 0;
   padding: 0 10px;
@@ -2579,8 +2579,25 @@ footer {
 #kommand-hint i  { color: var(--amber);  font-style: normal; }
 #kommand-hint em { color: var(--green);  font-style: normal; }
 
-
-
+/* ── TOOL BUTTON ICON – toggles draw tools on mobile, highlights on desktop ── */
+#kommand-tool-btn {
+  flex-shrink: 0;
+  background: var(--panel2);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  height: 100%;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+#kommand-tool-btn:hover { background: var(--hover); }
+#kommand-tool-btn.active { box-shadow: inset 0 0 0 1px var(--accent); }
+#kommand-tool-btn svg { width: 16px; height: 16px; stroke: #7ee8ff; color: #7ee8ff; }
+#kommand-tool-btn:hover svg { stroke: #b0f0ff; color: #b0f0ff; }
+#kommand-tool-btn.active svg { stroke: var(--accent); color: var(--accent); filter: drop-shadow(0 0 3px var(--accent)); }
 
 
 .tool-icon svg { width:16px; height:16px; stroke:#7ee8ff; color:#7ee8ff; }
@@ -2753,7 +2770,9 @@ body.light-mode .tool-btn.active .tool-icon svg {
   transition: bottom 0.1s ease;
 }
 .mobile-mode #kommand-hint { display: none; } /* no room for the hotkey legend on small screens */
-.mobile-mode #kommand-input { font-size: 16px; } /* 16px prevents iOS Safari auto-zoom-on-focus */
+.mobile-mode #kommand-input { font-size: 16px; -webkit-user-select: text; } /* 16px prevents iOS Safari auto-zoom-on-focus */
+.mobile-mode #kommand-input:focus { outline: 1px solid var(--accent); }
+.mobile-mode #kommand-tool-btn { display: flex; border-left: 1px solid var(--border-hi); border-right: 1px solid var(--border-hi); }
 #kommand-go-btn {
   display: none;
   flex-shrink: 0;
@@ -2775,6 +2794,41 @@ body.light-mode .tool-btn.active .tool-icon svg {
 /* Canvas: hand touch gestures fully to our own JS handlers rather than
    fighting the browser's native scroll/pinch — required for clean pinch-zoom */
 .mobile-mode #main-canvas { touch-action: none; }
+
+/* ── MOBILE STATUSBAR REFLOW ──
+   The statusbar lives in a fixed 32px grid row (--status-h), so it must
+   stay a single line — wrapping would clip inside #app's overflow:hidden.
+   sb-right (the hotkey legend) is useless on touch, so it goes. */
+.mobile-mode #statusbar {
+  gap: 4px;
+  padding: 0 8px;
+  overflow: hidden;
+}
+.mobile-mode .sb-item {
+  font-size: 11px;
+  white-space: nowrap;
+}
+.mobile-mode .sb-right {
+  display: none;  /* Hide hotkey legend on mobile */
+}
+
+/* ── MOBILE TOPBAR REFLOW ──
+   The far-right buttons (version badge, theme toggle, unit toggle) don't
+   fit alongside the menu on narrow screens. Drop the badge, compact the
+   toggles, and let the menu area scroll horizontally if it must. */
+.mobile-mode #topbar { padding: 0 6px; }
+.mobile-mode .tb-menu {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
+}
+.mobile-mode .tb-menu::-webkit-scrollbar { display: none; }
+.mobile-mode .tb-menu-item { padding: 0 8px; font-size: 13px; }
+.mobile-mode .tb-right { gap: 4px; flex-shrink: 0; }
+.mobile-mode .tb-badge { display: none; }        /* v0.0 badge — no room */
+.mobile-mode #theme-toggle .t-label { display: none; }  /* icon only */
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -4567,8 +4621,14 @@ document.addEventListener('keydown', function(e) {
 <!-- ═══ KOMMAND LINE ════════════════════════════════════════════════════════ -->
 <div id="kommand-bar">
   <div id="kommand-context">SELECT</div>
-  <div id="kommand-label" style="flex-shrink:0;padding:0 8px;font-family:var(--fm);font-size:12px;font-weight:700;color:var(--accent);letter-spacing:0.14em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;">KOMMAND</div>
+  <div id="kommand-label" style="flex-shrink:0;padding:0 6px;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.12em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;min-width:35px;">KMD</div>
   <div id="kommand-echo">ready</div>
+  <button id="kommand-tool-btn" onclick="toggleToolsMenu()" aria-label="Draw tools" title="Draw tools">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 20h9"/>
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+  </button>
   <div id="kommand-prefix">≫</div>
   <input id="kommand-input" type="text" spellcheck="false" autocomplete="off"
     placeholder="K → type: L line · 10,25 · @50,0 · @100&lt;45° · COPY · PASTE"
@@ -5991,6 +6051,14 @@ function setTool(tool) {
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
   const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',chamfer:'btn-chamfer',mirror:'btn-mirror',dim:'btn-dim',trim:'btn-trim',extend:'btn-extend',break:'btn-break',scale:'btn-scale',stretch:'btn-stretch',text:'btn-text'};
   if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
+  
+  // Update KOMMAND bar tool button active state (highlight on desktop)
+  const toolBtn = document.getElementById('kommand-tool-btn');
+  if (toolBtn && tool !== 'select') {
+    toolBtn.classList.add('active');
+  } else if (toolBtn) {
+    toolBtn.classList.remove('active');
+  }
 
   document.getElementById('sb-mode').textContent=tool.toUpperCase();
 
@@ -6327,10 +6395,46 @@ function submitKommandFromButton() {
   inp.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true, cancelable:true}));
 }
 
+// The document-level mousedown handler closes the ctx menu before this
+// button's click event fires — without a guard, tapping the button while
+// the menu is open would close it and instantly reopen it, making the
+// button unable to dismiss the menu.
+let _toolsMenuWasOpen = false;
+document.getElementById('kommand-tool-btn').addEventListener('mousedown', () => {
+  _toolsMenuWasOpen = document.getElementById('ctx-menu').classList.contains('open');
+});
+
+function toggleToolsMenu() {
+  // Opens the Quick Actions / Draw menu anchored to the tool button.
+  // The button's highlight state is managed exclusively by setTool() —
+  // it reflects the tool in use, so we never toggle it manually here.
+  if (_toolsMenuWasOpen) { _toolsMenuWasOpen = false; return; }
+  const toolBtn = document.getElementById('kommand-tool-btn');
+  const rect = toolBtn.getBoundingClientRect();
+  // Anchor at the button's top edge: openCtxMenu's clamp flips the menu
+  // upward when it would overflow the bottom — which is always the case
+  // for the mobile floating bar pinned near the bottom of the screen.
+  openCtxMenu(rect.left, rect.top - 4);
+}
+
 (function initMobileMode() {
   const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
   const small  = window.innerWidth <= 900;
   if (coarse || small) document.body.classList.add('mobile-mode');
+
+  // Tap-to-focus: the bar is mostly non-interactive labels (context, KMD,
+  // echo) — on touch, taps land on those and the input never focuses, so
+  // the on-screen keyboard never appears. Route any tap on the bar's dead
+  // space into the input. Because this runs inside the user's tap gesture,
+  // mobile browsers will raise the keyboard.
+  const kBar = document.getElementById('kommand-bar');
+  kBar.addEventListener('click', (e) => {
+    if (e.target.closest('#kommand-tool-btn') ||
+        e.target.closest('#kommand-go-btn')   ||
+        e.target.id === 'kommand-input') return;
+    const inp = document.getElementById('kommand-input');
+    inp.focus();
+  });
 
   // Keep the floating KOMMAND bar pinned just above the on-screen keyboard.
   // visualViewport is the reliable signal for keyboard height — window.innerHeight
@@ -9530,7 +9634,7 @@ kInput.addEventListener('keydown', function(e) {
     if (!kPrefix) return;
     if (v.startsWith('@') && v.includes('<')) kPrefix.textContent = 'POL';
     else if (v.startsWith('@'))               kPrefix.textContent = 'REL';
-    else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'CMD';
+    else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'KMD';
     else if (v.match(/^[0-9+\-]/))           kPrefix.textContent = 'ABS';
     else                                      kPrefix.textContent = '≫';
   }, 0);
