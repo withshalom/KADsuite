@@ -317,7 +317,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 #dyn-input-hint em { color:var(--green); font-style:normal; }
 
 /* ── CONTEXT MENU ── */
-#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border-hi); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow:hidden; padding:4px 0; }
+#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border-hi); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; max-height:calc(100vh - 16px); padding:4px 0; }
 #ctx-menu.open { display:flex; }
 .ctx-head { padding:4px 12px 3px; font-family:var(--fu); font-size:11px; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; }
 .ctx-item { display:flex; align-items:center; gap:10px; padding:7px 14px; font-family:var(--fu); font-size:13px; color:var(--t2); cursor:pointer; transition:background 0.1s,color 0.1s; border:none; background:none; width:100%; text-align:left; }
@@ -326,6 +326,44 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 .ctx-item .ctx-key { margin-left:auto; font-size:12px; color:var(--t3); }
 .ctx-item.hi { color:var(--accent); }
 .ctx-item.hi:hover { background:rgba(0,212,255,0.08); }
+.ctx-item.del { color:var(--red); }
+.ctx-item.del:hover { background:rgba(255,68,85,0.12); }
+
+/* ── CTX MENU CUSTOMIZER ── */
+#ctxcfg-overlay {
+  position:fixed; inset:0; z-index:600; display:none;
+  background:rgba(0,0,0,0.55); align-items:center; justify-content:center;
+}
+#ctxcfg-overlay.open { display:flex; }
+#ctxcfg-panel {
+  width:min(340px, calc(100vw - 24px)); max-height:calc(100vh - 40px);
+  display:flex; flex-direction:column;
+  background:var(--panel); border:1px solid var(--border-hi); border-radius:8px;
+  box-shadow:0 18px 50px rgba(0,0,0,0.7);
+}
+.ctxcfg-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border-bottom:1px solid var(--border);
+  font-family:var(--fu); font-size:13px; font-weight:600; color:var(--accent);
+  letter-spacing:0.06em;
+}
+.ctxcfg-close {
+  background:none; border:none; color:var(--t3); font-size:14px;
+  cursor:pointer; padding:2px 6px;
+}
+.ctxcfg-close:hover { color:var(--t1); }
+.ctxcfg-sub {
+  padding:8px 14px 4px; font-family:var(--fu); font-size:11px; color:var(--t3);
+}
+#ctxcfg-list { overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 6px 10px; }
+.ctxcfg-row {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border-radius:5px; cursor:pointer;
+  font-family:var(--fu); font-size:13px; color:var(--t1);
+}
+.ctxcfg-row:hover { background:var(--hover); }
+.ctxcfg-row input { accent-color:var(--accent); width:15px; height:15px; flex-shrink:0; }
+.ctxcfg-row .ctxcfg-key { margin-left:auto; font-size:11px; color:var(--t3); font-family:var(--fm); }
 .ctx-sep { height:1px; background:var(--border); margin:3px 0; }
 
 /* ── RECT DRAG PREVIEW ── */
@@ -1020,7 +1058,7 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 #dyn-input-hint em { color:var(--green); font-style:normal; }
 
 /* ── CONTEXT MENU ── */
-#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border-hi); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow:hidden; padding:4px 0; }
+#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border-hi); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; max-height:calc(100vh - 16px); padding:4px 0; }
 #ctx-menu.open { display:flex; }
 .ctx-head { padding:4px 12px 3px; font-family:var(--fu); font-size:11px; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; }
 .ctx-item { display:flex; align-items:center; gap:10px; padding:7px 14px; font-family:var(--fu); font-size:13px; color:var(--t2); cursor:pointer; transition:background 0.1s,color 0.1s; border:none; background:none; width:100%; text-align:left; }
@@ -1029,6 +1067,8 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 .ctx-item .ctx-key { margin-left:auto; font-size:12px; color:var(--t3); }
 .ctx-item.hi { color:var(--accent); }
 .ctx-item.hi:hover { background:rgba(0,212,255,0.08); }
+.ctx-item.del { color:var(--red); }
+.ctx-item.del:hover { background:rgba(255,68,85,0.12); }
 .ctx-sep { height:1px; background:var(--border); margin:3px 0; }
 
 /* ── RECT DRAG PREVIEW ── */
@@ -4105,6 +4145,7 @@ document.addEventListener('keydown', function(e) {
     </div>
     <div class="tb-menu-item" id="menu-draw" onmouseenter="openMenu('draw')" onmouseleave="scheduleClose()">Draw
       <div class="tb-dropdown" id="dd-draw" onmouseenter="cancelClose()" onmouseleave="scheduleClose()">
+        <div class="tb-dd-item" onclick="setTool('pline');closeMenus()">Polyline<span class="dd-key">PL</span></div>
         <div class="tb-dd-item" onclick="setTool('line');closeMenus()">Line<span class="dd-key">L</span></div>
         <div class="tb-dd-item" onclick="setTool('arc');closeMenus()">Arc (3-point)<span class="dd-key">A</span></div>
         <div class="tb-dd-item" onclick="setTool('circle');closeMenus()">Circle<span class="dd-key">C</span></div>
@@ -4175,9 +4216,9 @@ document.addEventListener('keydown', function(e) {
 
   <div class="section-head">Draw Tools</div>
   <div class="tool-grid">
-    <button class="tool-btn active" id="btn-select" onclick="setTool('select')">
-      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3l14 9-7 1-4 7z"/></svg></div>
-      <span class="tool-label">SELECT</span>
+    <button class="tool-btn active" id="btn-pline" onclick="setTool('pline')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 20 8 8 14 14 21 4"/><circle cx="3" cy="20" r="1.6" fill="currentColor"/><circle cx="8" cy="8" r="1.6" fill="currentColor"/><circle cx="14" cy="14" r="1.6" fill="currentColor"/><circle cx="21" cy="4" r="1.6" fill="currentColor"/></svg></div>
+      <span class="tool-label">PLINE</span>
     </button>
     <button class="tool-btn" id="btn-line" onclick="setTool('line')">
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="4"/><circle cx="4" cy="20" r="2" fill="currentColor"/><circle cx="20" cy="4" r="2" fill="currentColor"/></svg></div>
@@ -4254,6 +4295,10 @@ document.addEventListener('keydown', function(e) {
     <button class="tool-btn" id="btn-array" onclick="openArrayDialog()">
       <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5"/><rect x="17" y="3" width="4" height="5"/><rect x="3" y="10" width="5" height="5"/><rect x="10" y="10" width="5" height="5"/><rect x="17" y="10" width="4" height="5"/></svg></div>
       <span class="tool-label">ARRAY</span>
+    </button>
+    <button class="tool-btn" id="btn-select" onclick="setTool('select')">
+      <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3l14 9-7 1-4 7z"/></svg></div>
+      <span class="tool-label">SELECT</span>
     </button>
   </div>
 
@@ -4569,7 +4614,7 @@ document.addEventListener('keydown', function(e) {
       <path d="M12 20h9"/>
       <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
     </svg>
-    <span id="kommand-context-label">SELECT</span>
+    <span id="kommand-context-label">PLINE</span>
   </button>
   <div id="kommand-label" style="flex-shrink:0;padding:0 8px;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.1em;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;min-width:72px;white-space:nowrap;">KOMMAND</div>
   <div id="kommand-echo"></div>
@@ -4587,7 +4632,7 @@ document.addEventListener('keydown', function(e) {
 </div>
 
 <div id="statusbar">
-  <div class="sb-item"><span>MODE</span><span class="sb-val act" id="sb-mode">SELECT</span></div>
+  <div class="sb-item"><span>MODE</span><span class="sb-val act" id="sb-mode">PLINE</span></div>
   <div class="sb-item"><span>SNAP</span><span class="sb-val ok" id="sb-snap">ON</span></div>
   <div class="sb-item"><span>GRID</span><span class="sb-val" id="sb-grid">10mm</span></div>
   <div class="sb-right">
@@ -4673,6 +4718,12 @@ document.addEventListener('keydown', function(e) {
     Clear Selection
     <span class="ctx-key">S</span>
   </button>
+  <button class="ctx-item del" id="ctx-delete-btn" onclick="ctxDelete()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+    Delete Selected
+    <span class="ctx-key">Del</span>
+  </button>
+  <div id="ctx-custom-slot"></div>
   <div class="ctx-sep"></div>
   <div class="ctx-head">Polyline</div>
   <button class="ctx-item" onclick="joinSelected();closeCtxMenu()">
@@ -4687,6 +4738,7 @@ document.addEventListener('keydown', function(e) {
   </button>
   <div class="ctx-sep"></div>
   <div class="ctx-head">Draw</div>
+  <button class="ctx-item" onclick="setTool('pline');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 20 8 8 14 14 21 4"/></svg>Polyline<span class="ctx-key">PL</span></button>
   <button class="ctx-item" onclick="setTool('line');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="20" x2="20" y2="4"/></svg>Line<span class="ctx-key">L</span></button>
   <button class="ctx-item" onclick="setTool('arc');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19a9 9 0 0 1 14 0"/></svg>Arc<span class="ctx-key">A</span></button>
   <button class="ctx-item" onclick="setTool('circle');closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg>Circle<span class="ctx-key">C</span></button>
@@ -4701,6 +4753,23 @@ document.addEventListener('keydown', function(e) {
   <button class="ctx-item" onclick="zoomExtents();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>Zoom Extents<span class="ctx-key">Z</span></button>
   <button class="ctx-item" onclick="initCamera();render();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>Reset View<span class="ctx-key">Home</span></button>
   <button class="ctx-item" onclick="toggleUnits();closeCtxMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span id="ctx-unit-label">Switch to inches</span><span class="ctx-key">U</span></button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-item" onclick="openCtxCustomize()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Customize Menu…
+  </button>
+</div>
+
+<!-- CTX MENU CUSTOMIZER -->
+<div id="ctxcfg-overlay">
+  <div id="ctxcfg-panel">
+    <div class="ctxcfg-head">
+      <span>Customize Right-Click Menu</span>
+      <button class="ctxcfg-close" onclick="closeCtxCustomize()" aria-label="Close">✕</button>
+    </div>
+    <div class="ctxcfg-sub">Checked actions appear in Quick Actions. Saved on this device.</div>
+    <div id="ctxcfg-list"></div>
+  </div>
 </div>
 
 <!-- DXF IMPORT DIALOG -->
@@ -5159,6 +5228,9 @@ let showGrid     = true;
 
 // Line tool
 let lineState = { active:false, x1:0, y1:0 };
+// 'chain' = PLINE (continuous polyline, commit via Enter/menu/close) ·
+// 'single' = LINE (auto-commits each 2-point segment). PLINE is default.
+let lineMode = 'chain';
 let shiftLockActive = false;
 let shiftLockAngle  = 0;
 let angleSnapDeg    = 15;  // 5 | 15 | 0(free)
@@ -5354,6 +5426,8 @@ function commitDynInput() {
       if(snapToStart){
         lineChain.pop();
         commitLineChain(true);
+      } else if(lineMode==='single' && lineChain.length>=2){
+        commitLineChain(false); // LINE mode: each segment commits on its second point
       } else {
         lineState={active:true, x1:pt.x, y1:pt.y};
       }
@@ -6042,6 +6116,14 @@ function setTool(tool) {
   closeDynInput();
   closeCtxMenu();
 
+  // PLINE is the line machinery in chain mode; LINE is single-segment
+  // mode. Both run as activeTool 'line' internally so every existing
+  // activeTool==='line' check keeps working — only the mode, the
+  // highlighted button, and the displayed label differ.
+  const requested = tool;
+  if (tool === 'pline') { lineMode = 'chain';  tool = 'line'; }
+  else if (tool === 'line') { lineMode = 'single'; }
+
   // Preserve selection when entering rotate tool so box-selected geometry rotates immediately
   if (tool !== 'rotate') {
     selectedIds.clear();
@@ -6051,17 +6133,18 @@ function setTool(tool) {
   activeTool = tool;
 
   document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  const btnMap={select:'btn-select',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',chamfer:'btn-chamfer',mirror:'btn-mirror',dim:'btn-dim',trim:'btn-trim',extend:'btn-extend',break:'btn-break',scale:'btn-scale',stretch:'btn-stretch',text:'btn-text'};
-  if(btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
+  const btnMap={select:'btn-select',pline:'btn-pline',line:'btn-line',rect:'btn-rect',polygon:'btn-polygon',offset:'btn-offset',rotate:'btn-rotate',circle:'btn-circle',arc:'btn-arc',fillet:'btn-fillet',chamfer:'btn-chamfer',mirror:'btn-mirror',dim:'btn-dim',trim:'btn-trim',extend:'btn-extend',break:'btn-break',scale:'btn-scale',stretch:'btn-stretch',text:'btn-text'};
+  const btnEl = document.getElementById(btnMap[requested]||'');
+  if(btnEl) btnEl.classList.add('active');
   
   // Update KOMMAND bar context button — shows the active tool's name so
   // identity never disappears from the left edge, and glows to match.
   const ctxBtn = document.getElementById('kommand-context');
   const ctxLbl = document.getElementById('kommand-context-label');
-  if (ctxLbl) ctxLbl.textContent = tool.toUpperCase();
-  if (ctxBtn) ctxBtn.classList.toggle('active', tool !== 'select');
+  if (ctxLbl) ctxLbl.textContent = requested.toUpperCase();
+  if (ctxBtn) ctxBtn.classList.toggle('active', requested !== 'select');
 
-  document.getElementById('sb-mode').textContent=tool.toUpperCase();
+  document.getElementById('sb-mode').textContent=requested.toUpperCase();
 
   document.getElementById('offset-bar').style.display  = tool==='offset'?'flex':'none';
   document.getElementById('poly-bar').style.display    = tool==='polygon'?'flex':'none';
@@ -6325,6 +6408,7 @@ function drawSelBox() {
 
 // ── MOUSE EVENTS ────────────────────────────────────────
 canvas.addEventListener('mousedown',  onMouseDown);
+canvas.addEventListener('mouseleave', () => { cursorSeen = false; render(); });
 canvas.addEventListener('mousemove',  onMouseMove);
 canvas.addEventListener('mouseup',    onMouseUp);
 canvas.addEventListener('wheel',      onWheel, {passive:false});
@@ -6420,7 +6504,7 @@ canvas.addEventListener('touchstart', function(e) {
   } else if (swipeState.engaged) {
     // Second finger landed mid-swipe: abort without committing, pinch takes over.
     if (swipeState.full) {
-      selBox.active = false; selBox.pending = false;
+      selBox.active = false; selBox.pending = false; selBox.deferred = null;
       canvas.style.cursor = 'default';
       render();
     }
@@ -6438,10 +6522,12 @@ canvas.addEventListener('touchmove', function(e) {
   if (!swipeState.engaged) {
     const moved = Math.hypot(t.clientX - swipeState.startX, t.clientY - swipeState.startY);
     if (moved <= SWIPE_SLOP) return;
-    // Engage. Freeze the injection mode at engage time so a mid-drag
-    // tool change can't strand a half-open state machine.
+    // Engage with full down/move/up injection in EVERY tool — the
+    // universal box machine arms on down for all click-tools, escalates
+    // to a box on drag, and press-drag tools (stretch grips, rotate
+    // pivot) get genuine touch dragging through the same path.
     swipeState.engaged = true;
-    swipeState.full = (activeTool === 'select' || activeTool === 'rotate');
+    swipeState.full = true;
     // Seed mouseScreen/mouseWorld at the swipe ORIGIN before pressing,
     // so the box anchors where the finger first landed, not where it
     // crossed the slop threshold.
@@ -6466,12 +6552,54 @@ canvas.addEventListener('touchend', function(e) {
 
 canvas.addEventListener('touchcancel', function() {
   if (swipeState.engaged && swipeState.full) {
-    selBox.active = false; selBox.pending = false;
+    selBox.active = false; selBox.pending = false; selBox.deferred = null;
     canvas.style.cursor = 'default';
     render();
   }
   swipeState.tracking = false;
   swipeState.engaged  = false;
+}, {passive:false});
+
+// ── TOUCH: LONG-PRESS → CONTEXT MENU ─────────────────────
+// Right-click's touch equivalent. Opens the same #ctx-menu via the same
+// openCtxMenu() used by desktop right-click, so every item — including
+// Delete Selected — is reachable on touch. Cancels itself if the finger
+// moves past the swipe slop (that's a drag, not a hold) or lifts early;
+// fires once, at the press point, and eats the touch so it can't also
+// register as a tap-to-place.
+const LONG_PRESS_MS = 500;
+let longPressTimer = null, longPressFired = false, longPressX = 0, longPressY = 0;
+
+canvas.addEventListener('touchstart', function(e) {
+  if (e.touches.length !== 1) { clearTimeout(longPressTimer); longPressTimer=null; return; }
+  const t = e.touches[0];
+  longPressFired = false;
+  longPressX = t.clientX; longPressY = t.clientY;
+  clearTimeout(longPressTimer);
+  longPressTimer = setTimeout(() => {
+    longPressTimer = null;
+    longPressFired = true;
+    swipeState.tracking = false; swipeState.engaged = false; // hand off from swipe
+    if (navigator.vibrate) navigator.vibrate(12); // light haptic confirms the hold registered
+    openCtxMenu(longPressX, longPressY);
+  }, LONG_PRESS_MS);
+}, {passive:false});
+
+canvas.addEventListener('touchmove', function(e) {
+  if (!longPressTimer) return;
+  const t = e.touches[0];
+  if (Math.hypot(t.clientX - longPressX, t.clientY - longPressY) > SWIPE_SLOP) {
+    clearTimeout(longPressTimer); longPressTimer = null; // moved — this is a drag/swipe, not a hold
+  }
+}, {passive:false});
+
+canvas.addEventListener('touchend', function(e) {
+  clearTimeout(longPressTimer); longPressTimer = null;
+  if (longPressFired) { e.preventDefault(); longPressFired = false; } // suppress the trailing tap→click
+}, {passive:false});
+
+canvas.addEventListener('touchcancel', function() {
+  clearTimeout(longPressTimer); longPressTimer = null;
 }, {passive:false});
 
 // ── MOBILE MODE: sidebar drawer + keyboard-aware KOMMAND bar ────
@@ -6575,11 +6703,63 @@ function onMouseDown(e) {
     // SELECT tool: hold off — decide on mousemove whether this is a click, drag-pan, or sel-box
     if(activeTool==='select') {
       selBox.pending=true;
+      selBox.deferred=null; // a stale deferred from a release-outside-canvas must never fire here
       selBox.startSX=mouseScreen.x; selBox.startSY=mouseScreen.y;
       selBox.startWX=mouseWorld.x;  selBox.startWY=mouseWorld.y;
       selBox.active=false;
       return;
     }
+
+    // Press-drag tools act on DOWN and cannot defer: a stretch grip must
+    // engage the instant it's pressed, and rotate has its own machinery
+    // (pivot drag, angle phases, and its own empty-selection box).
+    if(activeTool==='stretch'&&stretchState.endpt){ stretchState.active=true; return; }
+    if(activeTool==='rotate') {
+      // If nothing selected, allow point-pick or box-select first
+      if(selectedIds.size===0){
+        const hit=pickObject(mouseScreen.x,mouseScreen.y);
+        if(hit){ selectedIds.add(hit.id); updateSelectionProps(); render(); return; }
+        // Start a selection box — same pending logic as select tool
+        selBox.pending=true;
+        selBox.deferred=null;
+        selBox.startSX=mouseScreen.x; selBox.startSY=mouseScreen.y;
+        selBox.startWX=mouseWorld.x;  selBox.startWY=mouseWorld.y;
+        selBox.active=false;
+        return;
+      }
+
+      // Check if clicking near the pivot handle → start pivot drag
+      const piv = getActivePivot();
+      const sp  = worldToScreen(piv.x, piv.y);
+      if(Math.hypot(mouseScreen.x-sp.x, mouseScreen.y-sp.y) <= PIVOT_HANDLE_PX+4) {
+        rotateState.draggingPivot = true;
+        rotateState.phase = 0;
+        return;
+      }
+
+      // Phase 0: start angle drag
+      if(rotateState.phase===0){
+        rotateState.phase      = 1;
+        rotateState.startAngle = Math.atan2(-(mouseScreen.y-sp.y), mouseScreen.x-sp.x) * 180/Math.PI;
+        rotateState.previewDelta = 0;
+        showToast('Move cursor and click to confirm rotation · Esc to cancel');
+      } else {
+        // Phase 1: confirm rotation
+        rotateSelected(rotateState.previewDelta, getActivePivot());
+        rotateState.phase        = 0;
+        rotateState.previewDelta = 0;
+        rotateState.startAngle   = 0;
+      }
+      render(); return;
+    }
+
+    // ── UNIVERSAL SELECTION BOX ──
+    // Every remaining tool is click-driven (its action fires on a point,
+    // not a drag), so the drag gesture is free in all of them. Defer the
+    // tool's action into selBox.deferred: a clean click (no drag) runs it
+    // on mouseup exactly as before; a drag past threshold becomes the
+    // selection box and the deferred action is discarded.
+    const runToolAction = () => {
 
     if(activeTool==='line') {
       if(dynVisible) return;
@@ -6607,6 +6787,8 @@ function onMouseDown(e) {
         if(snapToStart) {
           lineChain.pop(); // remove the duplicate of the start point
           commitLineChain(true);
+        } else if(lineMode==='single' && lineChain.length>=2) {
+          commitLineChain(false); // LINE mode: each segment commits on its second point
         } else {
           lineState = {active:true, x1:wp.x, y1:wp.y};
         }
@@ -6690,7 +6872,6 @@ function onMouseDown(e) {
     if(activeTool==='extend')  { applyExtend();          return; }
     if(activeTool==='break')   { applyBreak(wp.x,wp.y); return; }
     if(activeTool==='text')    { placeTextAt(wp.x,wp.y); return; }
-    if(activeTool==='stretch'&&stretchState.endpt){ stretchState.active=true; return; }
     if(activeTool==='scale'||activeTool==='array'){ return; } // handled by dialog
     if(activeTool==='dim') {
       if(!dimState.active) {
@@ -6730,44 +6911,6 @@ function onMouseDown(e) {
       render(); return;
     }
 
-    if(activeTool==='rotate') {
-      // If nothing selected, allow point-pick or box-select first
-      if(selectedIds.size===0){
-        const hit=pickObject(mouseScreen.x,mouseScreen.y);
-        if(hit){ selectedIds.add(hit.id); updateSelectionProps(); render(); return; }
-        // Start a selection box — same pending logic as select tool
-        selBox.pending=true;
-        selBox.startSX=mouseScreen.x; selBox.startSY=mouseScreen.y;
-        selBox.startWX=mouseWorld.x;  selBox.startWY=mouseWorld.y;
-        selBox.active=false;
-        return;
-      }
-
-      // Check if clicking near the pivot handle → start pivot drag
-      const piv = getActivePivot();
-      const sp  = worldToScreen(piv.x, piv.y);
-      if(Math.hypot(mouseScreen.x-sp.x, mouseScreen.y-sp.y) <= PIVOT_HANDLE_PX+4) {
-        rotateState.draggingPivot = true;
-        rotateState.phase = 0;
-        return;
-      }
-
-      // Phase 0: start angle drag
-      if(rotateState.phase===0){
-        rotateState.phase      = 1;
-        rotateState.startAngle = Math.atan2(-(mouseScreen.y-sp.y), mouseScreen.x-sp.x) * 180/Math.PI;
-        rotateState.previewDelta = 0;
-        showToast('Move cursor and click to confirm rotation · Esc to cancel');
-      } else {
-        // Phase 1: confirm rotation
-        rotateSelected(rotateState.previewDelta, getActivePivot());
-        rotateState.phase        = 0;
-        rotateState.previewDelta = 0;
-        rotateState.startAngle   = 0;
-      }
-      render(); return;
-    }
-
     if (activeTool === 'mirror' && mirrorAxis === 'line') {
       const wp = snapActive && snapPoint ? snapPoint : mouseWorld;
       if (!mirrorLineState.p1) {
@@ -6791,12 +6934,23 @@ function onMouseDown(e) {
       }
       render(); return;
     }
+
+    }; // end runToolAction
+
+    // Arm: clean click → deferred action on mouseup · drag → selection box
+    selBox.pending=true;
+    selBox.deferred=runToolAction;
+    selBox.startSX=mouseScreen.x; selBox.startSY=mouseScreen.y;
+    selBox.startWX=mouseWorld.x;  selBox.startWY=mouseWorld.y;
+    selBox.active=false;
+    return;
   }
 }
 
 function onMouseMove(e) {
   const rect=canvas.getBoundingClientRect();
   mouseScreen={x:e.clientX-rect.left, y:e.clientY-rect.top};
+  cursorSeen=true;
   const raw=screenToWorld(mouseScreen.x,mouseScreen.y);
   const snap=findSnap(raw.x,raw.y);
   snapActive=!!snap; snapPoint=snap;
@@ -6829,12 +6983,15 @@ function onMouseMove(e) {
     cam.panY=camStart.y+(e.clientY-panOY);
   }
 
-  // SELECT and ROTATE tool drag logic: after threshold, switch to sel-box
-  if((activeTool==='select' || (activeTool==='rotate' && selectedIds.size===0)) && selBox.pending) {
+  // UNIVERSAL drag logic: any armed press escalates to a selection box
+  // past the threshold, in every tool. Escalation discards the deferred
+  // click-action — a drag is a box, never a point placement.
+  if(selBox.pending) {
     const dx=mouseScreen.x-selBox.startSX, dy=mouseScreen.y-selBox.startSY;
     if(Math.hypot(dx,dy) > SEL_DRAG_THRESHOLD) {
       selBox.pending=false;
       selBox.active=true;
+      selBox.deferred=null;
       canvas.style.cursor='crosshair';
     }
   }
@@ -6896,32 +7053,41 @@ function onMouseUp(e) {
     render(); return;
   }
 
-  if(e.button===0 && (activeTool==='select' || activeTool==='rotate')) {
-    if(selBox.active) {
-      const wx0=selBox.startWX, wy0=selBox.startWY;
-      const wx1=mouseWorld.x,   wy1=mouseWorld.y;
-      const lx=Math.min(wx0,wx1), rx=Math.max(wx0,wx1);
-      const by=Math.min(wy0,wy1), ty=Math.max(wy0,wy1);
-      const leftToRight = mouseScreen.x >= selBox.startSX;
-      if(!e.shiftKey) selectedIds.clear();
-      for(const o of GeoMemory.objects) {
-        const hit = leftToRight
-          ? selBoxWindow(o, lx, rx, by, ty)       // window: fully inside
-          : selBoxCrossing(o, lx, rx, by, ty);     // crossing: touches or intersects
-        if(hit) selectedIds.add(o.id);
-      }
-      const mode = leftToRight ? 'Window' : 'Crossing';
-      const n = selectedIds.size;
-      if(n>0) showToast(`${mode} select: ${n} object${n>1?'s':''}`);
-      updateSelectionProps();
-      selBox.active=false;
-      canvas.style.cursor='default';
-      render(); return;
+  // Selection box commit — universal: any tool can complete a box drag
+  if(e.button===0 && selBox.active) {
+    const wx0=selBox.startWX, wy0=selBox.startWY;
+    const wx1=mouseWorld.x,   wy1=mouseWorld.y;
+    const lx=Math.min(wx0,wx1), rx=Math.max(wx0,wx1);
+    const by=Math.min(wy0,wy1), ty=Math.max(wy0,wy1);
+    const leftToRight = mouseScreen.x >= selBox.startSX;
+    if(!e.shiftKey) selectedIds.clear();
+    for(const o of GeoMemory.objects) {
+      const hit = leftToRight
+        ? selBoxWindow(o, lx, rx, by, ty)       // window: fully inside
+        : selBoxCrossing(o, lx, rx, by, ty);     // crossing: touches or intersects
+      if(hit) selectedIds.add(o.id);
+    }
+    const mode = leftToRight ? 'Window' : 'Crossing';
+    const n = selectedIds.size;
+    if(n>0) showToast(`${mode} select: ${n} object${n>1?'s':''}`);
+    updateSelectionProps();
+    selBox.active=false;
+    updateCursor();
+    render(); return;
+  }
+
+  if(e.button===0 && selBox.pending) {
+    selBox.pending=false;
+
+    // Clean click in a click-tool: run the deferred action now — the
+    // point places on release, imperceptibly later than it used to.
+    if(selBox.deferred) {
+      const fn=selBox.deferred; selBox.deferred=null;
+      fn(); return;
     }
 
-    if(selBox.pending) {
-      // Was a quick click — treat as point-pick
-      selBox.pending=false;
+    // SELECT / ROTATE clean click: point-pick
+    if(activeTool==='select' || activeTool==='rotate') {
       const hit=pickObject(mouseScreen.x,mouseScreen.y);
       if(hit){
         if(e.shiftKey){
@@ -6997,12 +7163,19 @@ function onKeyDown(e) {
   // to open has been fully replaced — see KOMMAND LINE section below.
 
   if(!e.ctrlKey&&!e.metaKey&&!e.altKey){
-    if(k==='l'||k==='L') setTool('line');
+    // PL two-key sequence: P selects polygon instantly (no delay penalty);
+    // an L within the window upgrades it to PLINE. L alone is LINE.
+    const now = performance.now();
+    if(k==='l'||k==='L'){
+      if(window._plSeqAt && now - window._plSeqAt < 600) setTool('pline');
+      else setTool('line');
+      window._plSeqAt = 0;
+    }
+    if(k==='p'||k==='P'){ setTool('polygon'); window._plSeqAt = now; }
     if(k==='a'||k==='A') setTool('arc');
     if(k==='c'||k==='C') setTool('circle');
     if(k==='f'||k==='F') setTool('fillet');
     if(k==='r'||k==='R') setTool('rect');
-    if(k==='p'||k==='P') setTool('polygon');
     if(k==='s'||k==='S') setTool('select');
     if(k==='o'||k==='O') setTool('offset');
     if(k==='t'||k==='T') setTool('rotate');
@@ -7047,11 +7220,14 @@ function openCtxMenu(cx, cy) {
                     (activeTool==='rect'&&rectState.active) ? 'Cancel Rect' : 'Cancel / Select';
   ctxMenu.style.left=cx+'px'; ctxMenu.style.top=cy+'px';
   ctxMenu.classList.add('open');
-  // Clamp
+  // Clamp: flip above the press point if the bottom overflows, then floor
+  // the top at 8px — a menu taller than the viewport scrolls internally
+  // (max-height in CSS) instead of shoving Quick Actions off-screen.
   requestAnimationFrame(()=>{
     const r=ctxMenu.getBoundingClientRect();
-    if(r.right>window.innerWidth)  ctxMenu.style.left=(cx-r.width)+'px';
+    if(r.right>window.innerWidth)  ctxMenu.style.left=Math.max(8,(cx-r.width))+'px';
     if(r.bottom>window.innerHeight) ctxMenu.style.top=(cy-r.height)+'px';
+    if(parseFloat(ctxMenu.style.top)<8) ctxMenu.style.top='8px';
   });
 }
 function closeCtxMenu() { ctxMenu.classList.remove('open'); }
@@ -7060,6 +7236,13 @@ function closeCtxMenu() { ctxMenu.classList.remove('open'); }
 document.addEventListener('mousedown', e=>{
   if(!ctxMenu.contains(e.target)) closeCtxMenu();
 });
+// Touch equivalent: a tap outside the menu should dismiss it the same
+// way a click does. Skipped when the long-press just fired on this same
+// gesture, since touchend's own preventDefault already handles that case
+// and firing here too would double up harmlessly but needlessly.
+document.addEventListener('touchstart', e=>{
+  if(ctxMenu.classList.contains('open') && !ctxMenu.contains(e.target)) closeCtxMenu();
+}, {passive:true});
 
 function ctxCancelCommit() {
   closeCtxMenu();
@@ -7080,6 +7263,82 @@ function ctxClearSel() {
   selectedIds.clear(); updateSelectionProps();
   setTool('select');
 }
+
+function ctxDelete() {
+  closeCtxMenu();
+  deleteSelected(); // the app's own delete — same path as the Del key and Edit menu
+}
+
+// ── CUSTOMIZABLE RIGHT-CLICK ACTIONS ────────────────────────────
+// Users pick which app functions appear in the menu's Quick Actions
+// region; choices persist per-device in localStorage. Every entry maps
+// to a verified app function — the catalog is the single source of
+// truth, so a stale saved id from an older build simply won't render.
+const CTX_CATALOG = [
+  { id:'undo',    label:'Undo',            key:'Ctrl+Z', fn:()=>{ if(typeof undo==='function') undo(); } },
+  { id:'copy',    label:'Copy Selected',   key:'Ctrl+C', fn:()=>copySelected() },
+  { id:'paste',   label:'Paste',           key:'Ctrl+V', fn:()=>pasteSelected() },
+  { id:'mirror',  label:'Mirror Selected', key:'M',      fn:()=>mirrorSelected() },
+  { id:'flatten', label:'Flatten to 0°',   key:'0',      fn:()=>flattenSelection() },
+  { id:'grid',    label:'Toggle Grid',     key:'G',      fn:()=>toggleGrid() },
+  { id:'snap',    label:'Toggle Snap',     key:'X',      fn:()=>toggleSnap() },
+  { id:'theme',   label:'Toggle Theme',    key:'',       fn:()=>toggleTheme() },
+  { id:'save',    label:'Save .KAD',       key:'Ctrl+S', fn:()=>saveKAD() },
+  { id:'dxf',     label:'Export DXF',      key:'',       fn:()=>exportDXF() },
+];
+
+function loadCtxCustom() {
+  try { return JSON.parse(localStorage.getItem('kad-ctx-custom')) || []; }
+  catch(e) { return []; }
+}
+function saveCtxCustom(ids) {
+  try { localStorage.setItem('kad-ctx-custom', JSON.stringify(ids)); } catch(e) {}
+}
+
+function runCtxAction(id) {
+  closeCtxMenu();
+  const a = CTX_CATALOG.find(a=>a.id===id);
+  if(a) a.fn();
+}
+
+function renderCtxCustom() {
+  const slot = document.getElementById('ctx-custom-slot');
+  const ids = loadCtxCustom().filter(id => CTX_CATALOG.some(a=>a.id===id));
+  if(ids.length===0){ slot.innerHTML=''; return; }
+  slot.innerHTML = ids.map(id => {
+    const a = CTX_CATALOG.find(a=>a.id===id);
+    return `<button class="ctx-item" onclick="runCtxAction('${a.id}')">`+
+           `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`+
+           `${a.label}${a.key?`<span class="ctx-key">${a.key}</span>`:''}</button>`;
+  }).join('');
+}
+
+function openCtxCustomize() {
+  closeCtxMenu();
+  const ids = loadCtxCustom();
+  document.getElementById('ctxcfg-list').innerHTML = CTX_CATALOG.map(a =>
+    `<label class="ctxcfg-row">`+
+    `<input type="checkbox" data-ctxid="${a.id}" ${ids.includes(a.id)?'checked':''} onchange="ctxCfgToggle(this)">`+
+    `${a.label}${a.key?`<span class="ctxcfg-key">${a.key}</span>`:''}</label>`
+  ).join('');
+  document.getElementById('ctxcfg-overlay').classList.add('open');
+}
+function closeCtxCustomize() {
+  document.getElementById('ctxcfg-overlay').classList.remove('open');
+}
+function ctxCfgToggle(cb) {
+  let ids = loadCtxCustom();
+  const id = cb.dataset.ctxid;
+  if(cb.checked){ if(!ids.includes(id)) ids.push(id); }
+  else ids = ids.filter(x=>x!==id);
+  saveCtxCustom(ids);
+  renderCtxCustom();
+}
+// Overlay backdrop dismisses; panel clicks don't bubble out
+document.getElementById('ctxcfg-overlay').addEventListener('click', e=>{
+  if(e.target===e.currentTarget) closeCtxCustomize();
+});
+renderCtxCustom();
 
 // ── VIEW ────────────────────────────────────────────────
 function zoomExtents() {
@@ -7622,7 +7881,30 @@ function render() {
   drawMeasurePreview();
   drawChamferPreview();
   drawSelBox();
+  drawCursorCrosshair();
   if(typeof drawNewToolPreviews==='function') drawNewToolPreviews();
+}
+
+// ── CURSOR CROSSHAIR — full-window hairlines at the pointer ──
+// Available in every tool, mouse and touch alike. On mouse it tracks
+// mousemove; on touch the swipe injection drives the same position.
+// cursorSeen gates it so it never renders at (0,0) before first input,
+// and hides when the mouse leaves the canvas.
+let cursorSeen = false;
+function drawCursorCrosshair() {
+  if(!cursorSeen || isPanning) return;
+  const W=canvas.width, H=canvas.height;
+  // Snap-aware: hairlines pass through the snapped point when snapping,
+  // so the crosshair agrees with the ring and the coordinate readout.
+  const p = (snapActive && snapPoint) ? worldToScreen(snapPoint.x, snapPoint.y) : mouseScreen;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,212,255,0.30)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(p.x, 0); ctx.lineTo(p.x, H);
+  ctx.moveTo(0, p.y); ctx.lineTo(W, p.y);
+  ctx.stroke();
+  ctx.restore();
 }
 
 function drawGrid(W,H) {
@@ -9591,6 +9873,8 @@ function kommandClear() {
 
 // Command word table
 const KOMMANDS = {
+  'PL':      () => setTool('pline'),
+  'PLINE':   () => setTool('pline'),
   'L':       () => setTool('line'),
   'LINE':    () => setTool('line'),
   'A':       () => setTool('arc'),
@@ -9929,6 +10213,10 @@ if ('launchQueue' in window) {
     }));
   });
 }
+
+// ── BOOT TOOL ── An empty drafting space has nothing to select, so the
+// app opens ready to draw: PLINE (chained line) is the default tool.
+setTool('pline');
 </script>
 </body>
 </html>
