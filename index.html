@@ -8874,12 +8874,15 @@ requestAnimationFrame(()=>{
     _patchSetTool();
     resizeCanvas();
     initCamera();
-    setTool('select');
+    // Boot in PLINE: an empty drafting space has nothing to select, so
+    // the app opens ready to draw. This is the authoritative init — it
+    // runs two frames after all scripts, so the tool must be set HERE.
+    setTool('pline');
     document.getElementById('cc-year').textContent = new Date().getFullYear();
     initSplash();
     setTimeout(()=>{
       render();
-      showToast('Press K for KOMMAND · L line · A arc · C circle');
+      showToast('Press K for KOMMAND · PL polyline · L line · C circle');
     },100);
   });
 });
@@ -10117,10 +10120,9 @@ function showDynInput(seed) {
 function closeDynInput() { kommandClear(); }
 function positionDynInput() { /* no-op — kommand is fixed */ }
 
-// Sync context label when tools change
-document.addEventListener('DOMContentLoaded', () => {
-  if (kContext) kContext.textContent = (activeTool||'SELECT').toUpperCase();
-});
+// Context label sync happens exclusively through the patched setTool —
+// the boot init calls setTool('pline') two frames after load, so a
+// separate DOMContentLoaded sync would only flash a stale label first.
 
 // ── Theme toggle ─────────────────────────────────────────────────────────────
 let _lightMode = false;
@@ -10214,9 +10216,6 @@ if ('launchQueue' in window) {
   });
 }
 
-// ── BOOT TOOL ── An empty drafting space has nothing to select, so the
-// app opens ready to draw: PLINE (chained line) is the default tool.
-setTool('pline');
 </script>
 </body>
 </html>
