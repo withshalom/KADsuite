@@ -593,7 +593,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 
 
 
-#suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; background:rgba(6,10,16,0.92); }
+#suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; background:rgba(18,50,89,0.92); }
 #kad-escape-bar { position:fixed; top:0; left:0; right:0; z-index:999; height:36px; display:none; align-items:center; justify-content:space-between; padding:0 16px; background:rgba(4,6,10,0.97); border-bottom:1px solid var(--accent); font-family:var(--fu); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(12px); }
 body.drafting-mode #kad-escape-bar { display:flex; }
 body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
@@ -1278,7 +1278,6 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --kam:   #ffaa00;
   --kubic:  #20e8c0;
   --karve: #d4aa40;
-  --kode:  #e03800;
   
   --kanvas: #0090a8; /* → #8b5cf6 via gradient */
 
@@ -1286,21 +1285,16 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --kam-g:  rgba(255,170,0,0.12);
   --kubic-g: rgba(32,232,192,0.12);
   --karve-g:rgba(212,170,64,0.12);
-  --kode-g: rgba(224,56,0,0.12);
   --kultivate: #6ab830;  /* fresh growth green */
   --kultivate-g: rgba(90,158,60,0.12);
   --kanvas-g: rgba(0,144,168,0.12);
 
   
   --konstruct:   #4a8fd4;  /* blueprint technical blue */
-  --kloud:       #7ec8e3;  /* sky blue — lighter, distinct from KAD cyan */
-  --kloud-g:     rgba(126,200,227,0.10);
   --kodex:       #e8a020;  /* machinist amber */
   --kodex-g:     rgba(232,160,32,0.10);
-  --kampus:      #E8600A;  /* construction cone orange */
   --kubic:       #20e8c0;  /* solid modeling teal */
   --kraft:       #c0c0c0;  /* brushed steel */
-  --kampus-g:    rgba(232,96,10,0.12);
   --konstruct-g: rgba(74,143,212,0.12);
 
   --ff-display: 'Syne', sans-serif;
@@ -1358,7 +1352,7 @@ nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   padding: 20px 48px;
   display: flex; align-items: center; justify-content: space-between;
-  background:rgba(6,10,16,0.92);
+  background:rgba(18,50,89,0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(0,212,255,0.15);
@@ -1486,7 +1480,7 @@ nav {
 /* ── PROGRAM CARD ── */
 .card {
   position: relative;
-  background:rgba(8,12,20,0.92);
+  background:rgba(10,22,40,0.92);  /* midnight blue — #0a1628 from the blueprint palette */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255,255,255,0.08);
@@ -1525,7 +1519,6 @@ nav {
 .card-kubic  { --card-color: var(--kubic);  --card-glow: var(--kubic-g);  }
 .card-karve { --card-color: var(--karve); --card-glow: var(--karve-g); }
 .card-karve .card-mark { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); box-shadow: 0 0 20px rgba(212,170,64,0.45); }
-.card-kode { --card-color: var(--kode); --card-glow: var(--kode-g); }
 
   
 
@@ -1546,7 +1539,6 @@ nav {
 .card-kad  .card-mark { background: linear-gradient(135deg, #00d4ff, #0088bb); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
 .card-kam  .card-mark { background: linear-gradient(135deg, #ffaa00, #ff6b00); box-shadow: 0 0 20px rgba(255,170,0,0.4); }
 
-  .card-kode .card-mark { background: linear-gradient(135deg, #2a0800, #882000, #e03800); box-shadow: 0 0 20px rgba(224,56,0,0.45); }
 
   
 
@@ -1688,14 +1680,10 @@ nav {
 .flow-icon.kam       { background: linear-gradient(135deg,#804800,#cc8000,#ffaa00); }
 .flow-icon.kubic      { background: linear-gradient(135deg,#001c18,#20e8c0,#d4aa40); }
   .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
-  .flow-icon.kode      { background: linear-gradient(135deg,#2a0800,#882000,#e03800); }
   
-.flow-icon.kloud    { background: linear-gradient(135deg,#0d2235,#5ab3d0,#b8e4f5); }
 .flow-icon.kubic    { background: linear-gradient(135deg,#001c18,#20e8c0,#18c8a0); }
-.flow-icon.kampus   { background: linear-gradient(135deg,#3a1200,#E8600A,#ffaa40); }
 .flow-icon.kanvas    { background: linear-gradient(135deg,#001c28,#005878,#0090a8,#6030c8,#8b5cf6); }
 .flow-icon.kultivate { background: linear-gradient(135deg,#201008,#2e5818,#6ab830); }
-.flow-icon.konnector { background: linear-gradient(135deg,#1a2838,#3a5870,#b8c8d8); }
 .flow-icon.kid       { background: linear-gradient(135deg,#3a1800,#cc5500,#ff8800); }
 .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
 
@@ -1805,33 +1793,11 @@ footer {
   box-shadow: 0 0 20px rgba(0,144,168,0.40);
 }
 
-/* ── KONNECTOR ── */
-.card-konnector { --card-color: #b8c8d8; --card-glow: rgba(184,200,216,0.10); }
-.card-konnector .card-mark {
-  background: linear-gradient(135deg, #1a2838, #3a5870, #b8c8d8);
-  box-shadow: 0 0 20px rgba(184,200,216,0.35);
-}
-
 /* ── KID ── */
-.card-kloud { --card-color: var(--kloud); --card-glow: var(--kloud-g); }
-.card-kloud .card-mark {
-  background: linear-gradient(135deg, #0d2235, #5ab3d0, #b8e4f5);
-  box-shadow: 0 0 20px rgba(126,200,227,0.30);
-}
 .card-kubic { --card-color: var(--kubic); --card-glow: rgba(32,232,192,0.12); }
 .card-kubic .card-mark {
   background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40);
   box-shadow: 0 0 20px rgba(32,232,192,0.45);
-}
-.card-kampus { --card-color: var(--kampus); --card-glow: var(--kampus-g); }
-.card-kampus .card-mark {
-  background: linear-gradient(135deg, #7a2800 0%, #E8600A 60%, #ff9040 100%);
-  box-shadow: 0 0 18px rgba(232,96,10,0.35);
-}
-.card-kampus .card-beta-stamp {
-  background: rgba(232,96,10,0.15);
-  border-color: rgba(232,96,10,0.3);
-  color: var(--kampus);
 }
 .card-kid { --card-color: #ff8800; --card-glow: rgba(255,136,0,0.10); }
 .card-kid .card-mark {
@@ -2460,6 +2426,82 @@ body.light-mode .tool-btn.active .tool-icon svg {
   -webkit-overflow-scrolling: touch;
 }
 .mobile-mode .tb-dd-item { padding: 10px 14px; font-size: 14px; }  /* larger tap targets */
+
+/* ═══ KLOUD — collaboration layer ═══ */
+.kloud-alpha-badge {
+  /* Alpha palette matches KADsuite's .card-alpha-stamp — amber, authoritative */
+  font-family:var(--fm); font-size:9px; font-weight:700; letter-spacing:0.2em;
+  color:#e8a040; border:1px solid rgba(200,120,32,0.55); border-radius:3px;
+  padding:2px 6px; margin-left:8px; align-self:center; flex-shrink:0;
+  background:rgba(200,120,32,0.10); text-shadow:0 0 8px rgba(200,120,20,0.5);
+}
+#kloud-share-btn {
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--fu); font-size:12px; font-weight:600; letter-spacing:0.1em;
+  color:var(--accent); background:var(--panel2);
+  border:1px solid var(--accent-dim); border-radius:4px;
+  padding:4px 10px; cursor:pointer; transition:background .15s;
+}
+#kloud-share-btn:hover { background:var(--hover); }
+.kloud-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--t3);
+  transition:background .3s, box-shadow .3s;
+}
+.kloud-dot.live { background:#39ff14; box-shadow:0 0 6px #39ff14; }
+#kloud-overlay {
+  position:fixed; inset:0; z-index:640; display:none;
+  background:rgba(0,0,0,0.55); align-items:center; justify-content:center;
+}
+#kloud-overlay.open { display:flex; }
+#kloud-panel {
+  width:min(400px, calc(100vw - 24px)); max-height:calc(100vh - 40px);
+  display:flex; flex-direction:column; overflow-y:auto;
+  background:var(--panel); border:1px solid var(--border-hi); border-radius:8px;
+  box-shadow:0 18px 50px rgba(0,0,0,0.7);
+}
+.kloud-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-bottom:1px solid var(--border);
+  font-family:var(--fu); font-size:14px; font-weight:600; color:var(--accent);
+  letter-spacing:0.08em;
+}
+.kloud-head .kloud-alpha-badge { margin-left:10px; }
+.kloud-close { background:none; border:none; color:var(--t3); font-size:15px; cursor:pointer; }
+.kloud-close:hover { color:var(--t1); }
+.kloud-body { padding:14px 16px 18px; display:flex; flex-direction:column; gap:12px; }
+.kloud-sec-title {
+  font-family:var(--fm); font-size:10px; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--t3);
+}
+.kloud-btn {
+  font-family:var(--fu); font-size:13px; font-weight:600; letter-spacing:0.06em;
+  color:var(--accent); background:var(--accent-glow);
+  border:1px solid var(--accent-dim); border-radius:6px;
+  padding:10px 14px; cursor:pointer; text-align:center; transition:background .15s;
+}
+.kloud-btn:hover { background:rgba(0,212,255,0.25); }
+.kloud-btn.google { color:var(--t1); background:var(--panel2); border-color:var(--border-hi); }
+.kloud-btn[disabled] { opacity:0.45; cursor:not-allowed; }
+.kloud-status { font-family:var(--fu); font-size:12px; color:var(--t2); min-height:16px; }
+#kloud-invite {
+  display:none; flex-direction:column; gap:8px;
+  background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:10px;
+}
+#kloud-invite.show { display:flex; }
+#kloud-invite-link {
+  font-family:var(--fm); font-size:11px; color:var(--green);
+  word-break:break-all; user-select:all;
+}
+.kloud-row { display:flex; gap:8px; }
+.kloud-row input {
+  flex:1; min-width:0; background:var(--void); border:1px solid var(--border);
+  border-radius:6px; padding:9px 10px; color:var(--t1);
+  font-family:var(--fm); font-size:12px; outline:none;
+}
+.kloud-row input:focus { border-color:var(--accent-dim); }
+.kloud-peers { font-family:var(--fm); font-size:11px; color:var(--t3); }
+.kloud-sep { height:1px; background:var(--border); }
+.kloud-note { font-family:var(--fu); font-size:11px; color:var(--t3); line-height:1.5; }
 </style>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
@@ -2473,7 +2515,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
   </button>
 </div>
 <div id="suite-scroll">
-  <div id="site-shell" style="background:rgba(6,10,16,0.92);min-height:100%;position:relative;z-index:1;">
+  <div id="site-shell" style="background:rgba(18,50,89,0.92);min-height:100%;position:relative;z-index:1;">
 <!-- Background canvas for animated dots -->
 <canvas id="bg-canvas"></canvas>
 
@@ -2501,7 +2543,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
 <!-- HERO -->
 <div class="page">
-  <section class="hero" style="background:rgba(6,10,16,0.92);border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;padding-bottom:48px;position:relative;z-index:1;">
+  <section class="hero" style="background:rgba(18,50,89,0.92);border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;padding-bottom:48px;position:relative;z-index:1;">
     <div class="hero-eyebrow">Browser-native · No install · AGPL-3.0 · Open source</div>
     <p style="font-family:var(--ff-ui);font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--text2);opacity:0.85;margin:0 0 0.6rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
     <h1 class="hero-title"><span class="kerf">KADsuite<sup class="suite">™</sup></span></h1>
@@ -2515,7 +2557,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 </div>
 
 <!-- SCROLL STRIP -->
-<div class="strip" style="background:rgba(6,10,16,0.92);border-top:1px solid rgba(0,212,255,0.10);border-bottom:1px solid rgba(0,212,255,0.10);position:relative;z-index:1;">
+<div class="strip" style="background:rgba(18,50,89,0.92);border-top:1px solid rgba(0,212,255,0.10);border-bottom:1px solid rgba(0,212,255,0.10);position:relative;z-index:1;">
   <div class="strip-track">
     <span class="strip-item">Kernel-Aided Design</span>
     <span class="strip-item">Kernel-Aided Manufacturing</span>
@@ -2546,7 +2588,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
 <!-- PROGRAM GRID -->
 <div class="page">
-  <section class="programs" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;padding-bottom:60px;">
+  <section class="programs" style="background:rgba(18,50,89,0.92);position:relative;z-index:1;padding-bottom:60px;">
 
     <div class="programs-grid">
 
@@ -2596,48 +2638,8 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
       <!-- KUBIC -->
 
-      <!-- KLOUD -->
-      <a class="card card-kloud" href="https://kloud.kadsuite.com">
-        <div class="card-alpha-stamp">Alpha</div>
-        <div class="card-mark">KL</div>
-        <div class="card-name">KLOUD</div>
-        <div class="card-full">Kernel Live Optimized Universal Development</div>
-        <div class="card-preview">
-          <canvas id="kloud-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          KADsuite in the cloud. Sign in with Google, save files to cloud storage,
-          and collaborate in real time with your team. All KADsuite programs,
-          shared file library, live cursors, and version history.
-          Subscription required — Solo, Team, and Studio plans available.
-        </div>
-        <div class="card-cta">
-          <span>Open KLOUD</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
 
-            <!-- KID -->
-      <a class="card card-kid" href="https://kid.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
-        <div class="card-mark">KD</div>
-        <div class="card-name">KID</div>
-        <div class="card-full">Kernel-Instructed Design</div>
-        <div class="card-preview">
-          <canvas id="kid-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          Learn to draft through play. Age-adaptive line weights, four color-coded
-          drafting layers — solid, hidden, center, and dimension — and mission-based
-          tutorials that unlock as you draw. The right tool for future designers
-          of any age.
-        </div>
-        <div class="card-cta">
-          <span>Open KID</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
+      
       <!-- KUBIC -->
       <a class="card card-kubic" href="https://kubic.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
@@ -2729,43 +2731,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
       <!-- KANVAS -->
 
-      <!-- KONNECTOR -->
-      <a class="card card-konnector" href="https://konnector.kadsuite.com">
-        <div class="card-alpha-stamp">Alpha</div>
-        <div class="card-mark">KN</div>
-        <div class="card-name">KONNECTOR</div>
-        <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
-        <div class="card-desc">
-          Structural steel detailing and connection design. Imports geometry
-          from KAD, KUBIC, and KONSTRUCT. AISC section database, bolt group
-          placement, weld tagging, piece marking, and export to KAM for
-          cutting and nesting.
-        </div>
-        <div class="card-cta">
-          <span>Open KONNECTOR</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
 
-      <!-- KAMPUS -->
-      <a class="card card-kampus" href="https://kampus.kadsuite.com">
-        <div class="card-alpha-stamp">Alpha</div>
-        <div class="card-mark">KMP</div>
-        <div class="card-name">KAMPUS</div>
-        <div class="card-full">Kernel-Aided Map Plan Unified Site</div>
-        <div class="card-preview">
-          <canvas id="kampus-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          Browser-native civil site engineering. Survey point import, TIN surface
-          generation, contour extraction, cut and fill volume calculations, road
-          centerline layout, and DXF export — all without leaving the browser.
-        </div>
-        <div class="card-cta">
-          <span>Open KAMPUS</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
 
       <!-- KANVAS -->
       <a class="card card-kanvas" href="https://kanvas.kadsuite.com">
@@ -2786,26 +2752,24 @@ body.light-mode .tool-btn.active .tool-icon svg {
           <span class="card-cta-arrow">→</span>
         </div>
       </a>
-      <!-- KODE -->
 
-      <!-- KODE -->
-      <a class="card card-kode" href="https://kode.kadsuite.com">
+      <!-- KID -->
+      <a class="card card-kid" href="https://kid.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
-        
-        <div class="card-mark">GK</div>
-        <div class="card-name">KODE</div>
-        <div class="card-full">Kernel-Oriented Development Environment</div>
+        <div class="card-mark">KD</div>
+        <div class="card-name">KID</div>
+        <div class="card-full">Kernel-Instructed Design</div>
         <div class="card-preview">
-          <canvas id="kode-preview"></canvas>
+          <canvas id="kid-preview"></canvas>
         </div>
         <div class="card-desc">
-          CNC G-code editor and live toolpath verifier. Plasma-aware error
-          detection, KAM session integration, and real-time cut path preview.
-          Also runs as a full JavaScript environment — KOFFEE mode for
-          parametric scripting, web development, and application logic.
+          Learn to draft through play. Age-adaptive line weights, four color-coded
+          drafting layers — solid, hidden, center, and dimension — and mission-based
+          tutorials that unlock as you draw. The right tool for future designers
+          of any age.
         </div>
         <div class="card-cta">
-          <span>Open KODE</span>
+          <span>Open KID</span>
           <span class="card-cta-arrow">→</span>
         </div>
       </a>
@@ -2814,7 +2778,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
   </section>
 
   <!-- FLOW DIAGRAM -->
-  <section class="diagram" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
+  <section class="diagram" style="background:rgba(18,50,89,0.92);position:relative;z-index:1;">
     <div class="diagram-title">The KADsuite programs</div>
     <div class="diagram-flow">
       <div class="flow-row">
@@ -2822,41 +2786,32 @@ body.light-mode .tool-btn.active .tool-icon svg {
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kam">KM</div><div class="flow-label">KAM</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kloud">KL</div><div class="flow-label">KLOUD</div></div>
-        <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">KID</div></div>
-      </div>
-      <div class="flow-row">
         <div class="flow-node"><div class="flow-icon kubic">KB</div><div class="flow-label">KUBIC</div></div>
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon karve">KV</div><div class="flow-label">KARVE</div></div>
-        <div class="flow-arrow">──→</div>
+      </div>
+      <div class="flow-row">
         <div class="flow-node"><div class="flow-icon konstruct">KON</div><div class="flow-label">KONSTRUCT</div></div>
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kultivate">KLT</div><div class="flow-label">KULTIVATE</div></div>
-      </div>
-      <div class="flow-row">
-        <div class="flow-node"><div class="flow-icon konnector">KN</div><div class="flow-label">KONNECTOR</div></div>
-        <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kampus">KMP</div><div class="flow-label">KAMPUS</div></div>
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kanvas">KNV</div><div class="flow-label">KANVAS</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kode">GK</div><div class="flow-label">KODE</div></div>
+        <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">KID</div></div>
       </div>
     </div>
       </div>
     </div>
     <p class="flow-desc">
-      Twelve programs. One suite. Each does one job completely —
-      draw, manufacture, cloud sync, learn, model, machine, structure, plan, connect, reference, illustrate, verify.
+      Eight programs. One suite. Each does one job completely —
+      draw, manufacture, model, machine, structure, plan, illustrate, learn.
       Native formats: <code style="font-family:var(--fm,monospace);font-size:13px;color:var(--accent)">.kad .kam .nc .dxf</code> ·
       AGPL-3.0 open source.
     </p>
   </section>
 
   <!-- LICENSING -->
-  <section class="licensing" style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
+  <section class="licensing" style="background:rgba(18,50,89,0.92);position:relative;z-index:1;">
     <div class="licensing-header">Licensing</div>
     <div class="license-grid">
 
@@ -2916,7 +2871,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
   </section>
 
   <!-- FOOTER -->
-  <footer style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
+  <footer style="background:rgba(18,50,89,0.92);position:relative;z-index:1;">
     <div class="footer-brand">KAD<sup>suite™</sup></div>
     <div class="footer-links">
       <a class="footer-link" href="https://www.instagram.com/kadsuite" target="_blank">
@@ -3821,6 +3776,9 @@ document.addEventListener('keydown', function(e) {
     </div>
   </div>
   <div class="tb-right">
+    <button id="kloud-share-btn" onclick="kloudOpenPanel()" title="Host or join a live drafting space">
+      <span class="kloud-dot" id="kloud-dot"></span>SHARE
+    </button>
     <span class="tb-badge">v0.0</span>
 <button id="theme-toggle" onclick="toggleTheme()" title="Toggle dark / light mode">
       <span class="t-icon" id="theme-icon-dark">☾</span>
@@ -4479,6 +4437,44 @@ document.addEventListener('keydown', function(e) {
     </div>
     <div class="ctxcfg-sub">Checked actions appear in Quick Actions. Saved on this device.</div>
     <div id="ctxcfg-list"></div>
+  </div>
+</div>
+
+
+<!-- KLOUD COLLABORATION PANEL -->
+<div id="kloud-overlay">
+  <div id="kloud-panel">
+    <div class="kloud-head">
+      <span>KLOUD · Live Drafting Space<span class="kloud-alpha-badge">ALPHA</span></span>
+      <button class="kloud-close" onclick="kloudClosePanel()" aria-label="Close">✕</button>
+    </div>
+    <div class="kloud-body">
+      <div class="kloud-sec-title">Self-Hosted · Free Tier · Peer-to-Peer</div>
+      <button class="kloud-btn" id="kloud-host-btn" onclick="kloudHost()">Host This Drafting Space</button>
+      <div id="kloud-invite">
+        <div class="kloud-sec-title">Invitation Link — opens as an authentication link</div>
+        <div id="kloud-invite-link"></div>
+        <div class="kloud-row">
+          <button class="kloud-btn" id="kloud-copy-btn" onclick="kloudCopyInvite()" style="flex:1">Copy Link</button>
+        </div>
+      </div>
+      <div class="kloud-row">
+        <input id="kloud-join-input" type="text" spellcheck="false" autocomplete="off"
+          placeholder="Paste invite link or space code"/>
+        <button class="kloud-btn" onclick="kloudJoin()">Join</button>
+      </div>
+      <div class="kloud-status" id="kloud-status">Not connected.</div>
+      <div class="kloud-peers" id="kloud-peers"></div>
+      <div class="kloud-sep"></div>
+      <div class="kloud-sec-title">Server-Backed · Paid Tiers · Requires Firebase</div>
+      <button class="kloud-btn google" id="kloud-google-btn" onclick="kloudGoogleSignIn()">Sign in with Google</button>
+      <div class="kloud-status" id="kloud-auth-status">Not signed in — see KLOUD-HOSTING.md to configure Firebase.</div>
+      <div class="kloud-note">
+        Free tier runs peer-to-peer through your own hosted copy of this file —
+        no account, no server, effective immediately. Paid tiers add Google
+        sign-in, server-backed rooms, cloud file storage, and version history.
+      </div>
+    </div>
   </div>
 </div>
 
@@ -10139,5 +10135,230 @@ if ('launchQueue' in window) {
 }
 
 </script>
+<!-- PeerJS — peer-to-peer collaboration for the self-hosted free tier -->
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FIREBASE — server backend for paid tiers (Google Sign-In).
+     Fill in your project config below and the Sign In button goes
+     live. Leave as-is and KLOUD runs pure P2P. Setup walkthrough:
+     KLOUD-HOSTING.md  ·  https://console.firebase.google.com
+  ═══════════════════════════════════════════════════════════════ -->
+<script type="module">
+  const firebaseConfig = {
+    apiKey:            "YOUR_API_KEY",
+    authDomain:        "YOUR_PROJECT.firebaseapp.com",
+    projectId:         "YOUR_PROJECT",
+    storageBucket:     "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
+  };
+  // Only initialize when the placeholder config has been replaced —
+  // an unconfigured copy must keep working as pure P2P free tier.
+  if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    try {
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+      const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } =
+        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+      const app  = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      window._kloudFirebase = { auth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged };
+      onAuthStateChanged(auth, (user) => {
+        const el = document.getElementById('kloud-auth-status');
+        if (el) el.textContent = user
+          ? `Signed in as ${user.displayName || user.email} — server-backed rooms unlocked.`
+          : 'Not signed in.';
+      });
+    } catch (e) { console.warn('Firebase init failed:', e); }
+  }
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  KLOUD COLLABORATION ENGINE — alpha
+//  Room-hosting technique adapted from Hero's Gambit: the host
+//  creates a PeerJS peer whose ID becomes the space code; the
+//  invite URL carries it as a hash, so opening the link both
+//  authenticates (bearer token) and auto-joins the space.
+//  Sync model: full-document, host-authoritative, last-write-wins.
+//  A 600ms change poll on GeoMemory.serialize() catches every
+//  mutation path (draw, move, delete, undo, props) without hooking
+//  dozens of functions — honest alpha engineering.
+// ═══════════════════════════════════════════════════════════════
+let kloudPeer = null;
+let kloudConns = [];            // host: all guests · guest: [hostConn]
+let kloudRole = null;           // 'host' | 'guest' | null
+let kloudApplyingRemote = false;
+let kloudLastDoc = null;
+
+function kloudSafeOrigin(){ try{ const o=location.origin; return (o&&o!=='null')?o:''; }catch(e){ return ''; } }
+function kloudInviteURL(id){
+  const o=kloudSafeOrigin();
+  return o ? `${o}${location.pathname||''}#${id}` : id;
+}
+function kloudStatus(msg, color){
+  const el=document.getElementById('kloud-status');
+  if(el){ el.textContent=msg; el.style.color=color||'var(--t2)'; }
+}
+function kloudPeersLabel(){
+  const el=document.getElementById('kloud-peers');
+  if(!el) return;
+  const n=kloudConns.filter(c=>c.open).length;
+  el.textContent = kloudRole ? `${kloudRole.toUpperCase()} · ${n} peer${n!==1?'s':''} connected` : '';
+  const dot=document.getElementById('kloud-dot');
+  if(dot) dot.classList.toggle('live', n>0);
+}
+function kloudOpenPanel(){ document.getElementById('kloud-overlay').classList.add('open'); }
+function kloudClosePanel(){ document.getElementById('kloud-overlay').classList.remove('open'); }
+document.getElementById('kloud-overlay').addEventListener('click', e=>{
+  if(e.target===e.currentTarget) kloudClosePanel();
+});
+
+function kloudPeerAvailable(){
+  if(typeof Peer==='undefined'){
+    kloudStatus('PeerJS unavailable — host this file on a web server (see KLOUD-HOSTING.md).', 'var(--red)');
+    return false;
+  }
+  return true;
+}
+
+function kloudHost(){
+  if(!kloudPeerAvailable()) return;
+  kloudTeardown();
+  kloudStatus('Creating space…');
+  try { kloudPeer = new Peer(); }
+  catch(e){ kloudStatus('Could not create space: '+e.message, 'var(--red)'); return; }
+  kloudPeer.on('open', id=>{
+    kloudRole='host';
+    const url=kloudInviteURL(id);
+    document.getElementById('kloud-invite-link').textContent=url;
+    document.getElementById('kloud-invite').classList.add('show');
+    kloudStatus(kloudSafeOrigin()
+      ? 'Space is live — send the invitation link.'
+      : 'Sandboxed preview — share the space code manually when hosted.', 'var(--green)');
+    kloudPeersLabel();
+  });
+  kloudPeer.on('connection', c=>{
+    kloudConns.push(c);
+    kloudWire(c);
+    c.on('open', ()=>{
+      // New guest receives the whole current document immediately
+      c.send({type:'doc', kad:GeoMemory.serialize()});
+      kloudStatus('Collaborator joined.', 'var(--green)');
+      kloudPeersLabel();
+      showToast('KLOUD · collaborator joined');
+    });
+  });
+  kloudPeer.on('error', e=>kloudStatus('Connection error: '+e.type, 'var(--red)'));
+}
+
+function kloudJoin(rawArg){
+  if(!kloudPeerAvailable()) return;
+  let raw=(rawArg || document.getElementById('kloud-join-input').value || '').trim();
+  if(raw.includes('#')) raw=raw.split('#').pop();
+  if(!raw){ kloudStatus('Paste an invite link or space code.', 'var(--red)'); return; }
+  kloudTeardown();
+  kloudStatus('Joining space…');
+  try { kloudPeer=new Peer(); }
+  catch(e){ kloudStatus('Could not connect: '+e.message, 'var(--red)'); return; }
+  kloudPeer.on('open', ()=>{
+    try {
+      const c=kloudPeer.connect(raw, {reliable:true});
+      kloudConns=[c];
+      kloudWire(c);
+      c.on('open', ()=>{
+        kloudRole='guest';
+        kloudStatus('Connected — live drafting space joined.', 'var(--green)');
+        kloudPeersLabel();
+        showToast('KLOUD · joined live space');
+      });
+    } catch(e){ kloudStatus('Connection failed: '+e.message, 'var(--red)'); }
+  });
+  kloudPeer.on('error', e=>kloudStatus('Could not connect: '+e.type, 'var(--red)'));
+}
+
+function kloudWire(c){
+  c.on('data', data=>{
+    if(data && data.type==='doc' && typeof data.kad==='string'){
+      kloudApplyingRemote=true;
+      const ok=GeoMemory.deserialize(data.kad);
+      kloudApplyingRemote=false;
+      if(ok){
+        kloudLastDoc=data.kad;   // remote state is now the baseline — don't echo it
+        render();
+        // Host relays guest edits to every other guest
+        if(kloudRole==='host'){
+          for(const other of kloudConns){
+            if(other!==c && other.open){ try{ other.send(data); }catch(e){} }
+          }
+        }
+      }
+    }
+  });
+  c.on('close', ()=>{
+    kloudConns=kloudConns.filter(x=>x!==c);
+    kloudStatus('A collaborator disconnected.', 'var(--amber)');
+    kloudPeersLabel();
+  });
+  c.on('error', ()=>{ kloudConns=kloudConns.filter(x=>x!==c); kloudPeersLabel(); });
+}
+
+function kloudTeardown(){
+  if(kloudPeer){ try{ kloudPeer.destroy(); }catch(e){} }
+  kloudPeer=null; kloudConns=[]; kloudRole=null;
+  document.getElementById('kloud-invite').classList.remove('show');
+  kloudPeersLabel();
+}
+
+// Change poll — one watcher covers every mutation path in the app
+setInterval(()=>{
+  if(!kloudRole || kloudApplyingRemote) return;
+  const live=kloudConns.filter(c=>c.open);
+  if(live.length===0) return;
+  const doc=GeoMemory.serialize();
+  if(doc===kloudLastDoc) return;
+  kloudLastDoc=doc;
+  for(const c of live){ try{ c.send({type:'doc', kad:doc}); }catch(e){} }
+}, 600);
+
+function kloudCopyInvite(){
+  const txt=document.getElementById('kloud-invite-link').textContent;
+  const btn=document.getElementById('kloud-copy-btn');
+  const done=()=>{ btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy Link',2000); };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>window.prompt('Copy this invite link:',txt));
+  } else { window.prompt('Copy this invite link:',txt); }
+}
+
+function kloudGoogleSignIn(){
+  if(!window._kloudFirebase){
+    document.getElementById('kloud-auth-status').textContent=
+      'Firebase not configured — follow KLOUD-HOSTING.md to enable paid tiers.';
+    return;
+  }
+  const { auth, GoogleAuthProvider, signInWithPopup } = window._kloudFirebase;
+  signInWithPopup(auth, new GoogleAuthProvider())
+    .catch(e=>{ document.getElementById('kloud-auth-status').textContent='Sign-in failed: '+e.code; });
+}
+
+// Invitation link = authentication link: opening it auto-joins the space.
+// KADsuite normally boots to the landing page, not drafting mode — enter
+// drafting mode first so the canvas/engine are live before the panel and
+// join call run (the standalone KAD app skips this since it's always in
+// drafting mode already).
+window.addEventListener('load', ()=>{
+  try {
+    const hash=(location.hash||'').replace('#','');
+    if(hash && hash.length>4 && !hash.includes('/')){
+      openDraftingMode();
+      kloudOpenPanel();
+      document.getElementById('kloud-join-input').value=hash;
+      kloudStatus('Invitation detected — authenticating into space…', 'var(--accent)');
+      setTimeout(()=>kloudJoin(hash), 400);
+    }
+  } catch(e){}
+});
+</script>
+
 </body>
 </html>
