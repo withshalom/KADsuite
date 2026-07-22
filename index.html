@@ -1279,7 +1279,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --kubic:  #20e8c0;
   --karve: #d4aa40;
   
-  --kanvas: #0090a8; /* → #8b5cf6 via gradient */
+  --kanvas: #4a7fb5; /* steel-hi — brought into the blueprint family */
 
   --kad-g:  rgba(0,212,255,0.12);
   --kam-g:  rgba(255,170,0,0.12);
@@ -1287,7 +1287,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --karve-g:rgba(212,170,64,0.12);
   --kultivate: #6ab830;  /* fresh growth green */
   --kultivate-g: rgba(90,158,60,0.12);
-  --kanvas-g: rgba(0,144,168,0.12);
+  --kanvas-g: rgba(74,127,181,0.12);
 
   
   --konstruct:   #4a8fd4;  /* blueprint technical blue */
@@ -1682,7 +1682,7 @@ nav {
   .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
   
 .flow-icon.kubic    { background: linear-gradient(135deg,#001c18,#20e8c0,#18c8a0); }
-.flow-icon.kanvas    { background: linear-gradient(135deg,#001c28,#005878,#0090a8,#6030c8,#8b5cf6); }
+.flow-icon.kanvas    { background: linear-gradient(135deg,#0a1628,#123259,#4a7fb5); }
 .flow-icon.kultivate { background: linear-gradient(135deg,#201008,#2e5818,#6ab830); }
 .flow-icon.kid       { background: linear-gradient(135deg,#3a1800,#cc5500,#ff8800); }
 .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
@@ -1787,10 +1787,10 @@ footer {
   box-shadow: 0 0 20px rgba(90,158,60,0.38);
 }
 
-.card-kanvas { --card-color: var(--kanvas); --card-glow: rgba(139,92,246,0.14); }
+.card-kanvas { --card-color: var(--kanvas); --card-glow: rgba(74,127,181,0.14); }
 .card-kanvas .card-mark {
-  background: linear-gradient(105deg,#0090a8 0%,#5b4fd4 55%,#8b5cf6 100%);
-  box-shadow: 0 0 20px rgba(0,144,168,0.40);
+  background: linear-gradient(105deg,#0e2038 0%,#123259 50%,#4a7fb5 100%);
+  box-shadow: 0 0 20px rgba(74,127,181,0.40);
 }
 
 /* ── KID ── */
@@ -3062,13 +3062,15 @@ function drawBetaStamp(ctx, W, H) {
 
 initPreview('kad-preview', (ctx, W, H) => {
   ctx.clearRect(0, 0, W, H);
-  // Grid
-  ctx.strokeStyle = 'rgba(0,212,255,0.07)';
+  // Draftspace fill — KAD's actual canvas color, not the card's chrome
+  ctx.fillStyle = '#123259'; ctx.fillRect(0, 0, W, H);
+  // Grid — same subtle navy-on-navy grid KAD actually renders
+  ctx.strokeStyle = '#1a2840';
   ctx.lineWidth = 0.5;
   for (let x = 0; x < W; x += 16) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
   for (let y = 0; y < H; y += 16) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  // Part outline
-  ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 1.5;
+  // Part outline — amber-gold, KAD's current committed drafting ink
+  ctx.strokeStyle = '#ffc94d'; ctx.lineWidth = 1.5;
   const px = 24, py = 18, pw = W-48, ph = H-36;
   // Bracket shape
   ctx.beginPath();
@@ -3079,16 +3081,16 @@ initPreview('kad-preview', (ctx, W, H) => {
   ctx.closePath();
   ctx.stroke();
   // Holes
-  ctx.strokeStyle = 'rgba(0,212,255,0.5)'; ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,201,77,0.5)'; ctx.lineWidth = 1;
   [[px+40, py+ph/2, 10],[px+pw-40, py+ph/2, 10]].forEach(([cx,cy,r]) => {
     ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
   });
-  // Dim lines
-  ctx.strokeStyle = 'rgba(0,212,255,0.25)'; ctx.lineWidth = 0.5; ctx.setLineDash([3,3]);
+  // Dim line — green, matching KAD's DIM layer color
+  ctx.strokeStyle = 'rgba(57,255,20,0.35)'; ctx.lineWidth = 0.5; ctx.setLineDash([3,3]);
   ctx.beginPath(); ctx.moveTo(px, H-8); ctx.lineTo(px+pw, H-8); ctx.stroke();
   ctx.setLineDash([]);
-  // Origin cross
-  ctx.strokeStyle = 'rgba(0,255,157,0.6)'; ctx.lineWidth = 1;
+  // Origin cross — cyan, matching KAD's actual fixed origin marker
+  ctx.strokeStyle = 'rgba(0,212,255,0.5)'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(W/2-8,H/2); ctx.lineTo(W/2+8,H/2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(W/2,H/2-8); ctx.lineTo(W/2,H/2+8); ctx.stroke();
 });
