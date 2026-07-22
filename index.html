@@ -594,7 +594,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 
 
 #suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; background:rgba(18,50,89,0.92); }
-#kad-escape-bar { position:fixed; top:0; left:0; right:0; z-index:999; height:36px; display:none; align-items:center; justify-content:space-between; padding:0 16px; background:rgba(4,6,10,0.97); border-bottom:1px solid var(--accent); font-family:var(--fu); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(12px); }
+#kad-escape-bar { position:fixed; top:0; left:0; right:0; z-index:999; height:36px; display:none; align-items:center; justify-content:space-between; padding:0 16px; background:var(--panel); border-bottom:1px solid var(--accent); font-family:var(--fu); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
 body.drafting-mode #kad-escape-bar { display:flex; }
 body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
 body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
@@ -1387,12 +1387,22 @@ nav {
 .nav-link:hover { color: var(--text1); }
 
 /* ── HERO ── */
+/* Same bg/grid/gridMaj colors and 10:1 major-line ratio as the live KAD
+   canvas (see the C proxy object, dark mode: bg #123259, grid #1a2840,
+   gridMaj #253a58, major=10) — the banner is a static swatch of the
+   actual drafting space, not a lookalike invented separately. */
 .hero {
   padding: 140px 0 24px;
   text-align: center;
   opacity: 0;
   transform: translateY(24px);
   animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+  background-color: #123259;
+  background-image:
+    repeating-linear-gradient(to right,  #253a58 0px, #253a58 2px, transparent 2px, transparent 200px),
+    repeating-linear-gradient(to bottom, #253a58 0px, #253a58 2px, transparent 2px, transparent 200px),
+    repeating-linear-gradient(to right,  #1a2840 0px, #1a2840 1px, transparent 1px, transparent 20px),
+    repeating-linear-gradient(to bottom, #1a2840 0px, #1a2840 1px, transparent 1px, transparent 20px);
 }
 
   .hero-tagline {
@@ -2487,7 +2497,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
 <!-- HERO -->
 <div class="page">
-  <section class="hero" style="background:rgba(18,50,89,0.92);border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;position:relative;z-index:1;">
+  <section class="hero" style="border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;position:relative;z-index:1;">
     <p style="font-family:var(--ff-ui);font-size:1.05rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#eef3f8;opacity:1;margin:0 0 0.7rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
     <h1 class="hero-title"><span class="kerf">KADsuite<sup class="suite">™</sup></span></h1>
     <p class="hero-tagline">The cutting edge of design software.</p>
@@ -3934,8 +3944,8 @@ document.addEventListener('keydown', function(e) {
     <div id="coord-panel-body">
       <div class="coord-example">While LINE active, type to open input.</div>
       <div class="coord-example">Values entered in current unit (<span id="coord-cur-unit" style="color:var(--accent)">mm</span>):</div>
-      <div class="coord-example"><b>100,50</b> — absolute X,Y (a space works too: <b>100 50</b>)</div>
-      <div class="coord-example"><i>@50,-20</i> — relative dX,dY (or <i>@50 -20</i>)</div>
+      <div class="coord-example"><b>100,50</b> — absolute X,Y</div>
+      <div class="coord-example"><i>@50,-20</i> — relative dX,dY</div>
       <div class="coord-example"><em>@100&lt;45</em> — polar dist&lt;angle°</div>
       <div class="coord-example"><b>50</b> or <i>@50</i> — length only; extends toward
         the cursor, or the locked angle if angle lock is on</div>
@@ -3943,6 +3953,8 @@ document.addEventListener('keydown', function(e) {
         then a length on the next line</div>
       <div class="coord-example"><em>@&lt;30</em> then <b>100</b> — turn 30° from the
         current heading, then a length</div>
+      <div class="coord-example"><b>LINE 0,0 0,10 COMMIT</b> — a whole script line,
+        space-separated; each token runs like its own Enter</div>
       <div class="coord-example" style="margin-top:4px;color:var(--t3);">Press <b>Enter</b> to commit · <b>Esc</b> to cancel · <b>U</b> to toggle units</div>
     </div>
   </div>
@@ -9773,6 +9785,17 @@ const KOMMANDS = {
   'PA':      () => pasteSelected(),
   'REDO':    () => { if(typeof redo==='function') redo(); kecho('Redo'); },
   'CLEAR':   () => { if(confirm('Clear all?')){ GeoMemory.clear(); render(); kecho('Cleared'); } },
+  'DELETE':  () => deleteSelected(),
+  'DEL':     () => deleteSelected(),
+  'ESCAPE':  () => { cancelTool(); kecho('Cancelled'); render(); },
+  'CANCEL':  () => { cancelTool(); kecho('Cancelled'); render(); },
+  'COMMIT':  () => {
+    if (activeTool === 'line' && lineState.active && lineChain && lineChain.length >= 2) {
+      commitLineChain(false); kecho('Committed'); render();
+    } else { kecho('Nothing to commit', 'err'); }
+  },
+  'IN':      () => { splashSelectUnit('in'); kecho('Units: in'); },
+  'MM':      () => { splashSelectUnit('mm'); kecho('Units: mm'); },
   'NEW':     () => { if(confirm('New document?')){ GeoMemory.clear(); render(); kecho('New document'); } },
 };
 
@@ -9785,19 +9808,19 @@ let typedAngleLock;
 function parseKommandCoord(raw) {
   const s = raw.trim();
   // Polar relative: @D<A
-  const polar = s.match(/^@([+-]?[\d.]+)\s*<\s*([+-]?[\d.]+)$/);
+  const polar = s.match(/^@([+-]?[\d.]+)<([+-]?[\d.]+)$/);
   if (polar) {
     const d = fromDisplay(parseFloat(polar[1]));
     const a = parseFloat(polar[2]) * Math.PI / 180;
     return { mode:'polar', d, a };
   }
   // Relative: @dX,dY
-  const rel = s.match(/^@([+-]?[\d.]+)[,\s]+([+-]?[\d.]+)$/);
+  const rel = s.match(/^@([+-]?[\d.]+),([+-]?[\d.]+)$/);
   if (rel) {
     return { mode:'rel', dx:fromDisplay(parseFloat(rel[1])), dy:fromDisplay(parseFloat(rel[2])) };
   }
   // Absolute: X,Y
-  const abs = s.match(/^([+-]?[\d.]+)[,\s]+([+-]?[\d.]+)$/);
+  const abs = s.match(/^([+-]?[\d.]+),([+-]?[\d.]+)$/);
   if (abs) {
     return { mode:'abs', x:fromDisplay(parseFloat(abs[1])),
                          y:fromDisplay(parseFloat(abs[2])) };
@@ -9813,13 +9836,13 @@ function parseKommandCoord(raw) {
   // Angle on its own — "<45" then a length next. Lets you set the exact
   // direction first, independent of angle-snap increments, then type the
   // length as a separate entry: <45 [Enter] 100 [Enter].
-  const angleOnly = s.match(/^<\s*([+-]?[\d.]+)$/);
+  const angleOnly = s.match(/^<([+-]?[\d.]+)$/);
   if (angleOnly) return { mode:'anglelock', a: parseFloat(angleOnly[1]) * Math.PI / 180 };
   // @<angle — RELATIVE angle: turn this many degrees from the current
   // heading (previous committed segment, or the current mouse-aim if
   // there isn't one yet), rather than an absolute bearing from 0°.
   // "@" = relative, "<" = angle, same grammar as everywhere else.
-  const angleRel = s.match(/^@\s*<\s*([+-]?[\d.]+)$/);
+  const angleRel = s.match(/^@<([+-]?[\d.]+)$/);
   if (angleRel) return { mode:'anglelockrel', a: parseFloat(angleRel[1]) * Math.PI / 180 };
   return null;
 }
@@ -9841,9 +9864,43 @@ function resolveCoord(parsed, lastX, lastY, lastAngle) {
 }
 
 // Handle KOMMAND input keydown
-kInput.addEventListener('keydown', function(e) {
-  const raw = kInput.value.trim().toUpperCase();
+// Resolve and apply ONE token — a command word or a single coordinate/
+// angle/distance entry. Shared by plain single-token input and by each
+// step of a multi-token script line (see submitKommandText below).
+function submitKommandSingle(tokenText) {
+  const raw = tokenText.trim().toUpperCase();
+  if (!raw) return;
+  if (KOMMANDS[raw]) { KOMMANDS[raw](); return; }
+  const parsed = parseKommandCoord(tokenText.trim());
+  if (parsed) { applyKommandCoord(parsed); return; }
+  kecho('Unknown: ' + raw, 'err');
+}
 
+// Submit a raw KOMMAND string — a single command/coordinate, OR a full
+// AutoCAD-style script line: space-separated tokens, each resolved and
+// applied in order exactly as if typed alone and Enter pressed after
+// each one. This is why space is reserved purely as the token delimiter
+// now — comma is the only in-token separator (10,25 — never 10 25),
+// so there's no ambiguity about where one token ends and the next begins.
+// Example: "LINE 0,0 0,10 COMMIT" runs all three steps from one Enter.
+function submitKommandText(rawText) {
+  // A trailing space is itself the commit signal — same as AutoCAD's
+  // blank Enter to end a command. No typed/spoken "COMMIT" word needed;
+  // one more space after the last token does it.
+  const hasTrailingSpace = /\s$/.test(rawText || '');
+  const trimmed = (rawText || '').trim();
+  if (!trimmed) return;
+  const tokens = trimmed.split(/\s+/);
+  if (tokens.length > 1) {
+    for (const tok of tokens) submitKommandSingle(tok);
+  } else {
+    submitKommandSingle(trimmed);
+  }
+  if (hasTrailingSpace) submitKommandSingle('COMMIT');
+  kommandClear();
+}
+
+kInput.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     e.stopPropagation();
     kommandClear();
@@ -9855,24 +9912,7 @@ kInput.addEventListener('keydown', function(e) {
 
   if (e.key === 'Enter' || e.key === 'Tab') {
     e.preventDefault();
-    if (!raw) return;
-
-    // Check command words first
-    if (KOMMANDS[raw]) {
-      KOMMANDS[raw]();
-      kommandClear();
-      return;
-    }
-
-    // Try coordinate parse
-    const parsed = parseKommandCoord(kInput.value.trim());
-    if (parsed) {
-      applyKommandCoord(parsed);
-      kommandClear();
-      return;
-    }
-
-    kecho('Unknown: ' + raw, 'err');
+    submitKommandText(kInput.value);
     return;
   }
 
@@ -9880,7 +9920,8 @@ kInput.addEventListener('keydown', function(e) {
   setTimeout(() => {
     const v = kInput.value.trim();
     if (!kPrefix) return;
-    if (v.startsWith('@') && v.includes('<')) kPrefix.textContent = 'POL';
+    if (v.includes(' '))                      kPrefix.textContent = 'SCR';
+    else if (v.startsWith('@') && v.includes('<')) kPrefix.textContent = 'POL';
     else if (v.startsWith('@'))               kPrefix.textContent = 'REL';
     else if (v.match(/^[a-zA-Z]/))            kPrefix.textContent = 'KMD';
     else if (v.match(/^[0-9+\-]/))           kPrefix.textContent = 'ABS';
