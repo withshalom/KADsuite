@@ -52,40 +52,35 @@
    Toggled via body.light-mode — all UI vars flip, accent stays cyan
    ─────────────────────────────────────────────────────────────────────────── */
 body.light-mode {
-  --void:       #dcedf8;      /* draftspace — cloud */
-  --panel:      #8fc1e8;      /* chrome (topbar/sidebar/dropdowns/dialogs) — powder blue,
-                                  lighter than panel2 so menus read as "lifted" —
-                                  this is the same --panel/--panel2 split the dark
-                                  theme already uses, just with new values */
-  --panel2:     #5b9bd5;      /* tool-button surface — sky blue */
-  --hover:      #a9d4ef;      /* lifts toward cloud on hover, same direction
-                                  dark mode's hover lifts toward its void */
-  --border:     #6fa8d8;
-  --border-hi:  #3d7cb0;
-  --accent:     #004866;      /* dark again — panels are bright now, so ink
-                                  flips back to dark-on-light */
-  --accent-dim: #003650;
-  --accent-glow: rgba(0,72,102,0.12);
-  --t1:  #0a1a2c;
-  --t2:  #123354;
-  --t3:  #2c4d70;
+  --void:       #5b9bd5;      /* draftspace — sky blue */
+  --panel:      #2c5c8f;      /* panels main — steel */
+  --panel2:     #2c5c8f;      /* panels main — steel */
+  --hover:      #4a7fb5;      /* highlight, lighter — steel-hi */
+  --border:     #1c4372;      /* subtle separator, darker — slate navy */
+  --border-hi:  #4a7fb5;      /* highlight — steel-hi */
+  --accent:     #5ee8ff;      /* light again — panels are medium-dark steel
+                                  again, not bright cloud, so ink flips back
+                                  to light-on-dark like dark mode */
+  --accent-dim: #2ec4ee;
+  --accent-glow: rgba(94,232,255,0.18);
+  --t1:  #f4f8fc;
+  --t2:  #c8dcf0;
+  --t3:  #8fb0d0;
 }
 /* Icons: invert to dark cyan on light bg */
 
 
 
 /* Canvas: light mode draws on a white/pale background */
-body.light-mode #main-canvas { background: #dcedf8; }
+body.light-mode #main-canvas { background: #5b9bd5; }
 
 :root {
-  --void:       #123259;  /* draftspace — blueprint navy */
-  --panel:      #16294a;  /* chrome (topbar/sidebar/dropdowns/dialogs) — twilight
-                              navy, one step lighter than panel2 so menus read as
-                              "lifted", mirroring the light-mode panel/panel2 split */
-  --panel2:     #0e2038;  /* tool-button surface — deep navy (unchanged) */
-  --hover:      #1e2838;
-  --border:     #263548;
-  --border-hi:  #3a5070;
+  --void:       #123259;  /* draftspace — blueprint (unchanged) */
+  --panel:      #0e2038;  /* panels main — deep navy */
+  --panel2:     #0e2038;  /* panels main — deep navy */
+  --hover:      #2c5c8f;  /* highlight, lighter — steel */
+  --border:     #0a1628;  /* subtle separator, darker — midnight */
+  --border-hi:  #4a7fb5;  /* highlight, lighter — steel-hi (dropdown/menu borders) */
   --accent:        #00d4ff;
   --accent-dim:    #0088aa;
   --accent-glow:   rgba(0,212,255,0.15);
@@ -2116,12 +2111,12 @@ footer {
 /* Icons: invert to dark cyan on light bg (light-mode vars themselves are
    defined once, near the top of the file) */
 body.light-mode .tool-icon svg {
-  stroke: #0d2c47;
-  color:  #0d2c47;
+  stroke: #a8d8ec;
+  color:  #a8d8ec;
 }
 body.light-mode .tool-btn:hover .tool-icon svg {
-  stroke: #062038;
-  color:  #062038;
+  stroke: #d0ecfa;
+  color:  #d0ecfa;
 }
 body.light-mode .tool-btn.active .tool-icon svg {
   stroke: var(--accent);
@@ -7294,7 +7289,7 @@ const C = new Proxy({}, {
     // dark-on-light. Grid stays genuinely dark (not washed-out pale) per
     // request, graduated grid < gridMaj < axis same as dark mode.
     const lt = {
-      bg:'#dcedf8', grid:'#4a7fb5', gridMaj:'#1c4372', axis:'#0e2038',
+      bg:'#5b9bd5', grid:'#1c4372', gridMaj:'#123259', axis:'#0a1628',
       entity:'#8a5a00', entitySel:'#b35900', point:'#b35900',
       rubberLine:'#8a5a00', startPt:'#00704a',
     };
@@ -7905,7 +7900,7 @@ function drawEntities() {
       const px=Math.max(8,o.height*cam.zoom);
       ctx.save();
       ctx.font=px+'px JetBrains Mono,monospace';
-      ctx.fillStyle=sel?C.entitySel:C.entity;
+      ctx.fillStyle=_col;
       ctx.textBaseline='bottom';
       ctx.fillText(o.text,sp.x,sp.y);
       if(sel){const m=ctx.measureText(o.text);ctx.strokeStyle=C.entitySel;ctx.lineWidth=1;ctx.setLineDash([2,2]);ctx.strokeRect(sp.x-2,sp.y-px-2,m.width+4,px+4);ctx.setLineDash([]);}
@@ -7916,19 +7911,19 @@ function drawEntities() {
     } else if(o.type==='CIRCLE'){
       const sc=worldToScreen(o.cx,o.cy);const sr=o.r*cam.zoom;
       if(sel){ctx.shadowColor='rgba(255,170,0,0.5)';ctx.shadowBlur=10;}
-      ctx.strokeStyle=sel?C.entitySel:C.entity;ctx.lineWidth=sel?2:1.2;
+      ctx.strokeStyle=_col;ctx.lineWidth=sel?2:1.2;
       ctx.beginPath();ctx.arc(sc.x,sc.y,sr,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
-      ctx.lineWidth=0.5;ctx.strokeStyle=sel?C.entitySel:'rgba(0,212,255,0.3)';
+      ctx.lineWidth=0.5;ctx.strokeStyle=sel?C.entitySel:hexA(draftCommittedColor(),0.3);
       ctx.beginPath();ctx.moveTo(sc.x-6,sc.y);ctx.lineTo(sc.x+6,sc.y);ctx.moveTo(sc.x,sc.y-6);ctx.lineTo(sc.x,sc.y+6);ctx.stroke();
-      drawDot(sc.x,sc.y,sel?C.entitySel:C.entity,1.5);
+      drawDot(sc.x,sc.y,_col,1.5);
     } else if(o.type==='ARC'){
       const sc=worldToScreen(o.cx,o.cy);const sr=o.r*cam.zoom;
       if(sel){ctx.shadowColor='rgba(255,170,0,0.5)';ctx.shadowBlur=10;}
-      ctx.strokeStyle=sel?C.entitySel:C.entity;ctx.lineWidth=sel?2:1.2;
+      ctx.strokeStyle=_col;ctx.lineWidth=sel?2:1.2;
       ctx.beginPath();ctx.arc(sc.x,sc.y,sr,-o.endA,-o.startA,!o.ccw);ctx.stroke();ctx.shadowBlur=0;
       const sp1=worldToScreen(o.cx+o.r*Math.cos(o.startA),o.cy+o.r*Math.sin(o.startA));
       const sp2=worldToScreen(o.cx+o.r*Math.cos(o.endA),  o.cy+o.r*Math.sin(o.endA));
-      drawDot(sp1.x,sp1.y,sel?C.entitySel:C.entity);drawDot(sp2.x,sp2.y,sel?C.entitySel:C.entity);
+      drawDot(sp1.x,sp1.y,_col);drawDot(sp2.x,sp2.y,_col);
     }
   }
   ctx.restore();
@@ -8000,7 +7995,7 @@ function drawRubberBand() {
   if (shiftLockActive) {
     const deg = ((Math.round(shiftLockAngle*180/Math.PI)%360)+360)%360;
     ctx.font = '9px JetBrains Mono,monospace';
-    ctx.fillStyle = C.rubberLine;
+    ctx.fillStyle = draftLeadingColor();
     ctx.globalAlpha = 0.85;
     ctx.fillText('∠'+deg+'°', end.x+10, end.y-6);
   }
