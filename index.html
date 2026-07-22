@@ -1424,13 +1424,10 @@ nav {
   opacity: 0;
   transform: translateY(24px);
   animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
-  background-color: #123259;
-  background-image:
-    repeating-linear-gradient(to right,  #253a58 0px, #253a58 2px, transparent 2px, transparent 200px),
-    repeating-linear-gradient(to bottom, #253a58 0px, #253a58 2px, transparent 2px, transparent 200px),
-    repeating-linear-gradient(to right,  #1a2840 0px, #1a2840 2px, transparent 2px, transparent 20px),
-    repeating-linear-gradient(to bottom, #1a2840 0px, #1a2840 2px, transparent 2px, transparent 20px);
-  background-size: 200px 200px, 200px 200px, 20px 20px, 20px 20px;
+  /* No background here on purpose — #site-shell now owns the one grid
+     for the whole page. Giving hero its own copy tiled from hero's own
+     box origin, which is inset/centered differently than site-shell's,
+     so the two never lined up — that was the mismatched patch. */
 }
 
   .hero-tagline {
