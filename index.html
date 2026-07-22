@@ -1608,8 +1608,8 @@ nav {
 
 /* ── TAGLINE STRIP ── */
 .strip {
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-top: 2px solid rgba(255,201,77,0.45);
+  border-bottom: 2px solid rgba(255,201,77,0.45);
   padding: 22px 0;
   margin-bottom: 100px;
   overflow: hidden;
@@ -1627,14 +1627,16 @@ nav {
 .strip-item {
   font-family: var(--ff-ui);
   font-size: 15px;
+  font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--text3);
+  color: #eef3f8;
   display: flex; align-items: center; gap: 20px; flex-shrink: 0;
 }
 .strip-item::after {
   content: '·';
-  color: var(--text3);
+  color: #ffc94d;
+  font-weight: 700;
 }
 
 @keyframes scroll {
@@ -2557,11 +2559,6 @@ body.light-mode .tool-btn.active .tool-icon svg {
     <p style="font-family:var(--ff-ui);font-size:0.85rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text2);opacity:0.85;margin:0 0 0.6rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
     <h1 class="hero-title"><span class="kerf">KADsuite<sup class="suite">™</sup></span></h1>
     <p class="hero-tagline">The cutting edge of design software.</p>
-    <p class="hero-mission">
-      <strong>Next-generation web-hosted drafting software</strong> giving everyone
-      access to technical design. KAD draws, KAM manufactures, KUBIC builds, KARVE machines,
-      KONSTRUCT structures, KULTIVATE plans the site it sits on, KODE verifies, and KANVAS illustrates.
-    </p>
   </section>
 </div>
 
@@ -2877,6 +2874,16 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
 
     </div>
+  </section>
+
+  <!-- MISSION — moved below the fold so the program cards are reachable
+       immediately without scrolling past it first -->
+  <section style="max-width:900px;margin:0 auto;padding:0 24px;text-align:center;position:relative;z-index:1;">
+    <p class="hero-mission" style="margin:60px auto 0;">
+      <strong>Next-generation web-hosted drafting software</strong> giving everyone
+      access to technical design. KAD draws, KAM manufactures, KUBIC builds, KARVE machines,
+      KONSTRUCT structures, KULTIVATE plans the site it sits on, KODE verifies, and KANVAS illustrates.
+    </p>
   </section>
 
   <!-- FOOTER -->
