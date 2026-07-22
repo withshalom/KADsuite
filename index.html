@@ -1432,20 +1432,6 @@ nav {
 }
 .hero-title .suite { font-size:0.38em; letter-spacing:0.02em; vertical-align:super; line-height:0; }
 
-.hero-mission {
-  max-width: 620px;
-  margin: 0 auto 56px;
-  font-family: var(--ff-serif);
-  font-size: 21px;
-  font-weight: 400;
-  line-height: 1.65;
-  color: #c0b8b0;
-}
-.hero-mission strong {
-  color: var(--text1);
-  font-weight: 600;
-}
-
 /* ── PROGRAM GRID ── */
 .programs {
   padding: 16px 0 120px;
@@ -1636,18 +1622,9 @@ nav {
 /* ── SUITE DIAGRAM ── */
 .diagram {
   text-align: center;
-  padding: 0 0 120px;
+  padding: 40px 0 48px;
   opacity: 0;
   animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
-}
-
-.diagram-title {
-  font-family: var(--ff-ui);
-  font-size: 15px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 40px;
 }
 
 .diagram-flow { display:flex; flex-direction:column; align-items:center; gap:8px; }
@@ -1694,16 +1671,6 @@ nav {
   color: var(--text3);
   padding: 0 2px;
   margin-top: -16px;
-}
-
-.flow-desc {
-  margin-top: 48px;
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--text2);
-  max-width: 560px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* ── FOOTER ── */
@@ -1811,10 +1778,6 @@ footer {
   .hero-title .kerf { white-space: nowrap; }
   .hero-title .suite { font-size:0.38em; letter-spacing:0.02em; vertical-align:super; line-height:0; }
 
-  .hero-mission {
-    font-size: 17px; text-align: left; margin-bottom: 18px;
-  }
-
   /* ── Strip — compact ticker, not a spacer ── */
   .strip { padding: 8px 0; margin-bottom: 10px; }
 
@@ -1837,7 +1800,6 @@ footer {
   .diagram-flow { gap: 8px; }
   .flow-node { padding: 12px 16px; }
   .flow-icon { width: 44px; height: 44px; border-radius: 10px; font-size: 14px; }
-  .flow-desc { font-size: 16px; }
 
   /* ── Footer ── */
   footer { flex-direction: column; align-items: flex-start; gap: 16px;
@@ -1853,19 +1815,9 @@ footer {
 
 /* ── LICENSING SECTION ── */
 .licensing {
-  padding: 0 0 120px;
+  padding: 40px 0 48px;
   opacity: 0;
   animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;
-}
-
-.licensing-header {
-  font-family: var(--ff-ui);
-  font-size: 15px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 40px;
-  text-align: center;
 }
 
 .license-grid {
@@ -2765,7 +2717,6 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
   <!-- FLOW DIAGRAM -->
   <section class="diagram" style="background:rgba(18,50,89,0.92);position:relative;z-index:1;">
-    <div class="diagram-title">The KADsuite programs</div>
     <div class="diagram-flow">
       <div class="flow-row">
         <div class="flow-node"><div class="flow-icon kad">KD</div><div class="flow-label">KAD</div></div>
@@ -2788,17 +2739,10 @@ body.light-mode .tool-btn.active .tool-icon svg {
     </div>
       </div>
     </div>
-    <p class="flow-desc">
-      Eight programs. One suite. Each does one job completely —
-      draw, manufacture, model, machine, structure, plan, illustrate, learn.
-      Native formats: <code style="font-family:var(--fm,monospace);font-size:13px;color:var(--accent)">.kad .kam .nc .dxf</code> ·
-      AGPL-3.0 open source.
-    </p>
   </section>
 
   <!-- LICENSING -->
   <section class="licensing" style="background:rgba(18,50,89,0.92);position:relative;z-index:1;">
-    <div class="licensing-header">Licensing</div>
     <div class="license-grid">
 
 
@@ -2854,16 +2798,6 @@ body.light-mode .tool-btn.active .tool-icon svg {
 
 
     </div>
-  </section>
-
-  <!-- MISSION — moved below the fold so the program cards are reachable
-       immediately without scrolling past it first -->
-  <section style="max-width:900px;margin:0 auto;padding:0 24px;text-align:center;position:relative;z-index:1;">
-    <p class="hero-mission" style="margin:60px auto 0;">
-      <strong>Next-generation web-hosted drafting software</strong> giving everyone
-      access to technical design. KAD draws, KAM manufactures, KUBIC builds, KARVE machines,
-      KONSTRUCT structures, KULTIVATE plans the site it sits on, KODE verifies, and KANVAS illustrates.
-    </p>
   </section>
 
   <!-- FOOTER -->
@@ -4000,9 +3934,15 @@ document.addEventListener('keydown', function(e) {
     <div id="coord-panel-body">
       <div class="coord-example">While LINE active, type to open input.</div>
       <div class="coord-example">Values entered in current unit (<span id="coord-cur-unit" style="color:var(--accent)">mm</span>):</div>
-      <div class="coord-example"><b>100,50</b> — absolute X,Y</div>
-      <div class="coord-example"><i>@50,-20</i> — relative dX,dY</div>
+      <div class="coord-example"><b>100,50</b> — absolute X,Y (a space works too: <b>100 50</b>)</div>
+      <div class="coord-example"><i>@50,-20</i> — relative dX,dY (or <i>@50 -20</i>)</div>
       <div class="coord-example"><em>@100&lt;45</em> — polar dist&lt;angle°</div>
+      <div class="coord-example"><b>50</b> or <i>@50</i> — length only; extends toward
+        the cursor, or the locked angle if angle lock is on</div>
+      <div class="coord-example"><em>&lt;45</em> then <b>100</b> — set an exact angle,
+        then a length on the next line</div>
+      <div class="coord-example"><em>@&lt;30</em> then <b>100</b> — turn 30° from the
+        current heading, then a length</div>
       <div class="coord-example" style="margin-top:4px;color:var(--t3);">Press <b>Enter</b> to commit · <b>Esc</b> to cancel · <b>U</b> to toggle units</div>
     </div>
   </div>
@@ -5845,6 +5785,7 @@ function drawRotatePreview() {
 
 // ── TOOL MANAGEMENT ─────────────────────────────────────
 function cancelTool() {
+  typedAngleLock = undefined;
   lineState   = {active:false};
   if(typeof dimState!=='undefined') dimState={active:false,p1:null};
   lineChain   = [];
@@ -9836,10 +9777,15 @@ const KOMMANDS = {
 };
 
 // Parse coordinate input: "X,Y" | "@dX,dY" | "@D<A"
+// One-shot angle typed on its own ("<45" then a length next) — highest
+// priority direction source for the next dist-mode entry, above both
+// angle lock and mouse ray-casting. Cleared on use, cancel, or Escape.
+let typedAngleLock;
+
 function parseKommandCoord(raw) {
   const s = raw.trim();
   // Polar relative: @D<A
-  const polar = s.match(/^@([+-]?[\d.]+)<([+-]?[\d.]+)$/);
+  const polar = s.match(/^@([+-]?[\d.]+)\s*<\s*([+-]?[\d.]+)$/);
   if (polar) {
     const d = fromDisplay(parseFloat(polar[1]));
     const a = parseFloat(polar[2]) * Math.PI / 180;
@@ -9856,9 +9802,25 @@ function parseKommandCoord(raw) {
     return { mode:'abs', x:fromDisplay(parseFloat(abs[1])),
                          y:fromDisplay(parseFloat(abs[2])) };
   }
-  // Single number = distance along current direction
+  // Single number = distance along current direction (ray-cast toward
+  // the cursor, or the locked angle if angle lock is on)
   const num = s.match(/^([+-]?[\d.]+)$/);
   if (num) return { mode:'dist', d: fromDisplay(parseFloat(num[1])) };
+  // @distance (no comma, no angle) — same thing, written the way many
+  // CAD users expect "relative distance" to look
+  const relDist = s.match(/^@([+-]?[\d.]+)$/);
+  if (relDist) return { mode:'dist', d: fromDisplay(parseFloat(relDist[1])) };
+  // Angle on its own — "<45" then a length next. Lets you set the exact
+  // direction first, independent of angle-snap increments, then type the
+  // length as a separate entry: <45 [Enter] 100 [Enter].
+  const angleOnly = s.match(/^<\s*([+-]?[\d.]+)$/);
+  if (angleOnly) return { mode:'anglelock', a: parseFloat(angleOnly[1]) * Math.PI / 180 };
+  // @<angle — RELATIVE angle: turn this many degrees from the current
+  // heading (previous committed segment, or the current mouse-aim if
+  // there isn't one yet), rather than an absolute bearing from 0°.
+  // "@" = relative, "<" = angle, same grammar as everywhere else.
+  const angleRel = s.match(/^@\s*<\s*([+-]?[\d.]+)$/);
+  if (angleRel) return { mode:'anglelockrel', a: parseFloat(angleRel[1]) * Math.PI / 180 };
   return null;
 }
 
@@ -9928,6 +9890,38 @@ kInput.addEventListener('keydown', function(e) {
 
 // Apply a resolved coordinate to the current tool state
 function applyKommandCoord(parsed) {
+  // Angle typed on its own — prime it for the next length entry and stop;
+  // this doesn't place anything by itself.
+  if (parsed.mode === 'anglelock') {
+    if (!getDrawAnchor()) { kecho('Start a line/shape first', 'err'); return; }
+    typedAngleLock = parsed.a;
+    const deg = ((parsed.a * 180 / Math.PI) % 360 + 360) % 360;
+    kecho('Angle set to ' + deg.toFixed(1) + '° — type a length', 'ok');
+    return;
+  }
+
+  // Relative angle — turn N° from the current heading, then resolve to
+  // the same one-shot typedAngleLock so the next length entry behaves
+  // exactly like the absolute case.
+  if (parsed.mode === 'anglelockrel') {
+    const relAnchor = getDrawAnchor();
+    if (!relAnchor) { kecho('Start a line/shape first', 'err'); return; }
+    let baseAngle;
+    if (activeTool === 'line' && lineChain && lineChain.length >= 2) {
+      const a = lineChain[lineChain.length-2], b = lineChain[lineChain.length-1];
+      baseAngle = Math.atan2(b.y - a.y, b.x - a.x);
+    } else if (mouseWorld) {
+      baseAngle = Math.atan2(mouseWorld.y - relAnchor.y, mouseWorld.x - relAnchor.x);
+    } else {
+      baseAngle = 0;
+    }
+    typedAngleLock = baseAngle + parsed.a;
+    const deg = ((typedAngleLock * 180 / Math.PI) % 360 + 360) % 360;
+    const turnDeg = parsed.a * 180 / Math.PI;
+    kecho('Turned ' + turnDeg.toFixed(1) + '° to ' + deg.toFixed(1) + '° — type a length', 'ok');
+    return;
+  }
+
   // Get anchor + any tool-specific committed angle (e.g. an arc's p1→p2
   // already fixes its sweep direction) from the current tool state
   let lastX = 0, lastY = 0, lastAngle;
@@ -9938,14 +9932,19 @@ function applyKommandCoord(parsed) {
   }
 
   // Plain-number length entry ("type 96, hit Enter" mid-draw): direction
-  // comes from whatever is currently indicating it — angle lock first
-  // (Shift held, or the touch toggle), otherwise a ray cast from the
-  // anchor out to the last known cursor position, exactly like aiming
-  // with the mouse/finger and reading the length off a tape measure.
+  // comes from whatever is currently indicating it, highest priority first:
+  //   1. A typed angle ("<45" entered just before this) — exact, one-shot.
+  //   2. Angle lock (Shift held, or the touch toggle) — snapped increments.
+  //   3. A ray cast from the anchor to the last known cursor position —
+  //      exact, unsnapped, like aiming with the mouse/finger and reading
+  //      the length off a tape measure.
   // This is what makes typed lengths work for LINE, PLINE segments, RECT,
   // POLYGON, and an ARC's second point — not just LINE continuations.
   if (parsed.mode === 'dist' && anchor) {
-    if (shiftLockActive) {
+    if (typedAngleLock !== undefined) {
+      lastAngle = typedAngleLock;
+      typedAngleLock = undefined; // one-shot — doesn't linger past this entry
+    } else if (shiftLockActive) {
       lastAngle = shiftLockAngle;
     } else if (mouseWorld) {
       lastAngle = Math.atan2(mouseWorld.y - lastY, mouseWorld.x - lastX);
