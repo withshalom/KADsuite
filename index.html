@@ -1361,12 +1361,12 @@ nav {
 .nav-brand {
   font-family: var(--ff-display);
   font-weight: 800;
-  font-size: 18px;
+  font-size: 21px;
   letter-spacing: -0.02em;
   color: var(--text1);
 }
 .nav-brand sup {
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.1em;
   color: var(--text2);
   vertical-align: super;
@@ -1377,7 +1377,7 @@ nav {
 }
 .nav-link {
   font-family: var(--ff-ui);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text2);
   text-decoration: none;
   letter-spacing: 0.14em;
@@ -1397,8 +1397,8 @@ nav {
 
 .hero-eyebrow {
   font-family: var(--ff-ui);
-  font-size: 13px;
-  letter-spacing: 0.22em;
+  font-size: 15px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text2);
   margin-bottom: 28px;
@@ -1414,7 +1414,7 @@ nav {
 
   .hero-tagline {
     font-family: var(--ff-display);
-    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    font-size: clamp(1.3rem, 3.4vw, 1.9rem);
     font-weight: 700;
     color: var(--text1);
     letter-spacing: 0.01em;
@@ -1424,7 +1424,7 @@ nav {
 
   .hero-title {
   font-family: var(--ff-display);
-  font-size: clamp(58px, 9vw, 110px);
+  font-size: clamp(64px, 10vw, 120px);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 0.92;
@@ -1450,10 +1450,10 @@ nav {
 .hero-title .suite { font-size:0.38em; letter-spacing:0.02em; vertical-align:super; line-height:0; }
 
 .hero-mission {
-  max-width: 580px;
+  max-width: 620px;
   margin: 0 auto 56px;
   font-family: var(--ff-serif);
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 400;
   line-height: 1.65;
   color: #c0b8b0;
@@ -1525,12 +1525,12 @@ nav {
 
 /* Card corner mark */
 .card-mark {
-  width: 42px; height: 42px;
-  border-radius: 10px;
+  width: 46px; height: 46px;
+  border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--ff-ui);
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 700;
+  font-size: 16px;
   letter-spacing: 0.04em;
   color: #000;
   margin-bottom: 28px;
@@ -1545,7 +1545,7 @@ nav {
 
 .card-name {
   font-family: var(--ff-display);
-  font-size: 36px;
+  font-size: 46px;
   font-weight: 800;
   letter-spacing: -0.025em;
   line-height: 1;
@@ -1555,8 +1555,8 @@ nav {
 
 .card-full {
   font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.18em;
+  font-size: 15px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #686058;
   margin-bottom: 20px;
@@ -1564,7 +1564,7 @@ nav {
 
 .card-desc {
   font-family: var(--ff-serif);
-  font-size: 15px;
+  font-size: 19px;
   line-height: 1.6;
   color: #c8c0b4;
   flex: 1;
@@ -1587,17 +1587,23 @@ nav {
 }
 
 .card-cta {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  align-self: center;
   font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.16em;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--card-color);
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  color: #1a1000;
+  background: linear-gradient(135deg, #ffc94d, #e8a020);
+  border-radius: 10px;
+  padding: 15px 30px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(232,160,32,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.card:hover .card-cta { opacity: 1; }
-.card-cta-arrow { font-size: 15px; }
+.card:hover .card-cta { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,160,32,0.55); }
+.card-cta-arrow { font-size: 21px; }
 
 
 /* ── TAGLINE STRIP ── */
@@ -1620,8 +1626,8 @@ nav {
 
 .strip-item {
   font-family: var(--ff-ui);
-  font-size: 13px;
-  letter-spacing: 0.2em;
+  font-size: 15px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text3);
   display: flex; align-items: center; gap: 20px; flex-shrink: 0;
@@ -1651,8 +1657,8 @@ nav {
 
 .diagram-title {
   font-family: var(--ff-ui);
-  font-size: 13px;
-  letter-spacing: 0.2em;
+  font-size: 15px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text3);
   margin-bottom: 40px;
@@ -1672,7 +1678,7 @@ nav {
   display: flex; align-items: center; justify-content: center;
   font-family: var(--ff-ui);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 15px;
   color: #000;
   letter-spacing: 0.04em;
 }
@@ -1690,15 +1696,15 @@ nav {
 
 .flow-label {
   font-family: var(--ff-ui);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-size: 13px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text3);
 }
 
 .flow-arrow {
   font-family: var(--ff-ui);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text3);
   padding: 0 2px;
   margin-top: -16px;
@@ -1706,7 +1712,7 @@ nav {
 
 .flow-desc {
   margin-top: 48px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.7;
   color: var(--text2);
   max-width: 560px;
@@ -1729,11 +1735,11 @@ footer {
 
 .footer-brand {
   font-weight: 800;
-  font-size: 16px;
+  font-size: 18px;
   letter-spacing: -0.02em;
   color: var(--text2);
 }
-.footer-brand sup { font-size: 11px; vertical-align: super; }
+.footer-brand sup { font-size: 12px; vertical-align: super; }
 
 .footer-links {
   display: flex; align-items: center; gap: 28px;
@@ -1741,8 +1747,8 @@ footer {
 
 .footer-link {
   font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.16em;
+  font-size: 14px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text2);
   text-decoration: none;
@@ -1759,8 +1765,8 @@ footer {
 
 .footer-copy {
   font-family: var(--ff-ui);
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-size: 13px;
+  letter-spacing: 0.08em;
   color: var(--text3);
   width: 100%;
 }
@@ -1810,42 +1816,45 @@ footer {
   nav { padding: 14px 20px; }
   .page { padding: 0 18px; }
   .nav-links { gap: 14px; }
-  .nav-link { font-size: 12px; letter-spacing: 0.1em; }
+  .nav-link { font-size: 14px; letter-spacing: 0.1em; }
 
   /* ── Hero ── */
-  .hero { padding: 110px 0 48px; text-align: left; }
-  .hero-eyebrow { justify-content: flex-start; font-size: 12px; }
+  .hero { padding: 96px 0 20px; text-align: left; }
+  .hero-eyebrow { justify-content: flex-start; font-size: 14px; }
   .hero-eyebrow::before { display: none; }
   .hero-eyebrow::after  { display: none; }
 
-  .hero-title { font-size: clamp(36px, 10.5vw, 68px); letter-spacing:-0.02em; margin-bottom: 16px; }
+  .hero-title { font-size: clamp(40px, 11.5vw, 72px); letter-spacing:-0.02em; margin-bottom: 16px; }
   .hero-title .kerf { white-space: nowrap; }
   .hero-title .suite { font-size:0.38em; letter-spacing:0.02em; vertical-align:super; line-height:0; }
 
   .hero-mission {
-    font-size: 15px; text-align: left; margin-bottom: 40px;
+    font-size: 17px; text-align: left; margin-bottom: 18px;
   }
 
-  /* ── Strip ── */
-  .strip { margin-bottom: 56px; }
+  /* ── Strip — compact ticker, not a spacer ── */
+  .strip { padding: 10px 0; margin-bottom: 18px; }
+
+  /* ── Program grid — pull the cards right up under the strip ── */
+  .programs { padding: 12px 0 60px; }
 
   /* ── Cards — single column, more compact ── */
   .programs-grid { grid-template-columns: 1fr; gap: 14px; }
 
   .card { padding: 24px 24px 20px; border-radius: 12px; }
-  .card-mark { width: 36px; height: 36px; border-radius: 8px;
-    font-size: 12px; margin-bottom: 20px; }
-  .card-name { font-size: 28px; }
-  .card-full { font-size: 11px; margin-bottom: 14px; }
+  .card-mark { width: 40px; height: 40px; border-radius: 9px;
+    font-size: 15px; margin-bottom: 20px; }
+  .card-name { font-size: 36px; }
+  .card-full { font-size: 14px; margin-bottom: 14px; }
   .card-preview { height: 90px; margin-bottom: 18px; }
-  .card-desc { font-size: 14px; margin-bottom: 20px; }
+  .card-desc { font-size: 18px; margin-bottom: 20px; }
 
   /* ── Flow ── */
   .flow-arrow { display: none; }
   .diagram-flow { gap: 8px; }
   .flow-node { padding: 12px 16px; }
-  .flow-icon { width: 44px; height: 44px; border-radius: 10px; font-size: 12px; }
-  .flow-desc { font-size: 14px; }
+  .flow-icon { width: 44px; height: 44px; border-radius: 10px; font-size: 14px; }
+  .flow-desc { font-size: 16px; }
 
   /* ── Footer ── */
   footer { flex-direction: column; align-items: flex-start; gap: 16px;
@@ -1855,7 +1864,7 @@ footer {
 
 /* ── Very small screens ── */
 @media (max-width: 380px) {
-  .hero-title { font-size: 46px; }
+  .hero-title { font-size: 50px; }
   nav .nav-links { display: none; }
 }
 
@@ -1868,8 +1877,8 @@ footer {
 
 .licensing-header {
   font-family: var(--ff-ui);
-  font-size: 13px;
-  letter-spacing: 0.2em;
+  font-size: 15px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text3);
   margin-bottom: 40px;
@@ -1918,8 +1927,8 @@ footer {
 
 .lc-tag {
   font-family: var(--ff-ui);
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: 13px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--lc-color);
   background: rgba(255,255,255,0.04);
@@ -1931,7 +1940,7 @@ footer {
 
 .lc-title {
   font-family: var(--ff-display);
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text1);
@@ -1940,22 +1949,22 @@ footer {
 
 .lc-subtitle {
   font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  font-size: 14px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text3);
   margin-top: -6px;
 }
 
 .lc-price {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--lc-color);
   line-height: 1;
 }
 .lc-price span {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   font-family: var(--ff-ui);
   color: var(--text3);
@@ -1978,7 +1987,7 @@ footer {
 
 .lc-items li {
   font-family: var(--ff-serif);
-  font-size: 14.5px;
+  font-size: 16px;
   letter-spacing: 0.005em;
   color: var(--text2);
   display: flex;
@@ -2000,8 +2009,8 @@ footer {
   align-items: center;
   justify-content: space-between;
   font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.16em;
+  font-size: 14px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--lc-color);
   border: 1px solid var(--lc-color);
@@ -2545,7 +2554,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 <div class="page">
   <section class="hero" style="background:rgba(18,50,89,0.92);border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;padding-bottom:48px;position:relative;z-index:1;">
     <div class="hero-eyebrow">Browser-native · No install · AGPL-3.0 · Open source</div>
-    <p style="font-family:var(--ff-ui);font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--text2);opacity:0.85;margin:0 0 0.6rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
+    <p style="font-family:var(--ff-ui);font-size:0.85rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text2);opacity:0.85;margin:0 0 0.6rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
     <h1 class="hero-title"><span class="kerf">KADsuite<sup class="suite">™</sup></span></h1>
     <p class="hero-tagline">The cutting edge of design software.</p>
     <p class="hero-mission">
