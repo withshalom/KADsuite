@@ -52,40 +52,37 @@
    Toggled via body.light-mode — all UI vars flip, accent stays cyan
    ─────────────────────────────────────────────────────────────────────────── */
 body.light-mode {
-  --void:       #d0d8e0;
-  --panel:      #f0f4f8;
-  --panel2:     #e4eaf0;
-  --hover:      #d8e4ee;
-  --border:     #b0c4d8;
-  --border-hi:  #80a8c8;
-  --accent:     #0088aa;      /* darker cyan — readable on light */
-  --accent-dim: #006888;
-  --accent-glow: rgba(0,136,170,0.15);
-  --t1:  #0a1520;             /* near black */
-  --t2:  #2a4a6a;             /* dark blue-grey */
-  --t3:  #4a6a8a;             /* mid */
+  --void:       #dcedf8;      /* draftspace — cloud */
+  --panel:      #8fc1e8;      /* chrome (topbar/sidebar/dropdowns/dialogs) — powder blue,
+                                  lighter than panel2 so menus read as "lifted" —
+                                  this is the same --panel/--panel2 split the dark
+                                  theme already uses, just with new values */
+  --panel2:     #5b9bd5;      /* tool-button surface — sky blue */
+  --hover:      #a9d4ef;      /* lifts toward cloud on hover, same direction
+                                  dark mode's hover lifts toward its void */
+  --border:     #6fa8d8;
+  --border-hi:  #3d7cb0;
+  --accent:     #004866;      /* dark again — panels are bright now, so ink
+                                  flips back to dark-on-light */
+  --accent-dim: #003650;
+  --accent-glow: rgba(0,72,102,0.12);
+  --t1:  #0a1a2c;
+  --t2:  #123354;
+  --t3:  #2c4d70;
 }
 /* Icons: invert to dark cyan on light bg */
-body.light-mode .tool-icon svg {
-  stroke: #007a99;
-  color:  #007a99;
-}
-body.light-mode .tool-btn:hover .tool-icon svg {
-  stroke: #005577;
-  color:  #005577;
-}
-body.light-mode .tool-btn.active .tool-icon svg {
-  stroke: var(--accent);
-  color:  var(--accent);
-  filter: drop-shadow(0 0 3px var(--accent));
-}
+
+
+
 /* Canvas: light mode draws on a white/pale background */
-body.light-mode #main-canvas { background: #f8fbff; }
+body.light-mode #main-canvas { background: #dcedf8; }
 
 :root {
-  --void:       #080a0e;
-  --panel:      #0b0f14;
-  --panel2:     #131a24;
+  --void:       #123259;  /* draftspace — blueprint navy */
+  --panel:      #16294a;  /* chrome (topbar/sidebar/dropdowns/dialogs) — twilight
+                              navy, one step lighter than panel2 so menus read as
+                              "lifted", mirroring the light-mode panel/panel2 split */
+  --panel2:     #0e2038;  /* tool-button surface — deep navy (unchanged) */
   --hover:      #1e2838;
   --border:     #263548;
   --border-hi:  #3a5070;
@@ -108,119 +105,110 @@ body.light-mode #main-canvas { background: #f8fbff; }
   --status-h:      32px;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; background:var(--void); color:var(--t1); font-family:var(--fu); font-size:15px; }
 
 /* ── LAYOUT ── */
 #app { position:fixed; inset:0; z-index:0; pointer-events:none; display:grid; grid-template-columns:var(--sidebar-w) 1fr; grid-template-rows:var(--toolbar-h) 32px 1fr 28px var(--status-h); width:100vw; height:100vh; overflow:hidden; background:var(--void); }
 
 /* ── TOPBAR ── */
-#topbar { grid-column:1/-1; display:flex; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); padding:0 12px; position:relative; z-index:30; }
-.brand { display:flex; align-items:center; gap:8px; margin-right:20px; font-family:var(--fu); font-weight:700; font-size:15px; color:var(--accent); letter-spacing:0.04em; user-select:none; }
-.brand-sub { font-size:12px; color:var(--t3); letter-spacing:0.12em; text-transform:uppercase; font-weight:400; }
-.tb-menu { display:flex; align-items:center; }
-.tb-menu-item { padding:0 12px; height:var(--toolbar-h); display:flex; align-items:center; font-size:14px; color:var(--t2); cursor:pointer; transition:color 0.15s,background 0.15s; letter-spacing:0.02em; position:relative; }
-.tb-menu-item:hover { color:var(--t1); background:var(--hover); }
-.tb-menu-item.open { color:var(--t1); background:var(--hover); }
-.tb-sep { width:1px; height:18px; background:var(--border); margin:0 4px; }
-.tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+
+
+
+
+
+
+
+
+
 .tb-badge { font-family:var(--fu); font-size:13px; color:var(--t2); background:var(--panel2); border:1px solid var(--border); padding:2px 7px; border-radius:3px; letter-spacing:0.06em; }
 
 /* Topbar dropdown */
-.tb-dropdown { position:absolute; top:100%; left:0; background:var(--panel); border:1px solid var(--border-hi); border-radius:0 0 4px 4px; min-width:180px; z-index:200; display:none; flex-direction:column; box-shadow:0 8px 24px rgba(0,0,0,0.6); padding:4px 0; }
-.tb-dropdown.open { display:flex; }
-.tb-dd-item { padding:7px 14px; font-family:var(--fu); font-size:13px; color:var(--t2); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:16px; transition:background 0.1s,color 0.1s; }
-.tb-dd-item:hover { background:var(--hover); color:var(--t1); }
-.tb-dd-item .dd-key { color:var(--t3); font-size:12px; }
-.tb-dd-sep { height:1px; background:var(--border); margin:3px 0; }
+
+
+
+
+
+
 
 /* ── SIDEBAR ── */
-#sidebar { background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; position:relative; z-index:10; height:100%; flex-shrink:0; }
-.section-head { padding:8px 14px 5px; font-family:var(--fu); font-size:12px; font-weight:500; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; border-bottom:1px solid var(--border); flex-shrink:0; }
+
+
 .tool-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2px; padding:8px; background:var(--border); border-bottom:1px solid var(--border); flex-shrink:0; }
 .tool-btn { background:var(--panel2); border:none; cursor:pointer; padding:12px 4px; display:flex; flex-direction:column; align-items:center; gap:5px; transition:background 0.15s,box-shadow 0.15s; position:relative; overflow:hidden; }
-.tool-btn:hover { background:var(--hover); }
-.tool-btn.active { background:var(--hover); box-shadow:inset 0 0 0 1px var(--accent); }
-.tool-btn.active::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); box-shadow:0 0 8px var(--accent); }
+
+
+
 .tool-icon { width:28px; height:28px; display:flex; align-items:center; justify-content:center; }
 .tool-icon svg { width:20px; height:20px; stroke:#5de8ff; color:#5de8ff; }
 .tool-btn:hover .tool-icon svg { stroke:#b8f8ff; color:#b8f8ff; }
-.tool-btn.active .tool-icon svg { stroke:var(--accent); color:var(--accent); filter:drop-shadow(0 0 3px var(--accent)); }
+
 .tool-label { font-size:12px; font-family:var(--fu); color:var(--t1); letter-spacing:0.06em; opacity:0.9; }
-.tool-btn.active .tool-label { color:var(--accent); }
+
 
 /* Offset bar */
-#offset-bar { display:none; align-items:center; gap:6px; padding:5px 8px; background:var(--panel2); border-bottom:1px solid var(--border); flex-shrink:0; }
-#offset-bar.visible { display:flex; }
-#offset-bar label { font-family:var(--fu); font-size:12px; color:var(--t3); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
-#offset-dist-input { background:var(--panel); border:1px solid var(--border-hi); border-radius:3px; color:var(--accent); font-family:var(--fm); font-size:13px; padding:3px 6px; width:60px; outline:none; text-align:right; }
-#offset-dist-input:focus { border-color:var(--accent); }
-#offset-dist-unit { font-family:var(--fm); font-size:12px; color:var(--t3); }
+
+
+
+
+
+
 
 /* File ops */
-.file-ops { padding:6px; display:flex; flex-direction:column; gap:3px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.op-btn { display:flex; align-items:center; gap:8px; padding:6px 10px; background:var(--panel2); border:1px solid var(--border); border-radius:4px; color:var(--t2); font-size:13px; font-family:var(--fu); cursor:pointer; transition:all 0.15s; letter-spacing:0.04em; }
-.op-btn:hover { background:var(--hover); border-color:var(--border-hi); color:var(--t1); }
-.op-btn.dxf { color:var(--green); border-color:var(--green-dim); }
-.op-btn.dxf:hover { background:rgba(0,255,157,0.06); border-color:var(--green); }
-.op-btn svg { width:12px; height:12px; flex-shrink:0; }
-#load-kad { display:none; }
+
+
+
+
+
+
+
 
 /* Coord input panel */
-#coord-panel { flex-shrink:0; border-bottom:1px solid var(--border); }
-#coord-panel-head { padding:6px 14px 5px; font-family:var(--fu); font-size:12px; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
-#coord-panel-head:hover { color:var(--t2); }
-#coord-panel-body { padding:6px 8px 8px; display:none; }
-#coord-panel-body.open { display:block; }
-.coord-example { font-family:var(--fm); font-size:12px; color:var(--t3); margin-bottom:4px; line-height:1.6; }
-.coord-example b { color:var(--accent); }
-.coord-example i { color:var(--amber); font-style:normal; }
-.coord-example em { color:var(--green); font-style:normal; }
+
+
+
+
+
+
+
+
+
 
 /* Properties */
-.props-panel { flex:1; overflow-y:auto; padding:6px; }
-.props-panel::-webkit-scrollbar { width:3px; }
-.props-panel::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
-.prop-row { display:flex; justify-content:space-between; align-items:center; padding:3px 8px; border-radius:3px; margin-bottom:1px; }
-.prop-row:hover { background:var(--hover); }
-.prop-key { font-size:13px; color:var(--t3); font-family:var(--fu); }
-.prop-val { font-size:13px; color:var(--t2); font-family:var(--fm); }
-.prop-val.accent { color:var(--accent); }
-.prop-val.green  { color:var(--green); }
-.layer-row { display:flex; align-items:center; gap:8px; padding:4px 8px; cursor:pointer; border-radius:3px; margin-bottom:2px; }
-.layer-row:hover { background:var(--hover); }
-.layer-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.layer-name { font-size:13px; font-family:var(--fu); color:var(--t2); flex:1; }
-.layer-count { font-size:13px; color:var(--t3); font-family:var(--fm); }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── CANVAS AREA ── */
-#canvas-wrap { position:relative; overflow:hidden; background:var(--void); flex:1; min-width:0; }
-#main-canvas { display:block; }
+
+
 
 /* ── SNAP INDICATOR ── */
-.snap-ring { position:absolute; pointer-events:none; width:12px; height:12px; border:1.5px solid var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); transform:translate(-50%,-50%); display:none; }
+
 
 /* ── COORD OVERLAY ── */
-#coord-overlay { position:absolute; bottom:8px; right:8px; background:rgba(8,10,14,0.88); border:1px solid var(--border); backdrop-filter:blur(4px); padding:5px 10px; border-radius:4px; font-family:var(--fm); font-size:13px; color:var(--t2); pointer-events:none; display:flex; gap:12px; letter-spacing:0.04em; }
-#coord-overlay span { color:var(--accent); }
-.coord-label { color:var(--t3); }
+
+
+
 
 /* ── CONTEXT HINT ── */
-#hint { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(8,10,14,0.9); border:1px solid var(--border-hi); border-radius:4px; padding:4px 12px; font-size:13px; font-family:var(--fu); color:var(--t2); pointer-events:none; white-space:nowrap; letter-spacing:0.05em; }
-#hint span { color:var(--accent); }
+
+
 
 /* ── STATUS BAR ── */
 /* ── KOMMAND LINE ─────────────────────────────────────────────────────────── */
-#kommand-bar {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  background: var(--panel);
-  border-top: 1px solid var(--border);
-  padding: 0;
-  overflow: hidden;
-  z-index: 30;
-}
+
 /* #kommand-context is now a <button> — styled as the tool button further down */
 #kommand-echo {
   flex-shrink: 0;
@@ -284,53 +272,45 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 #kommand-hint i  { color: var(--amber);  font-style: normal; }
 #kommand-hint em { color: var(--green);  font-style: normal; }
 
-#statusbar { grid-column:1/-1; background:var(--panel); border-top:1px solid var(--border); display:flex; align-items:center; padding:0 12px; font-family:var(--fu); font-size:13px; color:var(--t3); letter-spacing:0.04em; }
-.sb-item { padding:0 10px; border-right:1px solid var(--border); height:100%; display:flex; align-items:center; gap:5px; }
-.sb-item:first-child { padding-left:0; }
-.sb-val { color:var(--t2); }
-.sb-val.ok  { color:var(--green); }
-.sb-val.act { color:var(--accent); }
-.sb-val.warn { color:var(--amber); }
-.sb-right { margin-left:auto; display:flex; align-items:center; }
-.sb-cc {
-  display: flex; align-items: center; gap: 5px;
-  padding: 0 12px; border-left: 1px solid var(--border);
-  font-family: var(--fu); font-size: 12px; color: var(--t3);
-  letter-spacing: 0.04em; white-space: nowrap;
-}
-.cc-link {
-  color: var(--accent-dim); text-decoration: none;
-  transition: color 0.15s;
-}
-.cc-link:hover { color: var(--accent); text-decoration: underline; }
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── TOAST ── */
-#toast { position:fixed; bottom:46px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--panel2); border:1px solid var(--border-hi); border-radius:4px; padding:6px 14px; font-size:13px; font-family:var(--fu); color:var(--t1); pointer-events:none; opacity:0; transition:opacity 0.18s,transform 0.18s; z-index:999; }
-#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+
 
 /* ── DYNAMIC INPUT ── */
 #dyn-input-wrap { display:none !important; pointer-events:none !important; visibility:hidden !important; }
-#dyn-input-box { background:var(--panel); border:1px solid var(--accent); border-radius:3px; box-shadow:0 0 12px rgba(0,212,255,0.3),0 2px 8px rgba(0,0,0,0.7); display:flex; align-items:center; min-width:170px; overflow:hidden; }
-#dyn-input-prefix { background:var(--panel2); border-right:1px solid var(--border); padding:5px 7px; font-family:var(--fm); font-size:12px; color:var(--accent); letter-spacing:0.05em; white-space:nowrap; flex-shrink:0; min-width:42px; text-align:center; }
-#dyn-input-field { background:transparent; border:none; outline:none; padding:5px 8px; font-family:var(--fm); font-size:13px; color:var(--t1); width:130px; caret-color:var(--accent); }
-#dyn-input-field::placeholder { color:var(--t3); }
-#dyn-input-hint { position:absolute; top:calc(100% + 4px); left:0; background:rgba(8,10,14,0.95); border:1px solid var(--border); border-radius:3px; padding:3px 8px; font-family:var(--fm); font-size:12px; color:var(--t3); white-space:nowrap; pointer-events:none; }
-#dyn-input-hint b { color:var(--accent); }
-#dyn-input-hint i { color:var(--amber); font-style:normal; }
-#dyn-input-hint em { color:var(--green); font-style:normal; }
+
+
+
+
+
+
+
+
 
 /* ── CONTEXT MENU ── */
-#ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border-hi); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; max-height:calc(100vh - 16px); padding:4px 0; }
-#ctx-menu.open { display:flex; }
-.ctx-head { padding:4px 12px 3px; font-family:var(--fu); font-size:11px; color:var(--t3); letter-spacing:0.14em; text-transform:uppercase; }
-.ctx-item { display:flex; align-items:center; gap:10px; padding:7px 14px; font-family:var(--fu); font-size:13px; color:var(--t2); cursor:pointer; transition:background 0.1s,color 0.1s; border:none; background:none; width:100%; text-align:left; }
-.ctx-item:hover { background:var(--hover); color:var(--t1); }
-.ctx-item svg { width:13px; height:13px; flex-shrink:0; opacity:0.7; }
-.ctx-item .ctx-key { margin-left:auto; font-size:12px; color:var(--t3); }
-.ctx-item.hi { color:var(--accent); }
-.ctx-item.hi:hover { background:rgba(0,212,255,0.08); }
-.ctx-item.del { color:var(--red); }
-.ctx-item.del:hover { background:rgba(255,68,85,0.12); }
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── CTX MENU CUSTOMIZER ── */
 #ctxcfg-overlay {
@@ -367,38 +347,24 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 .ctxcfg-row:hover { background:var(--hover); }
 .ctxcfg-row input { accent-color:var(--accent); width:15px; height:15px; flex-shrink:0; }
 .ctxcfg-row .ctxcfg-key { margin-left:auto; font-size:11px; color:var(--t3); font-family:var(--fm); }
-.ctx-sep { height:1px; background:var(--border); margin:3px 0; }
+
 
 /* ── RECT DRAG PREVIEW ── */
-#rect-preview { position:absolute; pointer-events:none; border:1px dashed var(--accent); background:rgba(0,212,255,0.04); display:none; }
+
 
 /* ── ROTATION BAR ── */
-#rotate-bar {
-  display: none; align-items: center; gap: 6px;
-  padding: 5px 8px; background: var(--panel2);
-  border-bottom: 1px solid var(--border); flex-shrink: 0;
-  flex-wrap: wrap;
-}
-#rotate-bar.visible { display: flex; }
-#rotate-bar label { font-family:var(--fu); font-size:12px; color:var(--t3); letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
-#rotate-angle-input {
-  background:var(--panel); border:1px solid var(--border-hi); border-radius:3px;
-  color:var(--accent); font-family:var(--fu); font-size:13px;
-  padding:3px 6px; width:62px; outline:none; text-align:right;
-}
-#rotate-angle-input:focus { border-color:var(--accent); }
-.rot-btn {
-  background:var(--panel); border:1px solid var(--border); border-radius:3px;
-  color:var(--t2); font-family:var(--fu); font-size:12px;
-  padding:3px 6px; cursor:pointer; transition:all 0.12s; white-space:nowrap;
-  letter-spacing:0.04em;
-}
-.rot-btn:hover { background:var(--hover); border-color:var(--border-hi); color:var(--t1); }
-.rot-btn.hi { color:var(--accent); border-color:var(--accent-dim); }
-.rot-btn.hi:hover { background:var(--accent-glow); border-color:var(--accent); }
+
+
+
+
+
+
+
+
+
 /* Angle readout in selection properties */
-#prop-angle-row { display:none; }
-#prop-angle-row.visible { display:flex; }
+
+
 
 /* ── UNIT TOGGLE ── */
 #theme-toggle {
@@ -430,132 +396,45 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-#unit-toggle {
-  font-family: var(--fu);
-  font-size: 13px;
-  background: var(--panel2);
-  border: 1px solid var(--border-hi);
-  border-radius: 3px;
-  color: var(--t2);
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  user-select: none;
-  letter-spacing: 0.05em;
-  transition: border-color 0.2s;
-}
-#unit-toggle:hover { border-color: var(--accent); }
-.unit-seg {
-  padding: 3px 8px;
-  transition: background 0.15s, color 0.15s;
-  line-height: 1;
-}
-.unit-seg.active { /* color handled by ID-specific rules below */ }
-.unit-divider { width:1px; background: var(--border-hi); align-self: stretch; }
+
+
+
+
+
 /* ── DXF IMPORT DIALOG ── */
-#dxf-import-overlay {
-  position: fixed; inset: 0;
-  background: rgba(4,6,10,0.82);
-  backdrop-filter: blur(3px);
-  z-index: 800;
-  display: none; align-items: center; justify-content: center;
-}
-#dxf-import-overlay.open { display: flex; }
-#dxf-import-dialog {
-  background: var(--panel);
-  border: 1px solid var(--border-hi);
-  border-radius: 6px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,212,255,0.08);
-  width: 420px; max-width: 95vw;
-  font-family: var(--fu);
-  overflow: hidden;
-}
-#dxf-import-dialog .dlg-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px;
-  background: var(--panel2);
-  border-bottom: 1px solid var(--border);
-}
-#dxf-import-dialog .dlg-title {
-  font-size: 13px; font-weight: 500; color: var(--accent);
-  letter-spacing: 0.08em; text-transform: uppercase;
-}
-#dxf-import-dialog .dlg-close {
-  background: none; border: none; color: var(--t3);
-  cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px;
-  transition: color 0.1s;
-}
-#dxf-import-dialog .dlg-close:hover { color: var(--t1); }
-#dxf-import-dialog .dlg-body { padding: 16px; }
-.dlg-file-info {
-  background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 4px; padding: 10px 12px; margin-bottom: 14px;
-}
-.dlg-file-info .fi-name {
-  font-size: 13px; color: var(--t1); margin-bottom: 6px;
-  word-break: break-all; letter-spacing: 0.02em;
-}
-.dlg-file-info .fi-row {
-  display: flex; justify-content: space-between;
-  font-size: 13px; color: var(--t3); margin-bottom: 2px;
-}
-.dlg-file-info .fi-row span { color: var(--t2); }
-.dlg-file-info .fi-row span.ok  { color: var(--green); }
-.dlg-file-info .fi-row span.warn { color: var(--amber); }
-.dlg-section-label {
-  font-size: 12px; color: var(--t3); letter-spacing: 0.12em;
-  text-transform: uppercase; margin-bottom: 8px;
-}
-.dlg-unit-grid {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 6px; margin-bottom: 14px;
-}
-.dlg-unit-btn {
-  background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 4px; padding: 8px 6px;
-  font-family: var(--fu); font-size: 13px;
-  color: var(--t2); cursor: pointer;
-  transition: all 0.12s; text-align: center; letter-spacing: 0.04em;
-}
-.dlg-unit-btn:hover { background: var(--hover); border-color: var(--border-hi); color: var(--t1); }
-.dlg-unit-btn.selected { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
-.dlg-unit-btn .dub-label { font-size: 14px; font-weight: 700; display: block; margin-bottom: 2px; }
-.dlg-unit-btn .dub-sub   { font-size: 11px; color: inherit; opacity: 0.7; display: block; }
-.dlg-merge-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 6px; margin-bottom: 16px;
-}
-.dlg-merge-btn {
-  background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 4px; padding: 8px 10px;
-  font-family: var(--fu); font-size: 13px;
-  color: var(--t2); cursor: pointer;
-  transition: all 0.12s; text-align: left; letter-spacing: 0.03em;
-}
-.dlg-merge-btn:hover { background: var(--hover); border-color: var(--border-hi); color: var(--t1); }
-.dlg-merge-btn.selected { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
-.dlg-merge-btn .dmb-title { font-size: 13px; font-weight: 600; display: block; margin-bottom: 2px; }
-.dlg-merge-btn .dmb-sub   { font-size: 11px; opacity: 0.75; display: block; }
-.dlg-actions {
-  display: flex; gap: 8px; justify-content: flex-end;
-  border-top: 1px solid var(--border); padding-top: 14px;
-}
-.dlg-btn {
-  font-family: var(--fu); font-size: 13px; letter-spacing: 0.06em;
-  padding: 7px 16px; border-radius: 4px; cursor: pointer;
-  transition: all 0.12s; border: 1px solid var(--border);
-  text-transform: uppercase;
-}
-.dlg-btn.cancel { background: var(--panel2); color: var(--t2); }
-.dlg-btn.cancel:hover { background: var(--hover); color: var(--t1); }
-.dlg-btn.commit {
-  background: var(--accent); border-color: var(--accent);
-  color: var(--void); font-weight: 700;
-  box-shadow: 0 0 12px rgba(0,212,255,0.25);
-}
-.dlg-btn.commit:hover { background: #33ddff; box-shadow: 0 0 18px rgba(0,212,255,0.4); }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ── STARTUP UNIT SPLASH ── */
 #splash-overlay {
   position: fixed; inset: 0;
@@ -565,359 +444,158 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
   display: none; align-items: center; justify-content: center;
   pointer-events: all;
 }
-#splash-dialog {
-  background: var(--panel);
-  border: 1px solid var(--border-hi);
-  border-radius: 8px;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,212,255,0.1);
-  width: 400px; max-width: 95vw;
-  font-family: var(--fu);
-  overflow: hidden;
-}
-#splash-dialog .dlg-head {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 24px 20px 16px;
-  background: var(--panel2);
-  border-bottom: 1px solid var(--border);
-  text-align: center;
-}
-.splash-brand {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 22px; font-weight: 700; color: var(--accent);
-  letter-spacing: 0.06em; margin-bottom: 6px;
-}
-.splash-sub {
-  font-size: 13px; color: var(--t3);
-  letter-spacing: 0.14em; text-transform: uppercase;
-}
-#splash-dialog .dlg-body { padding: 20px; }
-.splash-prompt {
-  font-size: 13px; color: var(--t2);
-  text-align: center; margin-bottom: 16px; letter-spacing: 0.04em;
-  line-height: 1.6;
-}
-.splash-prompt strong { color: var(--t1); }
-.splash-unit-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 10px; margin-bottom: 20px;
-}
-.splash-unit-btn {
-  background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 6px; padding: 18px 12px;
-  font-family: var(--fu); cursor: pointer;
-  transition: all 0.14s; text-align: center;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-}
-.splash-unit-btn:hover {
-  background: var(--hover); border-color: var(--border-hi);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-}
-.splash-unit-btn.mm-btn:hover  { border-color: var(--accent); box-shadow: 0 4px 16px rgba(0,212,255,0.15); }
-.splash-unit-btn.in-btn:hover  { border-color: var(--amber);  box-shadow: 0 4px 16px rgba(255,170,0,0.15); }
-.splash-unit-btn .sub-unit {
-  font-size: 28px; font-weight: 700; letter-spacing: 0.02em;
-}
-.splash-unit-btn.mm-btn .sub-unit { color: var(--accent); }
-.splash-unit-btn.in-btn .sub-unit { color: var(--amber); }
-.splash-unit-btn .sub-name { font-size: 12px; color: var(--t3); letter-spacing: 0.1em; text-transform: uppercase; }
-.splash-unit-btn .sub-example { font-size: 13px; color: var(--t2); }
-.splash-note {
-  text-align: center; font-size: 12px; color: var(--t3);
-  letter-spacing: 0.06em; line-height: 1.5;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── OFFSET DISTANCE POPUP ── */
-#offset-popup-overlay {
-  position: fixed; inset: 0;
-  background: transparent;
-  z-index: 400;
-  display: none;
-}
-#offset-popup-overlay.open { display: block; }
-#offset-popup {
-  position: absolute;
-  background: var(--panel);
-  border: 1px solid var(--accent);
-  border-radius: 5px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,212,255,0.1);
-  width: 230px;
-  font-family: var(--fu);
-  overflow: hidden;
-}
-#offset-popup .op-head {
-  background: var(--panel2);
-  border-bottom: 1px solid var(--border);
-  padding: 7px 12px;
-  font-size: 12px; color: var(--accent);
-  letter-spacing: 0.12em; text-transform: uppercase;
-  display: flex; align-items: center; gap: 6px;
-}
-#offset-popup .op-head svg { width:12px; height:12px; opacity:0.8; }
-#offset-popup .op-body { padding: 12px; }
-.op-input-row {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
-}
-#offset-popup-input {
-  flex: 1; background: var(--panel2); border: 1px solid var(--border-hi);
-  border-radius: 3px; color: var(--accent); font-family: var(--fu);
-  font-size: 15px; padding: 6px 8px; outline: none; text-align: right;
-  min-width: 0;
-}
-#offset-popup-input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
-.op-unit-label { font-size: 13px; color: var(--t3); flex-shrink: 0; }
-.op-hint { font-size: 12px; color: var(--t3); letter-spacing: 0.06em; margin-bottom: 10px; line-height: 1.5; }
-.op-hint b { color: var(--t2); }
-.op-actions { display: flex; gap: 6px; }
-.op-actions .dlg-btn { flex: 1; padding: 6px 8px; font-size: 12px; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ── SCAD EXPORT DIALOG ── */
-#scad-export-overlay {
-  position: fixed; inset: 0;
-  background: rgba(4,6,10,0.82);
-  backdrop-filter: blur(3px);
-  z-index: 800;
-  display: none; align-items: center; justify-content: center;
-}
-#scad-export-overlay.open { display: flex; }
-#scad-export-dialog {
-  background: var(--panel);
-  border: 1px solid var(--border-hi);
-  border-radius: 6px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,170,0,0.1);
-  width: 420px; max-width: 95vw;
-  font-family: var(--fu);
-  overflow: hidden;
-}
-#scad-export-dialog .dlg-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px;
-  background: var(--panel2);
-  border-bottom: 1px solid var(--border);
-}
-#scad-export-dialog .dlg-title {
-  font-size: 13px; font-weight: 500; color: var(--amber);
-  letter-spacing: 0.08em; text-transform: uppercase;
-}
-#scad-export-dialog .dlg-close {
-  background: none; border: none; color: var(--t3);
-  cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px;
-  transition: color 0.1s;
-}
-#scad-export-dialog .dlg-close:hover { color: var(--t1); }
-#scad-export-dialog .dlg-body { padding: 14px 16px; }
-.scad-section-label {
-  font-size: 12px; color: var(--t3); letter-spacing: 0.12em;
-  text-transform: uppercase; margin-bottom: 8px; margin-top: 12px;
-}
-.scad-section-label:first-child { margin-top: 0; }
-.scad-mode-grid {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 4px;
-}
-.scad-mode-btn {
-  background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 4px; padding: 8px 6px;
-  cursor: pointer; text-align: center;
-  transition: all 0.15s; display: flex; flex-direction: column;
-  align-items: center; gap: 3px;
-}
-.scad-mode-btn:hover { border-color: var(--border-hi); background: var(--hover); }
-.scad-mode-btn.selected {
-  border-color: var(--amber); background: rgba(255,170,0,0.08);
-}
-.scad-mode-btn .smb-title {
-  font-size: 13px; color: var(--t1); font-weight: 500; letter-spacing: 0.04em;
-}
-.scad-mode-btn.selected .smb-title { color: var(--amber); }
-.scad-mode-btn .smb-sub {
-  font-size: 11px; color: var(--t3); line-height: 1.3; letter-spacing: 0.03em;
-}
-.scad-extrude-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 0 4px; border-top: 1px solid var(--border); margin-top: 10px;
-}
-.scad-extrude-row label {
-  font-size: 12px; color: var(--t3); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
-}
-#scad-extrude-h {
-  background: var(--panel); border: 1px solid var(--border-hi); border-radius: 3px;
-  color: var(--amber); font-family: var(--fu); font-size: 13px;
-  padding: 4px 8px; width: 70px; outline: none; text-align: right;
-}
-#scad-extrude-h:focus { border-color: var(--amber); }
-.scad-hint {
-  font-size: 12px; color: var(--t3); line-height: 1.6; margin-top: 10px;
-  padding: 8px 10px; background: var(--panel2); border-radius: 4px;
-  border: 1px solid var(--border);
-}
-.scad-hint code { color: var(--accent); font-family: var(--fu); }
-.scad-hint b { color: var(--amber); }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── KADsuite suite tokens (override/align) ── */
-:root {
-  --fm:     'JetBrains Mono', monospace;
-  --fd:       'Syne', sans-serif;
-  --fs:       'Literata', serif;
-  --fu:       'Atkinson Hyperlegible', sans-serif;
-}
+
 
 /* ── KANVAS tab system ── */
-.tab-bar {
-  display: flex; align-items: stretch;
-  background: var(--panel); border-bottom: 1px solid var(--border);
-  padding: 0 8px; gap: 2px; flex-shrink: 0;
-  font-family: var(--fu); height: 32px;
-  grid-column: 1 / -1;
-}
-.tab-item {
-  display: flex; align-items: center; gap: 6px;
-  padding: 0 14px; cursor: pointer; font-size: 13px;
-  color: var(--t2); letter-spacing: 0.1em; text-transform: uppercase;
-  border-bottom: 2px solid transparent; transition: all 0.15s;
-}
-.tab-item:hover { color: var(--t1); }
-.tab-item.active { color: var(--accent); border-bottom-color: var(--accent); }
-.tab-item.kanvas-tab.active { color: #0090a8; border-bottom-color: #0090a8; }
-.tab-item.kanvas-tab.active .tab-mark { background: linear-gradient(135deg,#0090a8,#006888); }
-.tab-mark {
-  width: 16px; height: 16px; border-radius: 3px;
-  background: var(--t3); display: flex; align-items: center; justify-content: center;
-  font-size: 10px; color: #000; font-weight: 700; flex-shrink: 0;
-}
+
+
+
+
+
+
+
 
 /* ── Model / KANVAS pane wrappers ── */
-#model-pane  { display: flex; flex: 1; overflow: hidden; grid-column: 1 / -1; height: 100%; min-height: 0; }
-#kanvas-pane { display: none; flex: 1; overflow: hidden; position: relative; grid-column: 1 / -1; }
-body.kanvas-mode #kanvas-pane { display: flex; }
-body.kanvas-mode #model-pane  { display: none; }
+
+
+
+
 
 /* ── KANVAS sidebar ── */
-#kanvas-sidebar {
-  width: var(--sidebar-w); background: var(--panel);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; overflow: hidden;
-  flex-shrink: 0;
-}
+
 
 /* ── KV tool buttons ── */
-.kv-tool-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px;
-}
-.kv-tbtn {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 8px 4px; background: rgba(255,255,255,0.03);
-  border: 1px solid transparent; border-radius: 6px;
-  cursor: pointer; transition: all 0.13s;
-}
-.kv-tbtn:hover { background: rgba(255,255,255,0.07); }
-.kv-tbtn.act { background: rgba(0,144,168,0.08); border-color: rgba(0,144,168,0.35); }
-.kv-tbtn .kv-ti { width: 18px; height: 18px; }
-.kv-tbtn .kv-ti svg { width: 100%; height: 100%; stroke: var(--t2); fill: none; stroke-width: 1.5; }
-.kv-tbtn.act .kv-ti svg { stroke: #0090a8; }
-.kv-tbtn .kv-tl { font-family: var(--fu); font-size: 10px; color: var(--t3); letter-spacing: 0.12em; }
-.kv-tbtn.act .kv-tl { color: #0090a8; }
+
+
+
+
+
+
+
+
+
 
 /* ── Dimensioning standard buttons ── */
-.kv-dim-row {
-  display: none; gap: 3px; padding: 4px 8px; flex-wrap: wrap;
-}
-.kv-dim-btn {
-  font-family: var(--fu); font-size: 11px; padding: 3px 7px;
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-  border-radius: 4px; color: var(--t2); cursor: pointer; letter-spacing: 0.06em;
-}
-.kv-dim-btn.act { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: var(--accent); }
+
+
+
 
 /* ── Weld symbol controls ── */
-.kv-weld-row { display: none; flex-direction: column; gap: 4px; padding: 4px 8px; }
-.kv-weld-select {
-  width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-  border-radius: 4px; color: var(--t2); font-family: var(--fu); font-size: 12px;
-  padding: 3px 6px; outline: none;
-}
+
+
 
 /* ── KV brush controls ── */
-.kv-brush-panel { padding: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
-.kv-sl-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-.kv-sl-lbl { font-family: var(--fu); font-size: 11px; color: var(--t3);
-  letter-spacing: 0.1em; width: 36px; flex-shrink: 0; text-transform: uppercase; }
-.kv-sl { flex: 1; height: 2px; accent-color: #0090a8; cursor: pointer; }
-.kv-sl-val { font-family: var(--fm); font-size: 11px; color: var(--t2); min-width: 26px; text-align: right; }
+
+
+
+
+
 
 /* ── KV color ── */
-.kv-color-row { display: flex; align-items: center; gap: 6px; padding: 6px 8px; }
-.kv-color-chip { width: 26px; height: 26px; border-radius: 5px; flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
-.kv-swatches { display: flex; flex-wrap: wrap; gap: 3px; padding: 0 8px 8px; }
-.kv-swatch { width: 16px; height: 16px; border-radius: 3px; cursor: pointer;
-  border: 1px solid transparent; transition: all 0.1s; }
-.kv-swatch:hover { transform: scale(1.2); border-color: rgba(255,255,255,0.3); }
+
+
+
+
+
 
 /* ── KV page size ── */
-.kv-page-sel {
-  width: calc(100% - 16px); margin: 0 8px 8px;
-  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-  border-radius: 4px; color: var(--t2); font-family: var(--fu); font-size: 12px;
-  padding: 4px 6px; outline: none;
-}
+
 
 /* ── KV layers ── */
-.kv-layer-item {
-  display: flex; align-items: center; gap: 6px; padding: 5px 8px;
-  font-family: var(--fu); font-size: 12px; color: var(--t2);
-  cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03);
-  transition: background 0.1s;
-}
-.kv-layer-item:hover { background: rgba(255,255,255,0.04); }
-.kv-layer-item.active { color: #0090a8; background: rgba(0,144,168,0.05); }
-.kv-layer-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+
+
+
 
 /* ── KV export buttons ── */
-.kv-export-row { display: flex; flex-direction: column; gap: 3px; padding: 8px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); }
-.kv-export-btn {
-  display: flex; align-items: center; gap: 6px; padding: 6px 10px;
-  font-family: var(--fu); font-size: 12px; letter-spacing: 0.06em;
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 5px; cursor: pointer; color: var(--t2); transition: all 0.13s;
-}
-.kv-export-btn:hover { color: var(--t1); border-color: rgba(255,255,255,0.18); }
-.kv-export-btn.vad { color: #0090a8; border-color: rgba(0,144,168,0.25); }
-.kv-export-btn.svg { color: var(--green); border-color: rgba(0,255,157,0.2); }
-.kv-export-btn.pdf { color: var(--t2); }
-.kv-export-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; }
+
+
+
+
+
+
+
 
 /* ── KANVAS canvas area ── */
-#kanvas-canvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+
 
 /* ── Sidebar reorganize: DELETE always at bottom ── */
-.tool-grid-bottom {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1px;
-  padding: 6px;
-  background: var(--border);
-  border-top: 1px solid var(--border);
-}
-.tool-grid-bottom .tool-btn,
-.tool-grid-bottom .tbtn {
-  grid-column: 1 / -1;   /* delete spans all columns = same width as tool-grid row */
-}
+
+
 
 /* ── KANVAS mode accent ── */
-body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba(0,144,168,0.15); }
+
 
 /* ── Print ── */
-@media print {
-  #topbar, #sidebar, #status-bar { display: none !important; }
-  #kanvas-pane { display: flex !important; }
-  body { background: white; }
-}
+
 
 
 /* ── UNIT TOGGLE TWO-TONE (cyan ↔ amber / KAD ↔ KAM) ──────── */
-#unit-seg-mm { color: rgba(0,212,255,0.50); }
-#unit-seg-in { color: rgba(255,170,0,0.50); }
-#unit-seg-mm.active { background: var(--accent); color: var(--void); font-weight:700; }
-#unit-seg-in.active { background: #ffaa00; color: #060e08; font-weight:700; }
+
+
+
+
 
 
 #suite-scroll { position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; background:rgba(6,10,16,0.92); }
@@ -1004,9 +682,7 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 .prop-val.green  { color:var(--green); }
 .layer-row { display:flex; align-items:center; gap:8px; padding:4px 8px; cursor:pointer; border-radius:3px; margin-bottom:2px; }
 .layer-row:hover { background:var(--hover); }
-.layer-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 .layer-name { font-size:13px; font-family:var(--fu); color:var(--t2); flex:1; }
-.layer-count { font-size:13px; color:var(--t3); font-family:var(--fm); }
 
 /* ── CANVAS AREA ── */
 #canvas-wrap { position:relative; overflow:hidden; background:var(--void); flex:1; min-width:0; }
@@ -1566,8 +1242,7 @@ body.kanvas-mode #model-pane  { display: none; }
   background: var(--border);
   border-top: 1px solid var(--border);
 }
-.tool-grid-bottom .tool-btn,
-.tool-grid-bottom .tbtn {
+.tool-grid-bottom .tool-btn {
   grid-column: 1 / -1;   /* delete spans all columns = same width as tool-grid row */
 }
 
@@ -1593,9 +1268,12 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --void:    #050607;
+  /* --void and --panel intentionally omitted here — they collided with,
+     and silently shadowed, the primary design-system variables of the
+     same name (last :root in source order wins per custom property).
+     This block now only supplies its own uniquely-named landing-card
+     colors; live --void/--panel come from the main :root above. */
   --surface: #0a0b0e;
-  --panel:   #111318;
   --border:  rgba(255,255,255,0.07);
   --text1:   #f2ede4;
   --text2:   #b0a898;
@@ -1872,7 +1550,7 @@ nav {
 }
 .card-kad  .card-mark { background: linear-gradient(135deg, #00d4ff, #0088bb); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
 .card-kam  .card-mark { background: linear-gradient(135deg, #ffaa00, #ff6b00); box-shadow: 0 0 20px rgba(255,170,0,0.4); }
-.card-kubic .card-mark { background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40); box-shadow: 0 0 20px rgba(32,232,192,0.45); }
+
   .card-kode .card-mark { background: linear-gradient(135deg, #2a0800, #882000, #e03800); box-shadow: 0 0 20px rgba(224,56,0,0.45); }
 
   
@@ -2016,12 +1694,10 @@ nav {
 .flow-icon.kubic      { background: linear-gradient(135deg,#001c18,#20e8c0,#d4aa40); }
   .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
   .flow-icon.kode      { background: linear-gradient(135deg,#2a0800,#882000,#e03800); }
-  .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
+  
 .flow-icon.kloud    { background: linear-gradient(135deg,#0d2235,#5ab3d0,#b8e4f5); }
-.flow-icon.kodex    { background: linear-gradient(135deg,#2a1800,#e8a020,#ff6820); }
 .flow-icon.kubic    { background: linear-gradient(135deg,#001c18,#20e8c0,#18c8a0); }
 .flow-icon.kampus   { background: linear-gradient(135deg,#3a1200,#E8600A,#ffaa40); }
-.flow-icon.kraft    { background: linear-gradient(135deg,#404040,#999999,#e0e0e0); }
 .flow-icon.kanvas    { background: linear-gradient(135deg,#001c28,#005878,#0090a8,#6030c8,#8b5cf6); }
 .flow-icon.kultivate { background: linear-gradient(135deg,#201008,#2e5818,#6ab830); }
 .flow-icon.konnector { background: linear-gradient(135deg,#1a2838,#3a5870,#b8c8d8); }
@@ -2147,18 +1823,12 @@ footer {
   background: linear-gradient(135deg, #0d2235, #5ab3d0, #b8e4f5);
   box-shadow: 0 0 20px rgba(126,200,227,0.30);
 }
-.card-kodex { --card-color: var(--kodex); --card-glow: var(--kodex-g); }
 .card-kubic { --card-color: var(--kubic); --card-glow: rgba(32,232,192,0.12); }
 .card-kubic .card-mark {
   background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40);
   box-shadow: 0 0 20px rgba(32,232,192,0.45);
 }
 .card-kampus { --card-color: var(--kampus); --card-glow: var(--kampus-g); }
-.card-kraft { --card-color: #999999; --card-glow: rgba(192,192,192,0.12); }
-.card-kraft .card-mark {
-  background: linear-gradient(135deg, #404040 0%, #999999 50%, #cccccc 100%);
-  box-shadow: 0 0 16px rgba(192,192,192,0.25);
-}
 .card-kampus .card-mark {
   background: linear-gradient(135deg, #7a2800 0%, #E8600A 60%, #ff9040 100%);
   box-shadow: 0 0 18px rgba(232,96,10,0.35);
@@ -2167,10 +1837,6 @@ footer {
   background: rgba(232,96,10,0.15);
   border-color: rgba(232,96,10,0.3);
   color: var(--kampus);
-}
-.card-kodex .card-mark {
-  background: linear-gradient(135deg, #2a1800, #e8a020, #ff6820);
-  box-shadow: 0 0 20px rgba(232,160,32,0.40);
 }
 .card-kid { --card-color: #ff8800; --card-glow: rgba(255,136,0,0.10); }
 .card-kid .card-mark {
@@ -2288,7 +1954,6 @@ footer {
 .license-card:hover::before { opacity: 1; }
 
 .lc-agpl   { --lc-color: rgba(0,212,255,0.5);  --lc-glow: rgba(0,212,255,0.07); }
-.lc-free   { --lc-color: rgba(0,232,122,0.5);  --lc-glow: rgba(0,232,122,0.07); }
 
 .lc-tag {
   font-family: var(--ff-ui);
@@ -2389,129 +2054,6 @@ footer {
 }
 .lc-btn:hover { background: var(--lc-color); color: #000; }
 
-/* ── LICENSE MODAL ── */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(5,6,7,0.92);
-  backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-
-.modal {
-  background: var(--panel);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 18px;
-  max-width: 680px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 48px;
-  position: relative;
-  transform: translateY(16px);
-  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-.modal-overlay.open .modal { transform: translateY(0); }
-
-.modal-close {
-  position: absolute; top: 20px; right: 20px;
-  font-family: var(--ff-ui);
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text3);
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 4px 10px;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
-}
-.modal-close:hover { color: var(--text1); border-color: rgba(255,255,255,0.2); }
-
-.modal-tag {
-  font-family: var(--ff-ui);
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--kam);
-  border: 1px solid rgba(255,170,0,0.3);
-  border-radius: 4px;
-  padding: 3px 8px;
-  width: fit-content;
-  margin-bottom: 20px;
-}
-
-.modal h2 {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  color: var(--text1);
-  margin-bottom: 6px;
-}
-
-.modal-version {
-  font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 32px;
-}
-
-.modal-section {
-  margin-bottom: 28px;
-}
-
-.modal-section h3 {
-  font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--kam);
-  margin-bottom: 10px;
-}
-
-.modal-section p, .modal-section li {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text2);
-}
-
-.modal-section ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 0;
-}
-
-.modal-section li::before {
-  content: '› ';
-  color: var(--kam);
-}
-
-.modal-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 28px 0;
-}
-
-.modal-note {
-  font-family: var(--ff-ui);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--text3);
-  line-height: 1.7;
-  padding: 16px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
 
 /* ── Nav link icons (show on mobile, hide text) ── */
 .nav-link-icon { display: none; }
@@ -2571,47 +2113,15 @@ footer {
 .tool-btn:hover .tool-icon svg { stroke:#a8f0ff; color:#a8f0ff; }
 .tool-btn.active .tool-icon svg { stroke:var(--accent); color:var(--accent); filter:drop-shadow(0 0 3px var(--accent)); }
 
-/* ── LIGHT MODE ─────────────────────────────────────────────────────────────
-   Toggled via body.light-mode — all UI vars flip, accent stays cyan
-   ─────────────────────────────────────────────────────────────────────────── */
-body.light-mode {
-  --void:       #d0d8e0;
-  --panel:      #f0f4f8;
-  --panel2:     #e4eaf0;
-  --hover:      #d8e4ee;
-  --border:     #b0c4d8;
-  --border-hi:  #80a8c8;
-  --accent:     #0088aa;      /* darker cyan — readable on light */
-  --accent-dim: #006888;
-  --accent-glow: rgba(0,136,170,0.15);
-  --t1:  #0a1520;             /* near black */
-  --t2:  #2a4a6a;             /* dark blue-grey */
-  --t3:  #4a6a8a;             /* mid */
-}
-/* Icons: invert to dark cyan on light bg */
+/* Icons: invert to dark cyan on light bg (light-mode vars themselves are
+   defined once, near the top of the file) */
 body.light-mode .tool-icon svg {
-  stroke: #007a99;
-  color:  #007a99;
+  stroke: #0d2c47;
+  color:  #0d2c47;
 }
 body.light-mode .tool-btn:hover .tool-icon svg {
-  stroke: #005577;
-  color:  #005577;
-}
-body.light-mode .tool-btn.active .tool-icon svg {
-  stroke: var(--accent);
-  color:  var(--accent);
-  filter: drop-shadow(0 0 3px var(--accent));
-}
-
-
-
-.tool-icon svg {
-  stroke: #007a99;
-  color:  #007a99;
-}
-body.light-mode .tool-btn:hover .tool-icon svg {
-  stroke: #005577;
-  color:  #005577;
+  stroke: #062038;
+  color:  #062038;
 }
 body.light-mode .tool-btn.active .tool-icon svg {
   stroke: var(--accent);
@@ -2813,6 +2323,93 @@ body.light-mode .tool-btn.active .tool-icon svg {
 #commit-fab svg { width: 17px; height: 17px; flex-shrink: 0; }
 #commit-fab:active { transform: scale(0.96); }
 .mobile-mode #commit-fab.show { display: flex; }
+
+/* ── FLOATING ESC (touch) ──
+   Escape's tap equivalent: cancels the tool in progress, or clears the
+   selection if nothing's being drawn. Top-left so it never fights the
+   COMMIT button (bottom-right) for thumb space, and sits below the
+   hamburger rather than on top of it. */
+#esc-fab {
+  display: none;
+  position: fixed;
+  top:  calc(var(--toolbar-h) + 60px + env(safe-area-inset-top, 0px));
+  left: calc(10px + env(safe-area-inset-left, 0px));
+  z-index: 210;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid rgba(255,68,85,0.55);
+  color: #ff4455;
+  font-family: var(--fu);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+#esc-fab:active { transform: scale(0.94); }
+.mobile-mode #esc-fab.show { display: flex; }
+
+/* ── FLOATING DELETE (touch) ──
+   Shown whenever anything is selected, independent of ESC/COMMIT state —
+   deleting a selection isn't tied to a draw-tool-in-progress the way
+   Escape and Commit are. Stacked directly under ESC in the same
+   danger-red family, since it's the same class of action. */
+#delete-fab {
+  display: none;
+  position: fixed;
+  top:  calc(var(--toolbar-h) + 114px + env(safe-area-inset-top, 0px));
+  left: calc(10px + env(safe-area-inset-left, 0px));
+  z-index: 210;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid rgba(255,68,85,0.55);
+  color: #ff4455;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+#delete-fab svg { width: 19px; height: 19px; flex-shrink: 0; }
+#delete-fab:active { transform: scale(0.94); }
+.mobile-mode #delete-fab.show { display: flex; }
+
+/* ── ANGLE LOCK TOGGLE (touch) ──
+   On/off equivalent of holding Shift. Persistent while in mobile mode —
+   no modifier key to hold on a touchscreen, so this has to be a mode you
+   switch into rather than a key you hold down. Glows accent color when on. */
+#angle-lock-toggle {
+  display: none;
+  position: fixed;
+  top:   calc(var(--toolbar-h) + 60px + env(safe-area-inset-top, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
+  z-index: 210;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  color: var(--t2);
+  font-family: var(--fu);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+#angle-lock-toggle svg { width: 15px; height: 15px; flex-shrink: 0; }
+.mobile-mode #angle-lock-toggle { display: flex; }
+#angle-lock-toggle.active {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 /* Canvas: hand touch gestures fully to our own JS handlers rather than
    fighting the browser's native scroll/pinch — required for clean pinch-zoom */
@@ -4694,6 +4291,25 @@ document.addEventListener('keydown', function(e) {
   COMMIT
 </button>
 
+<!-- Floating ESC — touch equivalent of the Escape key. Shown by
+     updateEscFab() (called from render) while a draw tool is in progress
+     or something is selected. -->
+<button id="esc-fab" onclick="escFabTap()" aria-label="Cancel / Escape">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+</button>
+
+<!-- Floating DELETE — shown by updateDeleteFab() (called from render)
+     whenever the selection is non-empty. -->
+<button id="delete-fab" onclick="deleteFabTap()" aria-label="Delete selected">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+</button>
+
+<!-- Angle-lock toggle — touch equivalent of holding Shift while drawing. -->
+<button id="angle-lock-toggle" onclick="toggleAngleLockTouch()" aria-label="Toggle angle lock" title="Angle lock">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4 8 L16 8"/><path d="M4 8 L18 20"/></svg>
+  <span id="angle-lock-label">LOCK</span>
+</button>
+
 <div id="statusbar">
   <div class="sb-item"><span>MODE</span><span class="sb-val act" id="sb-mode">PLINE</span></div>
   <div class="sb-item"><span>SNAP</span><span class="sb-val ok" id="sb-snap">ON</span></div>
@@ -5003,8 +4619,17 @@ const ctx    = canvas.getContext('2d');
 const wrap   = document.getElementById('canvas-wrap');
 
 function resizeCanvas() {
-  canvas.width  = wrap.clientWidth;
-  canvas.height = wrap.clientHeight;
+  // Render at native pixel density — without this, the canvas backing
+  // store is 1x on every HiDPI screen and the browser stretches it to
+  // fill the CSS box, which is what was actually making lines look soft.
+  // Capped at 2x: 3x gives no visible benefit and doubles fill cost again.
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cssW = wrap.clientWidth, cssH = wrap.clientHeight;
+  canvas.width  = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.width  = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   render();
 }
 window.addEventListener('resize', resizeCanvas);
@@ -5013,8 +4638,8 @@ window.addEventListener('resize', resizeCanvas);
 const cam = { panX:0, panY:0, zoom:3.0, minZoom:0.05, maxZoom:200 };
 
 function initCamera() {
-  cam.panX = canvas.width  / 2;
-  cam.panY = canvas.height / 2;
+  cam.panX = canvas.clientWidth  / 2;
+  cam.panY = canvas.clientHeight / 2;
   cam.zoom = 3.0;
   document.getElementById('prop-zoom').textContent = cam.zoom.toFixed(2) + '×';
   updateGridLabel();
@@ -5492,8 +5117,8 @@ function closeDynInput() {
 }
 function positionDynInput() {
   let sx = mouseScreen.x + 18, sy = mouseScreen.y + 22;
-  if(sx+190>canvas.width)  sx = mouseScreen.x - 190;
-  if(sy+72>canvas.height)  sy = mouseScreen.y - 72;
+  if(sx+190>canvas.clientWidth)  sx = mouseScreen.x - 190;
+  if(sy+72>canvas.clientHeight)  sy = mouseScreen.y - 72;
   dynWrap.style.left = sx+'px';
   dynWrap.style.top  = sy+'px';
 }
@@ -5873,7 +5498,7 @@ function drawPolyPreview() {
   const vr = inscribed ? r : r/Math.cos(Math.PI/n);
   const startAngle = Math.atan2(py-cy,px-cx);
   ctx.save();
-  ctx.strokeStyle='rgba(0,255,157,0.7)';
+  ctx.strokeStyle=hexA(draftLeadingColor(),0.7);
   ctx.setLineDash([5,4]);
   ctx.lineWidth=1.2;
   ctx.beginPath();
@@ -6106,22 +5731,24 @@ function drawCirclePreview(){
   const sc=worldToScreen(circleState.cx,circleState.cy);
   const ep=snapActive&&snapPoint?snapPoint:mouseWorld;
   const r=Math.hypot(ep.x-circleState.cx,ep.y-circleState.cy)*cam.zoom;
-  ctx.save();ctx.strokeStyle='rgba(0,212,255,0.6)';ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
+  const leadCol=draftLeadingColor();
+  ctx.save();ctx.strokeStyle=hexA(leadCol,0.6);ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
   ctx.beginPath();ctx.arc(sc.x,sc.y,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
-  const sep=worldToScreen(ep.x,ep.y);ctx.strokeStyle='rgba(0,212,255,0.3)';ctx.lineWidth=1;
+  const sep=worldToScreen(ep.x,ep.y);ctx.strokeStyle=hexA(leadCol,0.3);ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(sc.x,sc.y);ctx.lineTo(sep.x,sep.y);ctx.stroke();
-  drawDot(sc.x,sc.y,C.entity,3);ctx.restore();
+  drawDot(sc.x,sc.y,leadCol,3);ctx.restore();
 }
 
 function drawArcPreview(){
   if(activeTool!=='arc'||arcState.phase===0)return;
   const ep=snapActive&&snapPoint?snapPoint:mouseWorld;
-  ctx.save();ctx.strokeStyle='rgba(0,212,255,0.6)';ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
+  const leadCol=draftLeadingColor();
+  ctx.save();ctx.strokeStyle=hexA(leadCol,0.6);ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
   if(arcState.phase===1){
     const sp1=worldToScreen(arcState.p1.x,arcState.p1.y);
     const sep=worldToScreen(ep.x,ep.y);
     ctx.beginPath();ctx.moveTo(sp1.x,sp1.y);ctx.lineTo(sep.x,sep.y);ctx.stroke();
-    drawDot(sp1.x,sp1.y,C.entity,3);
+    drawDot(sp1.x,sp1.y,leadCol,3);
   }else if(arcState.phase===2){
     const circ=circumscribedCircle(arcState.p1,arcState.p2,ep);
     if(circ){
@@ -6134,7 +5761,7 @@ function drawArcPreview(){
       const sp1=worldToScreen(arcState.p1.x,arcState.p1.y);
       const sp2=worldToScreen(arcState.p2.x,arcState.p2.y);
       const sep=worldToScreen(ep.x,ep.y);
-      drawDot(sp1.x,sp1.y,C.entity,3);drawDot(sp2.x,sp2.y,C.entity,2);drawDot(sep.x,sep.y,C.entity,3);
+      drawDot(sp1.x,sp1.y,leadCol,3);drawDot(sp2.x,sp2.y,leadCol,2);drawDot(sep.x,sep.y,leadCol,3);
     }
   }
   ctx.setLineDash([]);ctx.restore();
@@ -6508,7 +6135,7 @@ function drawMirrorPreview() {
   ctx.setLineDash([6, 4]);
   ctx.strokeStyle = 'rgba(0,212,255,0.5)';
   ctx.lineWidth = 1;
-  const W = canvas.width, H = canvas.height;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
   if (mirrorAxis === 'h') {
     // horizontal axis through selection center or canvas center
     const cy = worldToScreen(0, 0).y;
@@ -6825,6 +6452,37 @@ function commitFabTap() {
     commitLineChain(false); // open polyline — same as Enter / "Commit Line"
     render();
   }
+}
+
+// Shown whenever there is something Escape would act on: a draw tool with
+// an anchor placed but not yet committed, or a non-empty selection. Tap
+// runs the exact same cancel/deselect logic as the Escape key.
+function updateEscFab() {
+  const fab = document.getElementById('esc-fab');
+  if (!fab) return;
+  const drawing = (lineState && lineState.active) || (rectState && rectState.active) ||
+                  (circleState && circleState.active) || (polyState && polyState.active) ||
+                  (arcState && arcState.active);
+  fab.classList.toggle('show', drawing || selectedIds.size > 0);
+}
+// Shown whenever the selection is non-empty — deleting isn't gated on any
+// particular tool being active, just on there being something to delete.
+function updateDeleteFab() {
+  const fab = document.getElementById('delete-fab');
+  if (!fab) return;
+  fab.classList.toggle('show', selectedIds.size > 0);
+}
+function deleteFabTap() {
+  deleteSelected();
+}
+function escFabTap() {
+  kommandClear();
+  closeDynInput();
+  if (activeTool !== 'select') cancelTool();
+  else selectedIds.clear();
+  updateSelectionProps();
+  if (document.activeElement === kInput) kInput.blur();
+  render();
 }
 
 (function initMobileMode() {
@@ -7145,6 +6803,29 @@ function onMouseDown(e) {
   }
 }
 
+// The "from" point of whichever draw tool has an anchor placed but isn't
+// committed yet — used by angle lock (above) and by KOMMAND numeric length
+// entry (applyKommandCoord, below) so both features agree on direction.
+function getDrawAnchor() {
+  if (activeTool==='line'    && lineState.active)                 return { x:lineState.x1,  y:lineState.y1  };
+  if (activeTool==='rect'    && rectState.active)                 return { x:rectState.x1,  y:rectState.y1  };
+  if (activeTool==='polygon' && polyState.active)                 return { x:polyState.cx,  y:polyState.cy  };
+  if (activeTool==='circle'  && circleState.active)               return { x:circleState.cx,y:circleState.cy};
+  if (activeTool==='arc'     && arcState.active && arcState.p1)   return arcState.p1;
+  return null;
+}
+// Touch angle-lock toggle — the tap equivalent of holding Shift. Persists
+// across points so a phone user doesn't need a spare finger on a key.
+let touchAngleLockOn = false;
+function toggleAngleLockTouch() {
+  touchAngleLockOn = !touchAngleLockOn;
+  const btn = document.getElementById('angle-lock-toggle');
+  if (btn) btn.classList.toggle('active', touchAngleLockOn);
+  showToast(touchAngleLockOn
+    ? `Angle lock ON — ${angleSnapDeg||15}° increments`
+    : 'Angle lock off');
+}
+
 function onMouseMove(e) {
   const rect=canvas.getBoundingClientRect();
   mouseScreen={x:e.clientX-rect.left, y:e.clientY-rect.top};
@@ -7154,10 +6835,14 @@ function onMouseMove(e) {
   snapActive=!!snap; snapPoint=snap;
   mouseWorld=snapActive?snapPoint:raw;
 
-  // Shift = angle lock 15° increments (LINE tool)
+  // Angle lock — Shift (desktop) or the touch angle-lock toggle — snaps
+  // the cursor to angleSnapDeg increments around whichever point anchors
+  // the tool currently in progress. Generalized from LINE-only so RECT,
+  // POLYGON, and ARC's second point all get the same lock.
   shiftLockActive = false;
-  if ((e.shiftKey) && activeTool==='line' && lineState.active) {
-    const sx = lineState.x1, sy = lineState.y1;
+  const lockAnchor = getDrawAnchor();
+  if ((e.shiftKey || touchAngleLockOn) && lockAnchor) {
+    const sx = lockAnchor.x, sy = lockAnchor.y;
     const rawAng = Math.atan2(mouseWorld.y - sy, mouseWorld.x - sx);
     const step   = (angleSnapDeg||15) * Math.PI / 180;
     const locked = Math.round(rawAng / step) * step;
@@ -7223,8 +6908,10 @@ function onMouseMove(e) {
     const lx=Math.min(sa.x,sb.x), ly=Math.min(sa.y,sb.y);
     const w=Math.abs(sb.x-sa.x), h=Math.abs(sb.y-sa.y);
     const rp=document.getElementById('rect-preview');
+    const leadCol=draftLeadingColor();
     rp.style.display='block'; rp.style.left=lx+'px'; rp.style.top=ly+'px';
     rp.style.width=w+'px'; rp.style.height=h+'px';
+    rp.style.borderColor=leadCol; rp.style.background=hexA(leadCol,0.06);
   } else {
     document.getElementById('rect-preview').style.display='none';
   }
@@ -7562,9 +7249,9 @@ function zoomExtents() {
     }
   }
   const rx=(x1-x0)||20, ry=(y1-y0)||20, pad=0.15;
-  const zoom=Math.min(canvas.width/(rx*(1+2*pad)), canvas.height/(ry*(1+2*pad)));
+  const zoom=Math.min(canvas.clientWidth/(rx*(1+2*pad)), canvas.clientHeight/(ry*(1+2*pad)));
   cam.zoom=Math.max(cam.minZoom,Math.min(cam.maxZoom,zoom));
-  cam.panX=canvas.width/2-((x0+x1)/2)*cam.zoom;
+  cam.panX=canvas.clientWidth/2-((x0+x1)/2)*cam.zoom;
   cam.panY=canvas.height/2+((y0+y1)/2)*cam.zoom;
   document.getElementById('prop-zoom').textContent=cam.zoom.toFixed(2)+'×';
   updateGridLabel(); render(); showToast('Zoom Extents');
@@ -7596,15 +7283,20 @@ function updateGridLabel() {
 const C = new Proxy({}, {
   get(_, key) {
     const light = document.body.classList.contains('light-mode');
+    // Drafting ink: amber-gold in dark mode, brass in light mode — cyan/blue
+    // ink on a blue draftspace had no hue separation from the paper itself.
     const dark = {
-      bg:'#080a0e', grid:'#1a2840', gridMaj:'#253a58', axis:'#2a5080',
-      entity:'#00d4ff', entitySel:'#ffaa00', point:'#ffaa00',
-      rubberLine:'#00d4ff', startPt:'#00ff9d',
+      bg:'#123259', grid:'#1a2840', gridMaj:'#253a58', axis:'#2a5080',
+      entity:'#ffc94d', entitySel:'#ffaa00', point:'#ffaa00',
+      rubberLine:'#ffc94d', startPt:'#00ff9d',
     };
+    // Light mode's bg is bright again (cloud) — ink flips back to
+    // dark-on-light. Grid stays genuinely dark (not washed-out pale) per
+    // request, graduated grid < gridMaj < axis same as dark mode.
     const lt = {
-      bg:'#f8fbff', grid:'#d0dde8', gridMaj:'#b8ccd8', axis:'#a0b8cc',
-      entity:'#0077aa', entitySel:'#cc6600', point:'#cc6600',
-      rubberLine:'#0077aa', startPt:'#007755',
+      bg:'#dcedf8', grid:'#4a7fb5', gridMaj:'#1c4372', axis:'#0e2038',
+      entity:'#8a5a00', entitySel:'#b35900', point:'#b35900',
+      rubberLine:'#8a5a00', startPt:'#00704a',
     };
     return (light ? lt : dark)[key];
   }
@@ -7895,13 +7587,14 @@ const LINETYPES = {
 };
 
 // Default 4 layers + custom
+// Line weights, second pass — thickened again on top of the first bump.
 const LAYERS = {
-  'SOLID':  { name:'SOLID',  color:'#00d4ff', ltype:'continuous', weight:1.4, visible:true, locked:false },
-  'HIDDEN': { name:'HIDDEN', color:'#ff4444', ltype:'dashed',     weight:1.0, visible:true, locked:false },
-  'CENTER': { name:'CENTER', color:'#ffdd00', ltype:'center',     weight:0.8, visible:true, locked:false },
-  'LEADER': { name:'LEADER', color:'#39ff14', ltype:'continuous', weight:0.7, visible:true, locked:false },
-  'DIM':    { name:'DIM',    color:'#39ff14', ltype:'continuous', weight:0.7, visible:true, locked:false },
-  'Layer_0':{ name:'Layer_0',color:'#00d4ff', ltype:'continuous', weight:1.2, visible:true, locked:false },
+  'SOLID':  { name:'SOLID',  color:'#00d4ff', ltype:'continuous', weight:3.0, visible:true, locked:false },
+  'HIDDEN': { name:'HIDDEN', color:'#ff4444', ltype:'dashed',     weight:2.2, visible:true, locked:false },
+  'CENTER': { name:'CENTER', color:'#ffdd00', ltype:'center',     weight:1.8, visible:true, locked:false },
+  'LEADER': { name:'LEADER', color:'#39ff14', ltype:'continuous', weight:1.5, visible:true, locked:false },
+  'DIM':    { name:'DIM',    color:'#39ff14', ltype:'continuous', weight:1.5, visible:true, locked:false },
+  'Layer_0':{ name:'Layer_0',color:'#00d4ff', ltype:'continuous', weight:2.6, visible:true, locked:false },
 };
 let activeLayer = 'SOLID'; // default active layer
 
@@ -7979,7 +7672,7 @@ let dimState = { active:false, p1:null };
 
 function drawDimension(p1w, p2w, commit=false) {
   // Draw a linear dimension between two world points
-  const lay  = (typeof LAYERS!=='undefined' && LAYERS['DIM']) || {color:'#39ff14',weight:0.7};
+  const lay  = (typeof LAYERS!=='undefined' && LAYERS['DIM']) || {color:'#39ff14',weight:1.5};
   const col  = lay.color;
   const dx = p2w.x - p1w.x, dy = p2w.y - p1w.y;
   const dist = Math.hypot(dx, dy);
@@ -8065,7 +7758,9 @@ function drawDimPreview() {
 
 function render() {
   updateCommitFab();
-  const W=canvas.width, H=canvas.height;
+  updateEscFab();
+  updateDeleteFab();
+  const W=canvas.clientWidth, H=canvas.clientHeight;
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H);
   if(showGrid) drawGrid(W,H);
@@ -8092,7 +7787,7 @@ function render() {
 let cursorSeen = false;
 function drawCursorCrosshair() {
   if(!cursorSeen || isPanning) return;
-  const W=canvas.width, H=canvas.height;
+  const W=canvas.clientWidth, H=canvas.clientHeight;
   // Snap-aware: hairlines pass through the snapped point when snapping,
   // so the crosshair agrees with the ring and the coordinate readout.
   const p = (snapActive && snapPoint) ? worldToScreen(snapPoint.x, snapPoint.y) : mouseScreen;
@@ -8160,7 +7855,13 @@ function drawEntities() {
     const _lay = (typeof LAYERS !== 'undefined') && LAYERS[o.layer];
     if(_lay && !_lay.visible && !sel) continue;
     // Layer style
-    const _col = sel ? C.entitySel : (_lay ? _lay.color : C.entity);
+    // Committed geometry: dark mode keeps each layer's own color (SOLID
+    // stays cyan). Light mode overrides just the cyan default-ink layers
+    // to dark navy — starker than brass, and distinct from the brass
+    // leading/rubber-band ink so in-progress vs. placed stay visually
+    // distinguishable while drawing.
+    const _layColor = _lay ? (_lay.color === '#00d4ff' ? draftCommittedColor() : _lay.color) : null;
+    const _col = sel ? C.entitySel : (_layColor !== null ? _layColor : draftCommittedColor());
     const _lw  = sel ? 2.5 : (_lay ? _lay.weight : 1.4);
     const _lt  = (!sel && _lay && typeof LINETYPES !== 'undefined')
                    ? LINETYPES[_lay.ltype] || LINETYPES.continuous
@@ -8237,6 +7938,22 @@ function drawDot(sx,sy,color,r=2.5) {
   ctx.fillStyle=color; ctx.beginPath(); ctx.arc(sx,sy,r,0,Math.PI*2); ctx.fill();
 }
 
+// ── DRAFTING INK: single source of truth ────────────────────────────────
+// Committed = placed geometry on the default ink layer (SOLID/Layer_0).
+// Leading   = any in-progress/preview line not yet committed (rubber
+// band, circle/arc/polygon/rect previews). Both flip with light/dark
+// mode; every draw path below calls these instead of hardcoding a color.
+function draftCommittedColor() {
+  return document.body.classList.contains('light-mode') ? '#0e2038' : '#00d4ff';
+}
+function draftLeadingColor() {
+  return document.body.classList.contains('light-mode') ? '#8a5a00' : '#ffc94d';
+}
+function hexA(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
 function drawRubberBand() {
   if(activeTool!=='line'||!lineState.active) return;
 
@@ -8244,8 +7961,9 @@ function drawRubberBand() {
 
   // ── Draw committed chain segments (in-progress, not yet in GeoMemory) ──
   if(lineChain.length >= 2) {
-    ctx.strokeStyle = C.entity;
-    ctx.lineWidth   = 1.2;
+    const leadCol = draftLeadingColor();
+    ctx.strokeStyle = leadCol;
+    ctx.lineWidth   = 2.4;
     ctx.globalAlpha = 1;
     ctx.setLineDash([]);
     ctx.beginPath();
@@ -8256,10 +7974,10 @@ function drawRubberBand() {
       ctx.lineTo(p.x, p.y);
     }
     ctx.stroke();
-    // Vertex dots along committed chain
+    // Vertex dots along in-progress chain (not yet committed — leading ink)
     for(const pt of lineChain){
       const sp = worldToScreen(pt.x, pt.y);
-      drawDot(sp.x, sp.y, C.entity, 2.5);
+      drawDot(sp.x, sp.y, leadCol, 2.5);
     }
   }
 
@@ -8269,8 +7987,8 @@ function drawRubberBand() {
   const start = worldToScreen(lineState.x1, lineState.y1);
 
   ctx.setLineDash([5,4]);
-  ctx.strokeStyle = C.rubberLine;
-  ctx.lineWidth   = 1;
+  ctx.strokeStyle = draftLeadingColor();
+  ctx.lineWidth   = 2.2;
   ctx.globalAlpha = 0.85;
   ctx.beginPath();
   ctx.moveTo(start.x, start.y);
@@ -10221,26 +9939,36 @@ kInput.addEventListener('keydown', function(e) {
 
 // Apply a resolved coordinate to the current tool state
 function applyKommandCoord(parsed) {
-  // Get last point from current tool state
-  let lastX = 0, lastY = 0, lastAngle = 0;
-  if (activeTool === 'line' && lineState && lineState.active) {
-    lastX = lineState.x1; lastY = lineState.y1;
-    if (lineChain && lineChain.length >= 2) {
+  // Get anchor + any tool-specific committed angle (e.g. an arc's p1→p2
+  // already fixes its sweep direction) from the current tool state
+  let lastX = 0, lastY = 0, lastAngle;
+  const anchor = getDrawAnchor();
+  if (anchor) { lastX = anchor.x; lastY = anchor.y; }
+  if (activeTool === 'arc' && arcState && arcState.phase === 2 && arcState.p2) {
+    lastAngle = Math.atan2(arcState.p2.y - arcState.p1.y, arcState.p2.x - arcState.p1.x);
+  }
+
+  // Plain-number length entry ("type 96, hit Enter" mid-draw): direction
+  // comes from whatever is currently indicating it — angle lock first
+  // (Shift held, or the touch toggle), otherwise a ray cast from the
+  // anchor out to the last known cursor position, exactly like aiming
+  // with the mouse/finger and reading the length off a tape measure.
+  // This is what makes typed lengths work for LINE, PLINE segments, RECT,
+  // POLYGON, and an ARC's second point — not just LINE continuations.
+  if (parsed.mode === 'dist' && anchor) {
+    if (shiftLockActive) {
+      lastAngle = shiftLockAngle;
+    } else if (mouseWorld) {
+      lastAngle = Math.atan2(mouseWorld.y - lastY, mouseWorld.x - lastX);
+    } else if (lastAngle === undefined && activeTool === 'line' && lineChain && lineChain.length >= 2) {
+      // No cursor position on record at all (rare) — fall back to
+      // continuing the previous committed segment's direction.
       const a = lineChain[lineChain.length-2], b = lineChain[lineChain.length-1];
       lastAngle = Math.atan2(b.y-a.y, b.x-a.x);
     }
-  } else if (activeTool === 'rect' && rectState && rectState.active) {
-    lastX = rectState.x1; lastY = rectState.y1;
-  } else if (activeTool === 'circle' && circleState && circleState.active) {
-    lastX = circleState.cx; lastY = circleState.cy;
-  } else if (activeTool === 'polygon' && polyState && polyState.active) {
-    lastX = polyState.cx; lastY = polyState.cy;
-  } else if (activeTool === 'arc' && arcState && arcState.active && arcState.p1) {
-    lastX = arcState.p1.x; lastY = arcState.p1.y;
-    if (arcState.phase === 2 && arcState.p2) {
-      lastAngle = Math.atan2(arcState.p2.y - arcState.p1.y, arcState.p2.x - arcState.p1.x);
-    }
   }
+  if (lastAngle === undefined) lastAngle = 0;
+
   const pt = resolveCoord(parsed, lastX, lastY, lastAngle);
   if (!pt) { kecho('Could not resolve coordinate', 'err'); return; }
 
