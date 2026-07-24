@@ -36,7 +36,6 @@
 <meta charset="UTF-8">
 <meta name="copyright" content="Copyright (C) 2026 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, KLOUD™, KID™, and KODEX™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>KADsuite — Kernel-Aided Design Suite</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0c1824">
 <link rel="icon" href="/icons/icon-192.png">
@@ -44,6 +43,113 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KADsuite">
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SEO / LANDING PAGE METADATA — KADsuite.html ONLY.
+     Everything below this banner, down to the matching END marker, is
+     public-facing landing-page content. It does not exist in KAD.html or
+     KOMMAND.html and should never be ported into either — both derive
+     their engine from KAD.html, which is not a hosted, crawled page, so
+     none of this metadata applies there. Keeping it walled off here means
+     the rest of <head> above this block stays an exact, line-for-line
+     match to KAD.html — that's what makes checking KAD.html alone
+     sufficient for verifying the engine is consistent everywhere.
+     ══════════════════════════════════════════════════════════════════════ -->
+<title>KADsuite — Browser-Based CAD & Drafting Software</title>
+<meta name="description" content="Free browser-based, collaborative CAD software for architecture, mechanical engineering, and construction drafting. No install.">
+<meta name="keywords" content="CAD software, drafting software, free drafting software, technical drawing, technical design, design software, engineering, engineering software, engineering design, engineering drawing, CAD for engineers, mechanical engineering, mechanical engineering software, mechanical design, mechanical drafting, fabrication drafting, architecture, architecture software, architectural design, architectural drafting, construction drafting, 2D drafting, 2D CAD, drafting tool, browser CAD, online CAD, web-based CAD, collaborative CAD, real-time collaboration, vector drafting, DXF editor, free CAD software, blueprint software, floor plan software">
+<meta name="robots" content="index, follow">
+<meta name="author" content="WithShalom Studios">
+<link rel="canonical" href="https://kadsuite.com/">
+
+<!-- Open Graph — link previews on Slack, Discord, iMessage, LinkedIn, etc. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KADsuite">
+<meta property="og:title" content="KADsuite — Browser-Based CAD & Drafting Software">
+<meta property="og:description" content="Free browser-based, collaborative CAD software for architecture, mechanical engineering, and construction drafting. No install.">
+<meta property="og:url" content="https://kadsuite.com/">
+<meta property="og:image" content="https://kadsuite.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="KADsuite — Browser-Based CAD & Drafting Software">
+<meta name="twitter:image" content="https://kadsuite.com/og-image.png">
+
+<!-- Twitter Card — same job as Open Graph, X/Twitter's own format -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KADsuite — Browser-Based CAD & Drafting Software">
+<meta name="twitter:description" content="Free browser-based, collaborative CAD software for architecture, mechanical engineering, and construction drafting. No install.">
+
+<!-- Structured data — schema.org SoftwareApplication, applicationCategory
+     confirmed as the correct Google-recognized value for design tools/
+     editors (not a guess). No aggregateRating/review included: KADsuite
+     doesn't have real user reviews yet, and fabricating one would be
+     exactly the kind of structured-data manipulation Google penalizes
+     sites for. Add it honestly once real reviews exist. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "KADsuite",
+  "url": "https://kadsuite.com/",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Any (runs in browser)",
+  "description": "KADsuite is a free, browser-based CAD and drafting suite for architecture, mechanical engineering, construction, and fabrication drafting — 2D drafting, dimensioning, AWS welding symbols, fillets, chamfers, DXF/SCAD import-export, and real-time multi-user collaboration, with no install required. The suite also includes KONSTRUCT for wall-aware floor plan drafting and KANVAS for vector illustration.",
+  "keywords": "CAD software, drafting software, free drafting software, technical drawing, technical design, design software, engineering, engineering software, engineering design, engineering drawing, CAD for engineers, mechanical engineering, mechanical engineering software, mechanical design, mechanical drafting, fabrication drafting, architecture, architecture software, architectural design, architectural drafting, construction drafting, 2D drafting, 2D CAD, drafting tool, browser CAD, online CAD, web-based CAD, collaborative CAD, real-time collaboration, vector drafting, DXF editor, free CAD software, blueprint software, floor plan software",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+<!-- FAQPage — must stay word-for-word in sync with the visible FAQ
+     section near the footer. Google checks that structured data matches
+     on-page content; a mismatch can get the rich result ignored. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is KADsuite free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — KAD, the core drafting engine, is free with no account or install required. It runs entirely in your browser." }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to install anything?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. KAD is browser-based CAD software — open it on desktop or mobile and start drafting immediately, with no download or installation step." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does KADsuite work on mobile and touch devices?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — KAD is built with real touch support, not just a shrunk desktop layout: gesture-based aiming while drafting, pinch to zoom, long-press for context menus, and a command bar designed for one-handed use." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I export my drawings?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — KAD supports DXF import and export for interoperability with other CAD software, plus OpenSCAD (.scad) export for 3D/parametric workflows." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is KADsuite good for architectural or construction drafting?",
+      "acceptedAnswer": { "@type": "Answer", "text": "KAD itself is general-purpose 2D drafting, well suited to technical and mechanical work. For wall-aware floor plan drafting specifically, the suite includes KONSTRUCT, built for architectural and construction layouts." }
+    },
+    {
+      "@type": "Question",
+      "name": "What drafting tools does KAD include?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Line, polyline, arc, circle, rectangle, and polygon drawing; trim, extend, break, offset, mirror, fillet, and chamfer editing; dimensioning with AWS welding-symbol support; and layer management." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can multiple people work on the same drawing?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — real-time multi-user collaboration is built directly into KAD, no separate app required. Paid KLOUD tiers add cloud save, sync, and extended collaboration features; see kloud.kadsuite.com for plans." }
+    }
+  ]
+}
+</script>
+<!-- ══════════════════════════ END SEO BLOCK ═══════════════════════════ -->
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Literata:ital,opsz,wght@0,16..30,400;0,16..30,500;0,16..30,600;0,16..30,700;1,16..30,400&family=Syne:wght@700;800&display=swap');
 
@@ -761,6 +867,33 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 #dyn-input-hint b { color:var(--accent); }
 #dyn-input-hint i { color:var(--amber); font-style:normal; }
 #dyn-input-hint em { color:var(--green); font-style:normal; }
+
+#dyn-lenang-box {
+  position: absolute; z-index: 81; pointer-events: auto;
+  display: flex; gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(0,212,255,0.25), 0 2px 8px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+.dyn-field {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--panel);
+  padding: 4px 6px;
+}
+.dyn-field label {
+  font-family: var(--fu); font-size: 10px; color: var(--t3);
+  letter-spacing: 0.06em; flex-shrink: 0;
+}
+.dyn-field input {
+  background: transparent; border: none; outline: none;
+  font-family: var(--fm); font-size: 13px; color: var(--t1);
+  width: 56px; caret-color: var(--accent);
+}
+.dyn-field span {
+  font-family: var(--fm); font-size: 11px; color: var(--t3); flex-shrink: 0;
+}
 
 /* ── CONTEXT MENU ── */
 #ctx-menu { position:fixed; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border-hi); border-radius:5px; box-shadow:0 10px 36px rgba(0,0,0,0.75),0 0 0 1px rgba(0,212,255,0.05); min-width:200px; z-index:500; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; max-height:calc(100vh - 16px); padding:4px 0; }
@@ -2848,6 +2981,41 @@ body.light-mode .tool-btn.active .tool-icon svg {
     </div>
   </section>
 
+  <!-- FAQ -->
+  <section class="faq-section" style="position:relative;z-index:1;max-width:800px;margin:0 auto;padding:60px 32px;">
+    <h2 style="font-family:var(--ff-display);font-size:clamp(28px,4vw,40px);color:var(--text1);text-align:center;margin-bottom:40px;">Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <details style="border-bottom:1px solid rgba(238,243,248,0.15);padding:18px 0;">
+        <summary style="cursor:pointer;font-family:var(--ff-serif);font-size:18px;color:var(--text1);font-weight:600;">Is KADsuite free?</summary>
+        <p style="margin-top:12px;color:rgba(238,243,248,0.75);line-height:1.6;">Yes — KAD, the core drafting engine, is free with no account or install required. It runs entirely in your browser.</p>
+      </details>
+      <details style="border-bottom:1px solid rgba(238,243,248,0.15);padding:18px 0;">
+        <summary style="cursor:pointer;font-family:var(--ff-serif);font-size:18px;color:var(--text1);font-weight:600;">Do I need to install anything?</summary>
+        <p style="margin-top:12px;color:rgba(238,243,248,0.75);line-height:1.6;">No. KAD is browser-based CAD software — open it on desktop or mobile and start drafting immediately, with no download or installation step.</p>
+      </details>
+      <details style="border-bottom:1px solid rgba(238,243,248,0.15);padding:18px 0;">
+        <summary style="cursor:pointer;font-family:var(--ff-serif);font-size:18px;color:var(--text1);font-weight:600;">Does KADsuite work on mobile and touch devices?</summary>
+        <p style="margin-top:12px;color:rgba(238,243,248,0.75);line-height:1.6;">Yes — KAD is built with real touch support, not just a shrunk desktop layout: gesture-based aiming while drafting, pinch to zoom, long-press for context menus, and a command bar designed for one-handed use.</p>
+      </details>
+      <details style="border-bottom:1px solid rgba(238,243,248,0.15);padding:18px 0;">
+        <summary style="cursor:pointer;font-family:var(--ff-serif);font-size:18px;color:var(--text1);font-weight:600;">Can I export my drawings?</summary>
+        <p style="margin-top:12px;color:rgba(238,243,248,0.75);line-height:1.6;">Yes — KAD supports DXF import and export for interoperability with other CAD software, plus OpenSCAD (.scad) export for 3D/parametric workflows.</p>
+      </details>
+      <details style="border-bottom:1px solid rgba(238,243,248,0.15);padding:18px 0;">
+        <summary style="cursor:pointer;font-family:var(--ff-serif);font-size:18px;color:var(--text1);font-weight:600;">Is KADsuite good for architectural or construction drafting?</summary>
+        <p style="margin-top:12px;color:rgba(238,243,248,0.75);line-height:1.6;">KAD itself is general-purpose 2D drafting, well suited to technical and mechanical work. For wall-aware floor plan drafting specifically, the suite includes KONSTRUCT, built for architectural and construction layouts.</p>
+      </details>
+      <details style="border-bottom:1px solid rgba(238,243,248,0.15);padding:18px 0;">
+        <summary style="cursor:pointer;font-family:var(--ff-serif);font-size:18px;color:var(--text1);font-weight:600;">What drafting tools does KAD include?</summary>
+        <p style="margin-top:12px;color:rgba(238,243,248,0.75);line-height:1.6;">Line, polyline, arc, circle, rectangle, and polygon drawing; trim, extend, break, offset, mirror, fillet, and chamfer editing; dimensioning with AWS welding-symbol support; and layer management.</p>
+      </details>
+      <details style="padding:18px 0;">
+        <summary style="cursor:pointer;font-family:var(--ff-serif);font-size:18px;color:var(--text1);font-weight:600;">Can multiple people work on the same drawing?</summary>
+        <p style="margin-top:12px;color:rgba(238,243,248,0.75);line-height:1.6;">Yes — real-time multi-user collaboration is built directly into KAD, no separate app required. Paid KLOUD tiers add cloud save, sync, and extended collaboration features; see kloud.kadsuite.com for plans.</p>
+      </details>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer style="position:relative;z-index:1;">
     <div class="footer-brand">KAD<sup>suite™</sup></div>
@@ -4031,6 +4199,19 @@ document.addEventListener('keydown', function(e) {
     <div id="dyn-input-hint"><b>X,Y</b> abs &nbsp;·&nbsp; <i>@dX,dY</i> rel &nbsp;·&nbsp; <em>@D&lt;A°</em> polar</div>
   </div>
 
+  <div id="dyn-lenang-box" style="display:none;">
+    <div class="dyn-field">
+      <label>LEN</label>
+      <input id="dyn-len-input" type="number" step="0.1" inputmode="decimal" autocomplete="off"/>
+      <span id="dyn-len-unit">mm</span>
+    </div>
+    <div class="dyn-field">
+      <label>ANG</label>
+      <input id="dyn-ang-input" type="number" step="1" inputmode="decimal" autocomplete="off"/>
+      <span>°</span>
+    </div>
+  </div>
+
   <div id="coord-overlay">
     <span><span class="coord-label">X </span><span id="cx">0.0000</span></span>
     <span><span class="coord-label">Y </span><span id="cy">0.0000</span></span>
@@ -4756,6 +4937,13 @@ function toggleUnits() {
     if(unitMode==='in'){ inp.value=(v/MM_PER_IN).toFixed(4); inp.step='0.0625'; if(unitLbl)unitLbl.textContent='in'; }
     else               { inp.value=(v*MM_PER_IN).toFixed(2); inp.step='0.5';    if(unitLbl)unitLbl.textContent='mm'; }
   });
+  // Dynamic length/angle box: its displayed number is always re-derived
+  // from dynBox.lockedLen (stored in canonical mm, unaffected by this
+  // toggle) rather than read back from the field itself, so only the
+  // unit label needs setting here — updateDynBox() redraws the number.
+  const dynLenUnit = document.getElementById('dyn-len-unit');
+  if (dynLenUnit) dynLenUnit.textContent = unitMode;
+  if (typeof updateDynBox==='function' && typeof getDynAnchor==='function') updateDynBox(getDynAnchor());
   updateGridLabel();
   // Update coord overlay unit label
   const coordLbl = document.getElementById('coord-unit-lbl');
@@ -5190,6 +5378,109 @@ function parseDynCoord(str) {
   }
   return null;
 }
+
+// ── DYNAMIC LENGTH/ANGLE (AutoCAD-style dynamic input) ────
+// Two floating fields showing live length+angle from the current anchor
+// while drafting LINE/PLINE/ARC, ray-cast the same way DraftSight/AutoCAD
+// do it. Typing into either LOCKS that dimension — the other keeps
+// tracking the cursor/finger live — same as AutoCAD's dynamic input.
+// Deliberately NOT a rebuild of the deprecated dyn-input above: this
+// never parses free-text coordinate syntax of its own. It only ever
+// adjusts mouseWorld itself, so onMouseDown/runToolAction/drawRubberBand/
+// drawArcPreview all respect it automatically with zero changes to that
+// already-proven code, and committing reuses simulateWorldClick — the
+// exact same path every other input method (click, tap, KOMMAND, voice)
+// already goes through.
+let lastInputWasTouch = false;
+let dynBox = { lenLocked:false, angLocked:false, lockedLen:0, lockedAng:0 };
+
+function getDynAnchor() {
+  if (activeTool==='line' && lineState.active) return { x:lineState.x1, y:lineState.y1 };
+  if (activeTool==='arc'  && arcState.phase===1 && arcState.p1) return arcState.p1;
+  if (activeTool==='arc'  && arcState.phase===2 && arcState.p2) return arcState.p2;
+  return null;
+}
+
+function applyDynLock(anchor) {
+  if (!anchor || (!dynBox.lenLocked && !dynBox.angLocked)) return;
+  const liveDist = Math.hypot(mouseWorld.x-anchor.x, mouseWorld.y-anchor.y);
+  const liveAng  = Math.atan2(mouseWorld.y-anchor.y, mouseWorld.x-anchor.x);
+  const useLen = dynBox.lenLocked ? dynBox.lockedLen : liveDist;
+  const useAng = dynBox.angLocked ? dynBox.lockedAng*Math.PI/180 : liveAng;
+  mouseWorld = { x: anchor.x + useLen*Math.cos(useAng), y: anchor.y + useLen*Math.sin(useAng) };
+}
+
+function updateDynBox(anchor) {
+  const box = document.getElementById('dyn-lenang-box');
+  if (!box) return;
+  if (!anchor) { box.style.display='none'; return; }
+  box.style.display = 'flex';
+
+  const dist = Math.hypot(mouseWorld.x-anchor.x, mouseWorld.y-anchor.y);
+  const ang  = ((Math.atan2(mouseWorld.y-anchor.y, mouseWorld.x-anchor.x)*180/Math.PI)+360)%360;
+
+  const lenInp = document.getElementById('dyn-len-input');
+  const angInp = document.getElementById('dyn-ang-input');
+  if (document.activeElement !== lenInp) {
+    lenInp.value = (dynBox.lenLocked ? toDisplay(dynBox.lockedLen) : toDisplay(dist)).toFixed(2);
+  }
+  if (document.activeElement !== angInp) {
+    angInp.value = (dynBox.angLocked ? dynBox.lockedAng : ang).toFixed(1);
+  }
+
+  // Position near the live point. On touch, offset well clear of the
+  // fingertip that's doing the dragging — on mouse, tuck in close like
+  // DraftSight does, since a pointer doesn't cover what it's pointing at.
+  // Same edge-clamping idea as the old positionDynInput() above.
+  const sp = worldToScreen(mouseWorld.x, mouseWorld.y);
+  const offX = lastInputWasTouch ? -86 : 16;
+  const offY = lastInputWasTouch ? -74 : -16;
+  let bx = sp.x+offX, by = sp.y+offY;
+  const bw = 168, bh = 34;
+  if (bx+bw > canvas.clientWidth)  bx = canvas.clientWidth - bw - 4;
+  if (bx < 4) bx = 4;
+  if (by < 4) by = sp.y + 20;
+  if (by+bh > canvas.clientHeight) by = canvas.clientHeight - bh - 4;
+  box.style.left = bx+'px';
+  box.style.top  = by+'px';
+}
+
+function resetDynBox() {
+  dynBox.lenLocked=false; dynBox.angLocked=false; dynBox.lockedLen=0; dynBox.lockedAng=0;
+  const box = document.getElementById('dyn-lenang-box');
+  if (box) box.style.display = 'none';
+}
+
+function commitDynBox() {
+  const anchor = getDynAnchor();
+  if (!anchor) return;
+  applyDynLock(anchor);
+  simulateWorldClick(mouseWorld.x, mouseWorld.y);
+  resetDynBox();
+}
+
+function dynBoxKeydown(e) {
+  e.stopPropagation();
+  if (e.key === 'Enter') { e.preventDefault(); commitDynBox(); }
+  else if (e.key === 'Escape') { e.preventDefault(); resetDynBox(); this.blur(); }
+}
+
+(function(){
+  const lenInp = document.getElementById('dyn-len-input');
+  const angInp = document.getElementById('dyn-ang-input');
+  lenInp.addEventListener('input', function(){
+    dynBox.lenLocked = true;
+    dynBox.lockedLen = fromDisplay(parseFloat(this.value)||0);
+    const a = getDynAnchor(); applyDynLock(a); updateDynBox(a); render();
+  });
+  angInp.addEventListener('input', function(){
+    dynBox.angLocked = true;
+    dynBox.lockedAng = parseFloat(this.value)||0;
+    const a = getDynAnchor(); applyDynLock(a); updateDynBox(a); render();
+  });
+  lenInp.addEventListener('keydown', dynBoxKeydown);
+  angInp.addEventListener('keydown', dynBoxKeydown);
+})();
 
 // ── OFFSET MATH ─────────────────────────────────────────
 function getOffsetDist() {
@@ -5869,6 +6160,7 @@ function cancelTool() {
   if(typeof extendPreview !== 'undefined') extendPreview = null;
   if(typeof breakState    !== 'undefined') breakState    = {active:false,hit:null,pt1:null};
   if(typeof stretchState  !== 'undefined') stretchState  = {active:false,endpt:null,obj:null,which:null};
+  if(typeof resetDynBox   === 'function') resetDynBox();
   document.getElementById('rect-preview').style.display='none';
 }
 
@@ -6658,6 +6950,7 @@ function onMouseDown(e) {
         // Start a new chain — no GeoMemory write yet, just set state
         lineState = {active:true, x1:wp.x, y1:wp.y};
         lineChain = [{x:wp.x, y:wp.y}];
+        resetDynBox();
         // No addPoint — chain is drawn live by drawRubberBand
       } else {
         // Ignore clicks exactly on the last point
@@ -6666,6 +6959,7 @@ function onMouseDown(e) {
         }
 
         lineChain.push({x:wp.x, y:wp.y});
+        resetDynBox();
 
         // Check if snapping to the chain start — use screen-space distance
         // so the check is consistent with the snap ring threshold
@@ -6733,8 +7027,8 @@ function onMouseDown(e) {
     if(activeTool==='arc') {
       if(dynVisible)return;
       const wp=snapActive&&snapPoint?snapPoint:mouseWorld;
-      if(arcState.phase===0){arcState={active:true,phase:1,p1:{x:wp.x,y:wp.y},p2:null};}
-      else if(arcState.phase===1){arcState.phase=2;arcState.p2={x:wp.x,y:wp.y};}
+      if(arcState.phase===0){arcState={active:true,phase:1,p1:{x:wp.x,y:wp.y},p2:null};resetDynBox();}
+      else if(arcState.phase===1){arcState.phase=2;arcState.p2={x:wp.x,y:wp.y};resetDynBox();}
       else{
         const circ=circumscribedCircle(arcState.p1,arcState.p2,{x:wp.x,y:wp.y});
         if(!circ){showToast('Points collinear — cannot form arc');arcState={active:false,phase:0};render();return;}
@@ -6745,6 +7039,7 @@ function onMouseDown(e) {
         const ccw=angleOnArc(normAngle(midA),normAngle(startA),normAngle(endA),true);
         GeoMemory.addArc(cx,cy,r,startA,endA,ccw);
         showToast('Arc r='+fmtU(r));arcState={active:false,phase:0,p1:null,p2:null};
+        resetDynBox();
       }
       render();return;
     }
@@ -6846,6 +7141,7 @@ function getDrawAnchor() {
   if (activeTool==='rect'    && rectState.active)                 return { x:rectState.x1,  y:rectState.y1  };
   if (activeTool==='polygon' && polyState.active)                 return { x:polyState.cx,  y:polyState.cy  };
   if (activeTool==='circle'  && circleState.active)               return { x:circleState.cx,y:circleState.cy};
+  if (activeTool==='arc'     && arcState.active && arcState.p2)   return arcState.p2;
   if (activeTool==='arc'     && arcState.active && arcState.p1)   return arcState.p1;
   return null;
 }
@@ -6886,6 +7182,13 @@ function onMouseMove(e) {
     shiftLockActive = true;
     shiftLockAngle  = locked;
   }
+
+  // Dynamic length/angle — isTrusted distinguishes a real mousemove from
+  // the swipe gesture's synthetic fakeMouseEvent() calls, for free.
+  lastInputWasTouch = !e.isTrusted;
+  const dynAnchor = getDynAnchor();
+  applyDynLock(dynAnchor);
+  updateDynBox(dynAnchor);
 
   document.getElementById('cx').textContent=fmtCoord(mouseWorld.x);
   document.getElementById('cy').textContent=fmtCoord(mouseWorld.y);
@@ -8184,14 +8487,10 @@ function drawRubberBand() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Angle lock annotation
-  if (shiftLockActive) {
-    const deg = ((Math.round(shiftLockAngle*180/Math.PI)%360)+360)%360;
-    ctx.font = '9px JetBrains Mono,monospace';
-    ctx.fillStyle = draftLeadingColor();
-    ctx.globalAlpha = 0.85;
-    ctx.fillText('∠'+deg+'°', end.x+10, end.y-6);
-  }
+  // Angle-lock snapping still adjusts mouseWorld itself (see onMouseMove),
+  // so the rubber-band above already reflects it — the dynamic length/
+  // angle box shows the resulting number, superseding the small text
+  // label this used to draw here.
 
   // ── Start point ring ──
   const chainStart = worldToScreen(lineChain[0].x, lineChain[0].y);
