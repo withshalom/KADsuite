@@ -869,7 +869,19 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
 #dyn-input-hint em { color:var(--green); font-style:normal; }
 
 #dyn-lenang-box {
-  position: absolute; z-index: 81; pointer-events: auto;
+  position: absolute; z-index: 81;
+  /* Deliberately NOT auto: this box follows the live cursor/stylus
+     position, so it's very likely to end up sitting directly on top of
+     wherever you're currently aiming. As a separate DOM element layered
+     above the canvas, pointer-events:auto here would swallow hover
+     events meant for the canvas's own mousemove listener underneath —
+     the rubber-band/dyn-box live update would silently stop the moment
+     the pointer crossed into the box's footprint. Only the two actual
+     inputs (see .dyn-field input below) need to stay interactive; the
+     background, padding, and labels should let hover pass straight
+     through to the canvas.
+  */
+  pointer-events: none;
   display: flex; gap: 1px;
   background: var(--border);
   border: 1px solid var(--accent);
@@ -887,6 +899,7 @@ body.drafting-mode #app { pointer-events:auto; z-index:20; padding-top:36px; }
   letter-spacing: 0.06em; flex-shrink: 0;
 }
 .dyn-field input {
+  pointer-events: auto; /* the one thing in this box that should intercept — see #dyn-lenang-box */
   background: transparent; border: none; outline: none;
   font-family: var(--fm); font-size: 13px; color: var(--t1);
   width: 56px; caret-color: var(--accent);
