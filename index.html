@@ -1459,7 +1459,7 @@ body.kanvas-mode #model-pane  { display: none; }
   border-radius: 5px; cursor: pointer; color: var(--t2); transition: all 0.13s;
 }
 .kv-export-btn:hover { color: var(--t1); border-color: rgba(255,255,255,0.18); }
-.kv-export-btn.vad { color: #0090a8; border-color: rgba(0,144,168,0.25); }
+.kv-export-btn.kvs { color: #0090a8; border-color: rgba(0,144,168,0.25); }
 .kv-export-btn.svg { color: var(--green); border-color: rgba(0,255,157,0.2); }
 .kv-export-btn.pdf { color: var(--t2); }
 .kv-export-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; }
@@ -1517,6 +1517,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --kam:   #ffaa00;
   --kubic:  #20e8c0;
   --karve: #d4aa40;
+  --kode:  #e03800;
   
   --kanvas: #4a7fb5; /* steel-hi — brought into the blueprint family */
 
@@ -1524,16 +1525,21 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --kam-g:  rgba(255,170,0,0.12);
   --kubic-g: rgba(32,232,192,0.12);
   --karve-g:rgba(212,170,64,0.12);
+  --kode-g: rgba(224,56,0,0.12);
   --kultivate: #6ab830;  /* fresh growth green */
   --kultivate-g: rgba(90,158,60,0.12);
   --kanvas-g: rgba(74,127,181,0.12);
 
   
   --konstruct:   #4a8fd4;  /* blueprint technical blue */
+  --kloud:       #7ec8e3;  /* sky blue — lighter, distinct from KAD cyan */
+  --kloud-g:     rgba(126,200,227,0.10);
   --kodex:       #e8a020;  /* machinist amber */
   --kodex-g:     rgba(232,160,32,0.10);
+  --kampus:      #E8600A;  /* construction cone orange */
   --kubic:       #20e8c0;  /* solid modeling teal */
   --kraft:       #c0c0c0;  /* brushed steel */
+  --kampus-g:    rgba(232,96,10,0.12);
   --konstruct-g: rgba(74,143,212,0.12);
 
   --ff-display: 'Syne', sans-serif;
@@ -2394,6 +2400,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
   overscroll-behavior: contain;
 }
 .mobile-mode.sidebar-open #sidebar { transform: translateX(0); }
+
 /* KANVAS's tool palette was a fixed --sidebar-w column with no mobile rule
    at all, so on a phone it permanently ate a third of the sheet and there
    was no way to dismiss it — while the identical palette in model space
@@ -2418,6 +2425,72 @@ body.light-mode .tool-btn.active .tool-icon svg {
 .mobile-mode.sidebar-open #kanvas-sidebar { transform: translateX(0); }
 /* Larger tap targets in the KANVAS palette, matching the model tool grid. */
 .mobile-mode .kv-tbtn { padding: 9px 4px; }
+
+/* Sheet orientation — a visible pair rather than another dropdown entry,
+   because turning the sheet is a gesture you make constantly at a table. */
+/* Sheet tabs — a horizontal strip under the mode tabs, outside the sidebar so
+   it stays visible on a phone where the drawer is closed. Double-click the
+   active tab to rename. */
+#kv-sheetbar {
+  display: none; align-items: center; gap: 4px;
+  grid-column: 1 / -1;          /* span both columns, like the tab bar */
+  padding: 3px 6px; background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  min-height: 0; overflow: hidden;
+}
+body.kanvas-mode #kv-sheetbar { display: flex; }
+/* The extra row exists only while the bar is on screen. */
+body.kanvas-mode #app {
+  grid-template-rows: var(--toolbar-h) 32px 30px 1fr 28px var(--status-h);
+}
+.mobile-mode.kanvas-mode #app {
+  grid-template-rows: var(--toolbar-h) 32px 36px 1fr 28px var(--status-h);
+}
+#kv-sheet-tabs {
+  display: flex; flex-direction: row; gap: 4px; flex: 1;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+#kv-sheet-tabs::-webkit-scrollbar { display: none; }
+#kv-sheet-add {
+  flex-shrink: 0; width: 26px; height: 24px; line-height: 1;
+  background: var(--panel2); border: 1px solid var(--border-hi); border-radius: 4px;
+  color: var(--t2); font-size: 15px; cursor: pointer;
+}
+#kv-sheet-add:hover { color: #33c6dd; border-color: #0090a8; }
+.kv-sheet-tab {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--t2); font-family: var(--fu); font-size: 10.5px; padding: 3px 9px;
+  cursor: pointer; text-align: left; white-space: nowrap; flex-shrink: 0;
+}
+.kv-sheet-tab:hover { border-color: var(--border-hi); color: var(--t1); }
+.kv-sheet-tab.act { border-color: #0090a8; color: #33c6dd; background: rgba(0,144,168,0.12); }
+.kv-sheet-tab .kvs-dim { font-size: 8.5px; opacity: 0.6; font-family: var(--fm); white-space: nowrap; }
+.mobile-mode #kv-sheet-tabs { gap: 5px; }
+.mobile-mode .kv-sheet-tab { padding: 5px 11px; font-size: 11.5px; }
+.mobile-mode #kv-sheet-add { width: 34px; height: 30px; font-size: 17px; }
+.kv-sheet-actions { display: flex; gap: 4px; padding: 4px 8px 2px; }
+.kv-sheet-actions button {
+  flex: 1; background: var(--panel2); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--t3); font-family: var(--fu); font-size: 9.5px; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 5px 2px; cursor: pointer;
+}
+.kv-sheet-actions button:hover { color: var(--t1); border-color: var(--border-hi); }
+.kv-sheet-actions button.del:hover { color: #ff6b6b; border-color: #ff6b6b; }
+.mobile-mode .kv-sheet-actions button { padding: 8px 2px; }
+
+.kv-orient-row { display: flex; gap: 4px; padding: 4px 8px 2px; }
+.kv-orient-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--t3); font-family: var(--fu); font-size: 9.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 5px 2px; cursor: pointer;
+}
+.kv-orient-btn svg { width: 16px; height: 16px; }
+.kv-orient-btn:hover { color: var(--t1); border-color: var(--border-hi); }
+.kv-orient-btn.act { color: var(--accent); border-color: var(--accent); background: var(--accent-glow); }
+.mobile-mode .kv-orient-btn { padding: 8px 2px; font-size: 10px; }
 
 /* Inline annotation entry. Fixed-position so it can sit exactly where the
    sheet was tapped, above the KOMMAND bar but below the layer dropdown. */
@@ -2740,6 +2813,7 @@ body.light-mode .tool-btn.active .tool-icon svg {
 .kloud-sep { height:1px; background:var(--border); }
 .kloud-note { font-family:var(--fu); font-size:11px; color:var(--t3); line-height:1.5; }
 </style>
+</head>
 <body>
 <!-- KAD escape bar — shown in drafting mode -->
 <div id="kad-escape-bar">
@@ -4084,6 +4158,12 @@ document.addEventListener('keydown', function(e) {
   </div>
 </div>
 
+<!-- Sheet tabs — always on screen in KANVAS, never behind the drawer -->
+<div id="kv-sheetbar">
+  <div id="kv-sheet-tabs"></div>
+  <button id="kv-sheet-add" onclick="kvAddSheet()" title="New sheet">+</button>
+</div>
+
 <!-- ── PANE WRAPPERS ── -->
 <div id="model-pane">
 
@@ -4355,6 +4435,16 @@ document.addEventListener('keydown', function(e) {
 <div id="kanvas-sidebar">
   <div class="section-head" style="color:#0090a8;letter-spacing:0.16em;">KV KANVAS</div>
 
+  <!-- Sheet management. The tab strip itself lives in #kv-sheetbar, outside
+       the drawer, so it is visible whether or not this panel is open. -->
+  <div class="section-head" style="font-size:10.5px;border:none;padding:6px 8px 3px;">SHEET</div>
+  <div class="kv-sheet-actions">
+    <button onclick="kvAddSheet()" title="New sheet">+ Sheet</button>
+    <button onclick="kvDuplicateSheet()" title="Duplicate this sheet">Duplicate</button>
+    <button onclick="kvRenameSheet()" title="Rename this sheet">Rename</button>
+    <button onclick="kvDeleteSheet()" title="Delete this sheet" class="del">Delete</button>
+  </div>
+
   <!-- Tools -->
   <div class="kv-tool-grid">
     <button class="kv-tbtn act" id="kv-tb-brush" onclick="kvSetTool('brush')">
@@ -4453,34 +4543,67 @@ document.addEventListener('keydown', function(e) {
   <!-- Page size -->
   <div class="section-head" style="font-size:10.5px;border:none;padding:6px 8px 3px;">PAGE</div>
   <select class="kv-page-sel" onchange="kvSetPageSize(this.value)">
-    <optgroup label="ISO">
-      <option value="a4p">A4 Portrait</option>
-      <option value="a4l">A4 Landscape</option>
-      <option value="a3p" selected>A3 Portrait</option>
-      <option value="a3l">A3 Landscape</option>
-      <option value="a2p">A2 Portrait</option>
-      <option value="a2l">A2 Landscape</option>
-      <option value="a1p">A1 Portrait</option>
-      <option value="a1l">A1 Landscape</option>
+    <optgroup label="ISO (metric)">
+      <option value="a4p">A4 Portrait — 210×297 mm</option>
+      <option value="a4l">A4 Landscape — 297×210 mm</option>
+      <option value="a3p" selected>A3 Portrait — 297×420 mm</option>
+      <option value="a3l">A3 Landscape — 420×297 mm</option>
+      <option value="a2p">A2 Portrait — 420×594 mm</option>
+      <option value="a2l">A2 Landscape — 594×420 mm</option>
+      <option value="a1p">A1 Portrait — 594×841 mm</option>
+      <option value="a1l">A1 Landscape — 841×594 mm</option>
+      <option value="a0p">A0 Portrait — 841×1189 mm</option>
+      <option value="a0l">A0 Landscape — 1189×841 mm</option>
     </optgroup>
-    <optgroup label="ANSI Engineering">
-      <option value="ansi_a_p">ANSI A 8.5×11</option>
-      <option value="ansi_a_l">ANSI A 11×8.5</option>
-      <option value="ansi_b">ANSI B 11×17</option>
-      <option value="ansi_c">ANSI C 17×22</option>
-      <option value="ansi_d">ANSI D 22×34</option>
-      <option value="ansi_e">ANSI E 34×44</option>
+    <optgroup label="US OFFICE">
+      <option value="letter_l">Letter Landscape — 11×8.5"</option>
+      <option value="letter_p">Letter Portrait — 8.5×11"</option>
+      <option value="legal_l">Legal Landscape — 14×8.5"</option>
+      <option value="legal_p">Legal Portrait — 8.5×14"</option>
+      <option value="tabloid_l">Tabloid Landscape — 17×11"</option>
+      <option value="tabloid_p">Tabloid Portrait — 11×17"</option>
     </optgroup>
-    <optgroup label="Architectural">
-      <option value="arch_b">Arch B 12×18</option>
-      <option value="arch_c">Arch C 18×24</option>
-      <option value="arch_d">Arch D 24×36</option>
-      <option value="arch_e">Arch E 36×48</option>
+    <optgroup label="ANSI ENGINEERING">
+      <option value="ansi_a_l">ANSI A Landscape — 11×8.5"</option>
+      <option value="ansi_a_p">ANSI A Portrait — 8.5×11"</option>
+      <option value="ansi_b_l">ANSI B Landscape — 17×11"</option>
+      <option value="ansi_b_p">ANSI B Portrait — 11×17"</option>
+      <option value="ansi_c_l">ANSI C Landscape — 22×17"</option>
+      <option value="ansi_c_p">ANSI C Portrait — 17×22"</option>
+      <option value="ansi_d_l">ANSI D Landscape — 34×22"</option>
+      <option value="ansi_d_p">ANSI D Portrait — 22×34"</option>
+      <option value="ansi_e_l">ANSI E Landscape — 44×34"</option>
+      <option value="ansi_e_p">ANSI E Portrait — 34×44"</option>
     </optgroup>
-    <optgroup label="AWS D1 Structural">
-      <option value="aws_d1">AWS D1 22×34</option>
+    <optgroup label="ARCHITECTURAL">
+      <option value="arch_a_l">Arch A Landscape — 12×9"</option>
+      <option value="arch_a_p">Arch A Portrait — 9×12"</option>
+      <option value="arch_b_l">Arch B Landscape — 18×12"</option>
+      <option value="arch_b_p">Arch B Portrait — 12×18"</option>
+      <option value="arch_c_l">Arch C Landscape — 24×18"</option>
+      <option value="arch_c_p">Arch C Portrait — 18×24"</option>
+      <option value="arch_d_l">Arch D Landscape — 36×24"</option>
+      <option value="arch_d_p">Arch D Portrait — 24×36"</option>
+      <option value="arch_e1_l">Arch E1 Landscape — 42×30"</option>
+      <option value="arch_e1_p">Arch E1 Portrait — 30×42"</option>
+      <option value="arch_e_l">Arch E Landscape — 48×36"</option>
+      <option value="arch_e_p">Arch E Portrait — 36×48"</option>
+    </optgroup>
+    <optgroup label="STANDARD DETAIL">
+      <option value="aws_d1_l">AWS D1 Landscape — 34×22"</option>
+      <option value="aws_d1_p">AWS D1 Portrait — 22×34"</option>
     </optgroup>
   </select>
+  <div class="kv-orient-row">
+    <button class="kv-orient-btn" data-orient="p" onclick="kvSetOrientation('p')" title="Portrait">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="3" width="12" height="18" rx="1"/></svg>
+      Portrait
+    </button>
+    <button class="kv-orient-btn" data-orient="l" onclick="kvSetOrientation('l')" title="Landscape">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="1"/></svg>
+      Landscape
+    </button>
+  </div>
 
   <!-- Layers -->
   <div class="section-head" style="font-size:10.5px;border:none;padding:6px 8px 3px;">LAYERS</div>
@@ -5026,6 +5149,12 @@ function applyUnitDisplay(unit) {
   if (dynLenUnit) dynLenUnit.textContent = unit;
   if (typeof updateDynBox==='function' && typeof getDynAnchor==='function') updateDynBox(getDynAnchor());
   updateGridLabel();
+  // KANVAS reads sheet trim in the same unit as the rest of the app. Nothing
+  // is converted in storage — the dropdown labels, the sheet tabs and the
+  // on-sheet callout are simply re-rendered from the millimetre values.
+  if (typeof kvRefreshPageOptions === 'function') kvRefreshPageOptions();
+  if (typeof kvBuildSheetTabs === 'function') kvBuildSheetTabs();
+  if (typeof kvScheduleDraw === 'function' && typeof kvActive !== 'undefined' && kvActive) kvScheduleDraw();
 }
 
 // Resets the offset/fillet/chamfer inputs to a sensible fixed default for
@@ -5379,6 +5508,147 @@ let rectState = { active:false, x1:0, y1:0 };
 
 // Polygon tool  (center+radius mode)
 let polyState = { active:false, cx:0, cy:0 };
+
+// ── DOCUMENT REVISION COUNTERS ────────────────────────────────────────────────
+// Change detection used to mean serialising the whole document every 600ms and
+// string-comparing it — doing the expensive thing to answer a cheap question.
+// These invert that: one integer per space, bumped on mutation, so an idle
+// session costs an integer compare and an active one serialises once per real
+// change. Two counters, not one, so a KANVAS mark doesn't force a resend of
+// model geometry or the reverse — which matters because ink is point-heavy
+// where model geometry is four numbers a line.
+let modelRev = 0, kanvasRev = 0;
+function markModelDirty()  { modelRev++;  scheduleCapture('model');  }
+function markKanvasDirty() { kanvasRev++; scheduleCapture('kanvas'); }
+
+// ── UNDO / REDO ───────────────────────────────────────────────────────────────
+// Both spaces previously "undid" by popping the last item off an array, with no
+// redo at all — so an undo was unrecoverable, and anything that edited an
+// object in place (trim, extend, fillet, stretch, move) could not be undone
+// because nothing had been removed to pop.
+//
+// This is snapshot-based rather than command-based. Snapshots are simple to
+// reason about and cannot drift out of sync with the engine the way a set of
+// hand-written inverse operations does — and every tool in KAD already routes
+// through one of two dirty marks, so there is exactly one place to hook.
+//
+// Capture is debounced: a burst of changes inside the window collapses into a
+// single step, which is what you want for a drag that modifies many objects.
+// Each space keeps its own stacks, matching the two-counter design.
+const UNDO_LIMIT = 80;
+const History = {
+  model:  { past: [], future: [], last: null, timer: null },
+  kanvas: { past: [], future: [], last: null, timer: null },
+};
+let _histSuspend = false;   // set while restoring, so a restore isn't recorded
+
+const _clone = o => (typeof structuredClone === 'function')
+  ? structuredClone(o) : JSON.parse(JSON.stringify(o));
+
+function snapshotOf(space) {
+  if (space === 'kanvas') {
+    return { strokes:_clone(KVM.strokes), dims:_clone(KVM.dims), welds:_clone(KVM.welds),
+             layers:_clone(KVM.layers), activeLayer:KVM.activeLayer, nextId:KVM.nextId };
+  }
+  return { objects:_clone(GeoMemory.objects), nextId:GeoMemory.nextId,
+           layers:_clone(LAYERS), activeLayer:activeLayer };
+}
+
+function restoreSnapshot(space, s) {
+  _histSuspend = true;
+  try {
+    if (space === 'kanvas') {
+      KVM.strokes = _clone(s.strokes); KVM.dims = _clone(s.dims); KVM.welds = _clone(s.welds);
+      KVM.layers  = _clone(s.layers);  KVM.activeLayer = s.activeLayer; KVM.nextId = s.nextId;
+      kvBuildLayerList();
+      if (typeof buildKvLayerDropdown === 'function' && kvActive) buildKvLayerDropdown();
+      kvRebuildEraseCanvas();
+      kvScheduleDraw();
+    } else {
+      GeoMemory.objects = _clone(s.objects);
+      GeoMemory.nextId  = s.nextId;
+      for (const k of Object.keys(LAYERS)) delete LAYERS[k];
+      Object.assign(LAYERS, _clone(s.layers));
+      activeLayer = s.activeLayer;
+      if (typeof selectedIds !== 'undefined') selectedIds.clear();
+      buildLayerPanel();
+      updateProps();
+      render();
+    }
+  } finally { _histSuspend = false; }
+}
+
+function scheduleCapture(space) {
+  if (_histSuspend) return;
+  // While a guest is connected the host owns the timeline. A guest recording
+  // its own snapshots would build a second, divergent history that undo could
+  // then walk into.
+  if (typeof kloudRole !== 'undefined' && kloudRole === 'guest') return;
+  const H = History[space];
+  if (!H) return;
+  clearTimeout(H.timer);
+  H.timer = setTimeout(() => captureHistory(space), 220);
+}
+
+function captureHistory(space) {
+  if (_histSuspend) return;
+  const H = History[space];
+  const snap = snapshotOf(space);
+  const sig  = JSON.stringify(snap);
+  if (H.last === null) { H.last = {snap, sig}; return; }   // first capture is the baseline
+  if (sig === H.last.sig) return;                          // dirty mark with no real change
+  H.past.push(H.last.snap);
+  if (H.past.length > UNDO_LIMIT) H.past.shift();
+  H.future.length = 0;                                     // a new edit forks the timeline
+  H.last = {snap, sig};
+}
+
+function undoSpace(space) {
+  // A guest asks; it does not act. The host is the single writer of history.
+  if (typeof kloudRole !== 'undefined' && kloudRole === 'guest'
+      && kloudConns.some(x => x.open)) return kloudRequestHistory('undo', space);
+  const H = History[space];
+  clearTimeout(H.timer);
+  captureHistory(space);          // fold in anything still inside the debounce window
+  if (!H.past.length) return false;
+  const current = snapshotOf(space);
+  H.future.push(current);
+  const prev = H.past.pop();
+  restoreSnapshot(space, prev);
+  H.last = {snap: prev, sig: JSON.stringify(prev)};
+  return true;
+}
+
+function redoSpace(space) {
+  if (typeof kloudRole !== 'undefined' && kloudRole === 'guest'
+      && kloudConns.some(x => x.open)) return kloudRequestHistory('redo', space);
+  const H = History[space];
+  clearTimeout(H.timer);
+  if (!H.future.length) return false;
+  const current = snapshotOf(space);
+  H.past.push(current);
+  const next = H.future.pop();
+  restoreSnapshot(space, next);
+  H.last = {snap: next, sig: JSON.stringify(next)};
+  return true;
+}
+
+// Loading a document starts a fresh timeline — the file is the new origin.
+function resetHistory(space) {
+  const H = History[space];
+  clearTimeout(H.timer);
+  H.past.length = 0; H.future.length = 0; H.last = null;
+  // KANVAS history lives per sheet, and History.kanvas only points at the
+  // active one — every other sheet would keep a timeline built against a
+  // document that no longer exists.
+  if (space === 'kanvas' && typeof KV_SHEETS !== 'undefined') {
+    for (const s of KV_SHEETS) {
+      if (!s.hist || s.hist === H) continue;
+      clearTimeout(s.hist.timer);
+      s.hist.past.length = 0; s.hist.future.length = 0; s.hist.last = null;
+    }
+  }
+}
 
 // Offset tool. selected/preview hold a tagged {kind:'line'|'circle'|'arc', ...}
 // — a plain LINE, one segment of a POLYLINE (read-only), or a CIRCLE/ARC.
@@ -5793,13 +6063,13 @@ function commitRect(x1,y1,x2,y2) {
   const by=Math.min(y1,y2), ty=Math.max(y1,y2);
   GeoMemory.addPolyline([
     {x:lx,y:by},{x:rx,y:by},{x:rx,y:ty},{x:lx,y:ty}
-  ], true); // closed
+  ], true, activeLayer||'Layer_0'); // closed
   showToast(`Rect ${fmtU(Math.abs(x2-x1))} × ${fmtU(Math.abs(y2-y1))}`);
 }
 
 function commitCircle(cx,cy,r) {
   if(r<1e-6){ showToast('Circle too small'); return; }
-  GeoMemory.addCircle(cx,cy,r);
+  GeoMemory.addCircle(cx,cy,r,activeLayer||'Layer_0');
   showToast('Circle r='+fmtU(r));
 }
 
@@ -5818,7 +6088,7 @@ function commitPolygon(cx,cy,px,py) {
     const a=startAngle+i*(2*Math.PI/n);
     pts.push({x:parseFloat((cx+vr*Math.cos(a)).toFixed(6)), y:parseFloat((cy+vr*Math.sin(a)).toFixed(6))});
   }
-  GeoMemory.addPolyline(pts, true); // always closed
+  GeoMemory.addPolyline(pts, true, activeLayer||'Layer_0'); // always closed
   showToast(`${n}-gon r=${fmtU(r)}`);
 }
 
@@ -5922,7 +6192,9 @@ function joinSelected() {
     const closed = Math.hypot(head.x-tail2.x, head.y-tail2.y) < SNAP_TOL;
     if(closed) chainPts.pop(); // remove duplicate closing point
 
-    chains.push({pts:chainPts, closed});
+    // Carry the seed lines layer so the joined polyline inherits it
+    // rather than silently landing on the active layer.
+    chains.push({pts:chainPts, closed, layer: startLn.layer});
   }
 
   // Remove original lines, add polylines
@@ -5931,7 +6203,7 @@ function joinSelected() {
 
   for(const ch of chains) {
     if(ch.pts.length < 2) continue;
-    const pl = GeoMemory.addPolyline(ch.pts, ch.closed);
+    const pl = GeoMemory.addPolyline(ch.pts, ch.closed, (ch.layer || activeLayer || 'Layer_0'));
     selectedIds.add(pl.id);
   }
 
@@ -7371,7 +7643,7 @@ function onMouseDown(e) {
         const midA  =Math.atan2(arcState.p2.y-cy,arcState.p2.x-cx);
         const endA  =Math.atan2(wp.y-cy,wp.x-cx);
         const ccw=angleOnArc(normAngle(midA),normAngle(startA),normAngle(endA),true);
-        GeoMemory.addArc(cx,cy,r,startA,endA,ccw);
+        GeoMemory.addArc(cx,cy,r,startA,endA,ccw,activeLayer||'Layer_0');
         showToast('Arc r='+fmtU(r));arcState={active:false,phase:0,p1:null,p2:null};
         resetDynBox();
       }
@@ -7792,8 +8064,14 @@ function onKeyDown(e) {
     if(k==='c'){ e.preventDefault(); copySelected(); }
     if(k==='v'){ e.preventDefault(); pasteSelected(); }
     if(k==='d'){ e.preventDefault(); copySelected(); _pasteCount=0; pasteSelected(); }
-    if(k==='z'){ e.preventDefault(); if(typeof undo==='function') undo(); }
-    if(k==='y'){ e.preventDefault(); if(typeof redo==='function') redo(); }
+    // These were guarded on a function named `undo` that was never defined
+    // anywhere, so Ctrl+Z and Ctrl+Y in model space have always been silent
+    // no-ops. They route through the space adapter now, which means they also
+    // do the right thing if the shortcut fires while KANVAS is in front.
+    if(k==='z'){ e.preventDefault();
+      if(e.shiftKey) { if(!SPACE().redo()) showToast('Nothing to redo'); }
+      else           { if(!SPACE().undo()) showToast('Nothing to undo'); } }
+    if(k==='y'){ e.preventDefault(); if(!SPACE().redo()) showToast('Nothing to redo'); }
   }
 }
 
@@ -9454,6 +9732,23 @@ function commitDxfImport() {
   closeDxfDialog();
   if (mergeSel === 'replace') GeoMemory.clear();
 
+  // Create any layer the file references but the session doesn't have.
+  // Without this every imported entity resolved through getLayer()'s
+  // Layer_0 fallback and the file's layer structure was lost on arrival.
+  const seen = new Set();
+  for (const e of [...parsed.lines, ...parsed.circles, ...parsed.arcs]) {
+    if (e.layer) seen.add(e.layer);
+  }
+  for (const name of seen) {
+    if (LAYERS[name]) continue;
+    // Shape must match the built-in layers exactly: ltype keys into LINETYPES
+    // and those keys are lowercase, so 'CONTINUOUS' would resolve to undefined
+    // and take the dash pattern down with it. locked is required by the DXF
+    // layer-table writer.
+    LAYERS[name] = { name, color:'#7fb0c8', ltype:'continuous', weight:2.0, visible:true, locked:false };
+  }
+  if (seen.size) buildLayerPanel();
+
   const { lines, circles, arcs } = parsed;
 
   for (const ln of lines) {
@@ -9464,20 +9759,18 @@ function commitDxfImport() {
     );
   }
   for (const c of circles) {
-    for (const seg of tessellateCircle(c.cx*S, c.cy*S, c.r*S, c.layer))
-      GeoMemory.addLine(seg.x1, seg.y1, seg.x2, seg.y2, seg.layer);
+    GeoMemory.addCircle(c.cx*S, c.cy*S, c.r*S, c.layer || 'Layer_0');
   }
   for (const a of arcs) {
-    for (const seg of tessellateArc(a.cx*S, a.cy*S, a.r*S, a.startA, a.endA, a.layer))
-      GeoMemory.addLine(seg.x1, seg.y1, seg.x2, seg.y2, seg.layer);
+    // DXF group 50/51 are DEGREES and always run counter-clockwise from
+    // start to end, which is why ccw is unconditionally true here.
+    GeoMemory.addArc(a.cx*S, a.cy*S, a.r*S,
+                     a.startA*Math.PI/180, a.endA*Math.PI/180, true,
+                     a.layer || 'Layer_0');
   }
 
-  render();
-  for(const o of _dxfParsed.arcs){
-    const startA=o.startA*Math.PI/180,endA=o.endA*Math.PI/180;
-    GeoMemory.addArc(o.cx*S,o.cy*S,o.r*S,startA,endA,true,o.layer);
-  }
   zoomExtents();
+  render();
 
   const unitLabel = unitSel==='auto'
     ? (S===25.4 ? 'inches (file header)' : S===1 ? 'mm (file header)' : `×${S} (file header)`)
@@ -9564,9 +9857,32 @@ function buildDXF(objects, units) {
         '43','0.0');                 // constant width
       for(const p of o.pts){ lines.push('10',f(p.x),'20',f(p.y)); }
     }
+    if(o.type==='CIRCLE')
+      lines.push('0','CIRCLE','8',o.layer,'10',f(o.cx),'20',f(o.cy),'30','0.0000','40',f(o.r));
+    if(o.type==='ARC'){
+      // DXF arcs are defined counter-clockwise from group 50 to group 51, in
+      // DEGREES. GeoMemory stores radians and carries an explicit ccw flag, so
+      // a clockwise arc has to be emitted with its endpoints swapped — writing
+      // the raw angles would silently invert the sweep.
+      const deg = a => f((a * 180 / Math.PI + 360) % 360);
+      const s = o.ccw ? o.startA : o.endA;
+      const e = o.ccw ? o.endA   : o.startA;
+      lines.push('0','ARC','8',o.layer,'10',f(o.cx),'20',f(o.cy),'30','0.0000',
+                 '40',f(o.r),'50',deg(s),'51',deg(e));
+    }
+    if(o.type==='TEXT')
+      lines.push('0','TEXT','8',o.layer,'10',f(o.x),'20',f(o.y),'30','0.0000',
+                 '40',f(o.height||5),'1',String(o.text==null?'':o.text));
   }
   lines.push('0','ENDSEC','0','EOF');
   return lines.join('\n');
+}
+
+// DXF has no simple representation for KAD's DIM records, so they are the one
+// type deliberately left out. Counting them lets the export say so instead of
+// quietly losing them.
+function dxfSkippedCount(objects) {
+  return objects.filter(o => o.type === 'DIM').length;
 }
 
 // ── MIRROR TOOL ─────────────────────────────────────────
@@ -9675,18 +9991,120 @@ function updateMeasureDisplay(p1, p2) {
 }
 
 // ── FILE I/O ────────────────────────────────────────────
-function saveKAD() { downloadText(GeoMemory.serialize(),'drawing.kad','application/json'); showToast('Saved drawing.kad'); }
+// ══ .kad — THE WHOLE PROGRAM ══════════════════════════════════════════════════
+// .kad used to hold model geometry and nothing else: no KANVAS sheet, and —
+// less obviously — no model layer table. Since getLayer() falls back to
+// LAYERS['Layer_0'] for unknown names, reopening a drawing that used custom
+// layers silently collapsed every object onto the default layer's colour,
+// linetype and weight. The geometry survived; the layers didn't.
+//
+// It is now the container for the entire program state, the way a .dwg holds
+// modelspace and its paper layouts together. .kvs remains a first-class
+// KANVAS-only export — the sheet on its own, for handing to someone who only
+// needs the annotation — and still opens in the KANVAS tab. Neither the
+// .kad→.dxf nor the .kvs→.svg mapping changes; this only makes the native
+// format richer than either interchange target, which is the point of a
+// native format.
+const KAD_DOC_VERSION = '2.0';
+const KAD_MIME = 'application/octet-stream';   // keeps the OS from appending .json
+
+function serializeDocument() {
+  return JSON.stringify({
+    format: 'KAD',
+    version: KAD_DOC_VERSION,
+    generator: 'KAD',
+    saved: new Date().toISOString(),
+    displayUnits: unitMode,
+    model: {
+      units: 'mm',
+      nextId: GeoMemory.nextId,
+      objects: GeoMemory.objects,
+      layers: LAYERS,            // the piece that was being lost
+      activeLayer: activeLayer,
+    },
+    // Whole-drawing KANVAS state: every sheet. .kvs is the single-sheet
+    // export; .kad is the only thing that carries the complete program.
+    kanvas: kvSheetsPayload(),
+  }, null, 2);
+}
+
+// Returns true if either space holds work, so callers know whether opening a
+// file would destroy something.
+function documentHasContent() {
+  return (GeoMemory.objects.length > 0) ||
+         (KVM.strokes.length + KVM.dims.length + KVM.welds.length > 0);
+}
+
+function deserializeDocument(text) {
+  let d;
+  try { d = JSON.parse(text); } catch (e) { return false; }
+  if (!d) return false;
+
+  // v0 files are a flat model-only shape. Detect and load them as such rather
+  // than rejecting drawings made before the container existed.
+  if (!d.format && Array.isArray(d.objects)) {
+    const ok = GeoMemory.deserialize(text);
+    if (ok) { buildLayerPanel(); render(); }
+    return ok;
+  }
+  if (d.format !== 'KAD') return false;
+
+  const m = d.model || {};
+  GeoMemory.objects = Array.isArray(m.objects) ? m.objects : [];
+  GeoMemory.nextId  = m.nextId || (GeoMemory.objects.reduce((x,o)=>Math.max(x,o.id||0),0) + 1);
+  // Replace the layer table wholesale: a document should open as it was saved,
+  // not blended with whatever the current session happened to define.
+  if (m.layers && typeof m.layers === 'object' && Object.keys(m.layers).length) {
+    for (const k of Object.keys(LAYERS)) delete LAYERS[k];
+    Object.assign(LAYERS, m.layers);
+  }
+  activeLayer = (m.activeLayer && LAYERS[m.activeLayer]) ? m.activeLayer
+              : (Object.keys(LAYERS)[0] || 'Layer_0');
+
+  if (d.kanvas) kvRestoreSheets(d.kanvas);
+  if (d.displayUnits && d.displayUnits !== unitMode) toggleUnits();
+
+  buildLayerPanel();
+  setActiveLayer(activeLayer);
+  updateProps();
+  render();
+  // The opened file is the new origin — undo must not walk back into the
+  // document that was on screen before it.
+  resetHistory('model'); resetHistory('kanvas');
+  markModelDirty(); markKanvasDirty();
+  return true;
+}
+
+function saveKAD() {
+  downloadText(serializeDocument(), 'drawing.kad', KAD_MIME);
+  showToast('Saved drawing.kad · model + KANVAS');
+}
 function loadKAD(event) {
   const file=event.target.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=e=>{ const ok=GeoMemory.deserialize(e.target.result); ok?render():null; showToast(ok?`Loaded ${file.name}`:'Invalid .kad'); event.target.value=''; };
+  reader.onload=e=>{
+    // Opening replaces the whole program state — both spaces — so it asks
+    // first whenever there is anything to lose.
+    if (documentHasContent() &&
+        !confirm('Open ' + file.name + '?\n\nThis replaces everything currently open in Model Space and KANVAS.')) {
+      event.target.value=''; return;
+    }
+    const ok=deserializeDocument(e.target.result);
+    showToast(ok?`Loaded ${file.name}`:'Invalid .kad');
+    event.target.value='';
+  };
   reader.readAsText(file);
 }
 function exportDXF() {
   const objs=GeoMemory.objects;
   if(!objs.length){ showToast('No geometry to export'); return; }
   downloadText(buildDXF(objs, unitMode),'drawing.dxf','text/plain');
-  showToast(`Exported ${objs.length} entities (${unitMode})`);
+  // Report what was actually written, not the object count — the old message
+  // claimed entities the writer had skipped.
+  const skipped = dxfSkippedCount(objs);
+  showToast(skipped
+    ? `Exported ${objs.length - skipped} entities (${unitMode}) · ${skipped} dimension${skipped>1?'s':''} not supported by DXF`
+    : `Exported ${objs.length} entities (${unitMode})`);
 }
 
 // ── SCAD EXPORT ─────────────────────────────────────────
@@ -9903,6 +10321,7 @@ function newDocument() {
 
 // ── UI HELPERS ──────────────────────────────────────────
 function updateProps() {
+  markModelDirty();   // single choke point for every GeoMemory mutation
   const lines    = GeoMemory.objects.filter(o=>o.type==='LINE').length;
   const polys    = GeoMemory.objects.filter(o=>o.type==='POLYLINE').length;
   const arcs2=GeoMemory.objects.filter(o=>o.type==='ARC'||o.type==='CIRCLE').length;
@@ -10021,7 +10440,7 @@ function commitChamfer(line1Id, line2Id) {
   }
   trimLine(o1, cp1, ip);
   trimLine(o2, cp2, ip);
-  GeoMemory.addLine(cp1.x, cp1.y, cp2.x, cp2.y);
+  GeoMemory.addLine(cp1.x, cp1.y, cp2.x, cp2.y, (o1.layer || activeLayer || 'Layer_0'));
   render();
   showToast(`Chamfer ${fmtU(d)} applied`);
 }
@@ -10103,9 +10522,38 @@ let kvCssW = 0, kvCssH = 0;   // CSS-pixel canvas extents (see kvResizeCanvas)
 // sheet and no drawing scale existed. KV_VIEW is the viewport: a scale
 // factor plus a page-space offset, making KANVAS a real paperspace where
 // the sheet is the sheet and the model is placed on it at a stated ratio.
-const KV_VIEW = { scale: 1, ox: 20, oy: 20, show: true };
+const KV_VIEW = { scale: 1, ox: 20, oy: 20, show: true, rot: 0 };  // rot: 0|90|180|270
 // Ratios a drafter actually calls out, largest first.
 const KV_SCALES = [1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 2, 5];
+// ── SHEET SIZE, SHOWN IN THE UNIT YOU THINK IN ────────────────────────────────
+// Page trim is STORED in millimetres and stays that way — it is the honest
+// unit for paper, every ISO size is defined in it, and converting the stored
+// value on a unit toggle would accumulate rounding on a number that should
+// never drift. This only formats it for reading. A3 is 297×420 to someone
+// working metric and 11.7×16.5 to someone working in inches; it is the same
+// sheet either way.
+function kvPageDim(p) {
+  if (!p) return '';
+  const trim = v => {
+    const s = v.toFixed(unitMode === 'in' ? 2 : 1);
+    return s.replace(/\.?0+$/, '');
+  };
+  const w = toDisplay(p.w), h = toDisplay(p.h);
+  return trim(w) + '\u00d7' + trim(h) + (unitMode === 'in' ? '"' : ' mm');
+}
+
+// The page dropdown is static markup, so its option text has to be rewritten
+// when the unit changes. Values are keys into KV_PAGE_SIZES, so the labels can
+// be rebuilt from the table without storing anything on the elements.
+function kvRefreshPageOptions() {
+  const sel = document.querySelector('.kv-page-sel');
+  if (!sel) return;
+  for (const opt of sel.options) {
+    const p = KV_PAGE_SIZES[opt.value];
+    if (p) opt.textContent = p.label + ' \u2014 ' + kvPageDim(p);
+  }
+}
+
 function kvScaleLabel(s) {
   if (Math.abs(s - 1) < 1e-9) return '1:1';
   return s < 1 ? ('1:' + Math.round(1/s)) : (Math.round(s) + ':1');
@@ -10114,7 +10562,17 @@ function kvScaleLabel(s) {
 // layer draws goes through this pair, so changing scale moves the whole
 // underlay coherently instead of per-primitive.
 function kvModelToPage(mx, my) {
-  return { x: KV_VIEW.ox + mx * KV_VIEW.scale, y: KV_VIEW.oy + my * KV_VIEW.scale };
+  const sx = mx * KV_VIEW.scale, sy = my * KV_VIEW.scale;
+  // The underlay turns with the sheet. Without this the annotations would
+  // rotate off the geometry they point at.
+  let rx, ry;
+  switch (KV_VIEW.rot) {
+    case 90:  rx =  sy; ry = -sx; break;
+    case 180: rx = -sx; ry = -sy; break;
+    case 270: rx = -sy; ry =  sx; break;
+    default:  rx =  sx; ry =  sy;
+  }
+  return { x: KV_VIEW.ox + rx, y: KV_VIEW.oy + ry };
 }
 function kvM2S(mx, my) { const p = kvModelToPage(mx, my); return kvW2S(p.x, p.y); }
 // Model length → screen length (scale AND page zoom, in that order).
@@ -10149,45 +10607,83 @@ function kvFitViewport() {
   const margin = 15;
   const availW = KV_PAGE.w - margin*2, availH = KV_PAGE.h - margin*2;
   const needW = Math.max(1e-6, m.x2-m.x1), needH = Math.max(1e-6, m.y2-m.y1);
-  const raw = Math.min(availW/needW, availH/needH);
+  // With the viewport turned a quarter, the model's width spans the sheet's
+  // height — swap the demands before fitting or a fit on a turned sheet
+  // silently under-scales.
+  const turned = (KV_VIEW.rot === 90 || KV_VIEW.rot === 270);
+  const fitW = turned ? needH : needW, fitH = turned ? needW : needH;
+  const raw = Math.min(availW/fitW, availH/fitH);
   const fit = KV_SCALES.filter(s => s <= raw).sort((a,b)=>b-a)[0] || Math.min(...KV_SCALES);
   KV_VIEW.scale = fit;
-  KV_VIEW.ox = (KV_PAGE.w - needW*fit)/2 - m.x1*fit;
-  KV_VIEW.oy = (KV_PAGE.h - needH*fit)/2 - m.y1*fit;
+  // Place the model origin so the rotated bounding box lands centred.
+  const cx = (KV_PAGE.w - fitW*fit)/2, cy = (KV_PAGE.h - fitH*fit)/2;
+  switch (KV_VIEW.rot) {
+    case 90:  KV_VIEW.ox = cx - m.y1*fit;            KV_VIEW.oy = cy + fitH*fit + m.x1*fit; break;
+    case 180: KV_VIEW.ox = cx + fitW*fit + m.x1*fit; KV_VIEW.oy = cy + fitH*fit + m.y1*fit; break;
+    case 270: KV_VIEW.ox = cx + fitW*fit + m.y1*fit; KV_VIEW.oy = cy - m.x1*fit;            break;
+    default:  KV_VIEW.ox = cx - m.x1*fit;            KV_VIEW.oy = cy - m.y1*fit;
+  }
   kvScheduleDraw();
   showToast('Viewport fitted · ' + kvScaleLabel(fit));
 }
 let kvDimStd      = 'asme';   // 'ansi'|'asme'|'aws'|'arch'
-let kvDimState    = {active:false, p1:null, p2:null, offset:0};
+let kvDimState    = {active:false, p1:null, p2:null, offset:0, phase:0};
 let kvWeldState   = {active:false, p1:null, p2:null};
 
 // ── KV PAGE SYSTEM ───────────────────────────────────────────────────────────
+// Every preset carries its orientation and the key of its opposite, so
+// flipping a sheet is a lookup rather than string surgery on the key name.
+// `key` is stored on the object because KV_PAGE holds a CLONE (see
+// kvSetPageSize) — identity comparison against this table would fail.
 const KV_PAGE_SIZES = {
-  // ISO
-  a4p:{w:210,h:297,label:'A4 Portrait',dim:'210×297 mm',unit:'mm'},
-  a4l:{w:297,h:210,label:'A4 Landscape',dim:'297×210 mm',unit:'mm'},
-  a3p:{w:297,h:420,label:'A3 Portrait',dim:'297×420 mm',unit:'mm'},
-  a3l:{w:420,h:297,label:'A3 Landscape',dim:'420×297 mm',unit:'mm'},
-  a2p:{w:420,h:594,label:'A2 Portrait',dim:'420×594 mm',unit:'mm'},
-  a2l:{w:594,h:420,label:'A2 Landscape',dim:'594×420 mm',unit:'mm'},
-  a1p:{w:594,h:841,label:'A1 Portrait',dim:'594×841 mm',unit:'mm'},
-  a1l:{w:841,h:594,label:'A1 Landscape',dim:'841×594 mm',unit:'mm'},
-  // ANSI/US Engineering
-  ansi_a_p:{w:215.9,h:279.4,label:'ANSI A 8.5×11',dim:'8.5×11 in',unit:'in'},
-  ansi_a_l:{w:279.4,h:215.9,label:'ANSI A 11×8.5',dim:'11×8.5 in',unit:'in'},
-  ansi_b:  {w:279.4,h:431.8,label:'ANSI B 11×17', dim:'11×17 in', unit:'in'},
-  ansi_c:  {w:431.8,h:558.8,label:'ANSI C 17×22', dim:'17×22 in', unit:'in'},
-  ansi_d:  {w:558.8,h:863.6,label:'ANSI D 22×34', dim:'22×34 in', unit:'in'},
-  ansi_e:  {w:863.6,h:1117.6,label:'ANSI E 34×44',dim:'34×44 in', unit:'in'},
-  // Architectural
-  arch_b:  {w:304.8,h:457.2,label:'Arch B 12×18', dim:'12×18 in', unit:'in'},
-  arch_c:  {w:457.2,h:609.6,label:'Arch C 18×24', dim:'18×24 in', unit:'in'},
-  arch_d:  {w:609.6,h:914.4,label:'Arch D 24×36', dim:'24×36 in', unit:'in'},
-  arch_e:  {w:914.4,h:1219.2,label:'Arch E 36×48',dim:'36×48 in', unit:'in'},
-  // AWS D1 Structural
-  aws_d1:  {w:558.8,h:863.6,label:'AWS D1 22×34', dim:'22×34 in', unit:'in'},
+  // ── ISO 216 (metric) ──
+  a4p:{key:'a4p',w:210,h:297,label:'A4 Portrait',dim:'210×297 mm',unit:'mm',orient:'p',pair:'a4l',family:'A4'},
+  a4l:{key:'a4l',w:297,h:210,label:'A4 Landscape',dim:'297×210 mm',unit:'mm',orient:'l',pair:'a4p',family:'A4'},
+  a3p:{key:'a3p',w:297,h:420,label:'A3 Portrait',dim:'297×420 mm',unit:'mm',orient:'p',pair:'a3l',family:'A3'},
+  a3l:{key:'a3l',w:420,h:297,label:'A3 Landscape',dim:'420×297 mm',unit:'mm',orient:'l',pair:'a3p',family:'A3'},
+  a2p:{key:'a2p',w:420,h:594,label:'A2 Portrait',dim:'420×594 mm',unit:'mm',orient:'p',pair:'a2l',family:'A2'},
+  a2l:{key:'a2l',w:594,h:420,label:'A2 Landscape',dim:'594×420 mm',unit:'mm',orient:'l',pair:'a2p',family:'A2'},
+  a1p:{key:'a1p',w:594,h:841,label:'A1 Portrait',dim:'594×841 mm',unit:'mm',orient:'p',pair:'a1l',family:'A1'},
+  a1l:{key:'a1l',w:841,h:594,label:'A1 Landscape',dim:'841×594 mm',unit:'mm',orient:'l',pair:'a1p',family:'A1'},
+  a0p:{key:'a0p',w:841,h:1189,label:'A0 Portrait',dim:'841×1189 mm',unit:'mm',orient:'p',pair:'a0l',family:'A0'},
+  a0l:{key:'a0l',w:1189,h:841,label:'A0 Landscape',dim:'1189×841 mm',unit:'mm',orient:'l',pair:'a0p',family:'A0'},
+  // ── US OFFICE ──
+  letter_l:{key:'letter_l',w:279.4,h:215.9,label:'Letter Landscape',dim:'11×8.5 in',unit:'in',orient:'l',pair:'letter_p',family:'Letter'},
+  letter_p:{key:'letter_p',w:215.9,h:279.4,label:'Letter Portrait',dim:'8.5×11 in',unit:'in',orient:'p',pair:'letter_l',family:'Letter'},
+  legal_l:{key:'legal_l',w:355.6,h:215.9,label:'Legal Landscape',dim:'14×8.5 in',unit:'in',orient:'l',pair:'legal_p',family:'Legal'},
+  legal_p:{key:'legal_p',w:215.9,h:355.6,label:'Legal Portrait',dim:'8.5×14 in',unit:'in',orient:'p',pair:'legal_l',family:'Legal'},
+  tabloid_l:{key:'tabloid_l',w:431.8,h:279.4,label:'Tabloid Landscape',dim:'17×11 in',unit:'in',orient:'l',pair:'tabloid_p',family:'Tabloid'},
+  tabloid_p:{key:'tabloid_p',w:279.4,h:431.8,label:'Tabloid Portrait',dim:'11×17 in',unit:'in',orient:'p',pair:'tabloid_l',family:'Tabloid'},
+  // ── ANSI ENGINEERING ──
+  ansi_a_l:{key:'ansi_a_l',w:279.4,h:215.9,label:'ANSI A Landscape',dim:'11×8.5 in',unit:'in',orient:'l',pair:'ansi_a_p',family:'ANSI A'},
+  ansi_a_p:{key:'ansi_a_p',w:215.9,h:279.4,label:'ANSI A Portrait',dim:'8.5×11 in',unit:'in',orient:'p',pair:'ansi_a_l',family:'ANSI A'},
+  ansi_b_l:{key:'ansi_b_l',w:431.8,h:279.4,label:'ANSI B Landscape',dim:'17×11 in',unit:'in',orient:'l',pair:'ansi_b_p',family:'ANSI B'},
+  ansi_b_p:{key:'ansi_b_p',w:279.4,h:431.8,label:'ANSI B Portrait',dim:'11×17 in',unit:'in',orient:'p',pair:'ansi_b_l',family:'ANSI B'},
+  ansi_c_l:{key:'ansi_c_l',w:558.8,h:431.8,label:'ANSI C Landscape',dim:'22×17 in',unit:'in',orient:'l',pair:'ansi_c_p',family:'ANSI C'},
+  ansi_c_p:{key:'ansi_c_p',w:431.8,h:558.8,label:'ANSI C Portrait',dim:'17×22 in',unit:'in',orient:'p',pair:'ansi_c_l',family:'ANSI C'},
+  ansi_d_l:{key:'ansi_d_l',w:863.6,h:558.8,label:'ANSI D Landscape',dim:'34×22 in',unit:'in',orient:'l',pair:'ansi_d_p',family:'ANSI D'},
+  ansi_d_p:{key:'ansi_d_p',w:558.8,h:863.6,label:'ANSI D Portrait',dim:'22×34 in',unit:'in',orient:'p',pair:'ansi_d_l',family:'ANSI D'},
+  ansi_e_l:{key:'ansi_e_l',w:1117.6,h:863.6,label:'ANSI E Landscape',dim:'44×34 in',unit:'in',orient:'l',pair:'ansi_e_p',family:'ANSI E'},
+  ansi_e_p:{key:'ansi_e_p',w:863.6,h:1117.6,label:'ANSI E Portrait',dim:'34×44 in',unit:'in',orient:'p',pair:'ansi_e_l',family:'ANSI E'},
+  // ── ARCHITECTURAL ──
+  arch_a_l:{key:'arch_a_l',w:304.8,h:228.6,label:'Arch A Landscape',dim:'12×9 in',unit:'in',orient:'l',pair:'arch_a_p',family:'Arch A'},
+  arch_a_p:{key:'arch_a_p',w:228.6,h:304.8,label:'Arch A Portrait',dim:'9×12 in',unit:'in',orient:'p',pair:'arch_a_l',family:'Arch A'},
+  arch_b_l:{key:'arch_b_l',w:457.2,h:304.8,label:'Arch B Landscape',dim:'18×12 in',unit:'in',orient:'l',pair:'arch_b_p',family:'Arch B'},
+  arch_b_p:{key:'arch_b_p',w:304.8,h:457.2,label:'Arch B Portrait',dim:'12×18 in',unit:'in',orient:'p',pair:'arch_b_l',family:'Arch B'},
+  arch_c_l:{key:'arch_c_l',w:609.6,h:457.2,label:'Arch C Landscape',dim:'24×18 in',unit:'in',orient:'l',pair:'arch_c_p',family:'Arch C'},
+  arch_c_p:{key:'arch_c_p',w:457.2,h:609.6,label:'Arch C Portrait',dim:'18×24 in',unit:'in',orient:'p',pair:'arch_c_l',family:'Arch C'},
+  arch_d_l:{key:'arch_d_l',w:914.4,h:609.6,label:'Arch D Landscape',dim:'36×24 in',unit:'in',orient:'l',pair:'arch_d_p',family:'Arch D'},
+  arch_d_p:{key:'arch_d_p',w:609.6,h:914.4,label:'Arch D Portrait',dim:'24×36 in',unit:'in',orient:'p',pair:'arch_d_l',family:'Arch D'},
+  arch_e1_l:{key:'arch_e1_l',w:1066.8,h:762.0,label:'Arch E1 Landscape',dim:'42×30 in',unit:'in',orient:'l',pair:'arch_e1_p',family:'Arch E1'},
+  arch_e1_p:{key:'arch_e1_p',w:762.0,h:1066.8,label:'Arch E1 Portrait',dim:'30×42 in',unit:'in',orient:'p',pair:'arch_e1_l',family:'Arch E1'},
+  arch_e_l:{key:'arch_e_l',w:1219.2,h:914.4,label:'Arch E Landscape',dim:'48×36 in',unit:'in',orient:'l',pair:'arch_e_p',family:'Arch E'},
+  arch_e_p:{key:'arch_e_p',w:914.4,h:1219.2,label:'Arch E Portrait',dim:'36×48 in',unit:'in',orient:'p',pair:'arch_e_l',family:'Arch E'},
+  // AWS D1 structural detail sheet — same trim as ANSI D, kept as a named
+  // preset because welding shops call it out by standard, not by size.
+  aws_d1_l:{key:'aws_d1_l',w:863.6,h:558.8,label:'AWS D1 Landscape',dim:'34×22 in',unit:'in',orient:'l',pair:'aws_d1_p',family:'AWS D1'},
+  aws_d1_p:{key:'aws_d1_p',w:558.8,h:863.6,label:'AWS D1 Portrait',dim:'22×34 in',unit:'in',orient:'p',pair:'aws_d1_l',family:'AWS D1'},
 };
-let KV_PAGE = KV_PAGE_SIZES.a3p;
+let KV_PAGE = {...KV_PAGE_SIZES.a3p};   // clone — see kvSetPageSize
 
 // Scale: how many pixels per mm in KANVAS (separate from KAD cam.zoom)
 let kvZoom = 2.5;
@@ -10287,6 +10783,7 @@ function kvToggleLayerVis(name) {
   const lay = KVM.layerOf(name);
   if (!lay) return;
   lay.visible = !lay.visible;
+  markKanvasDirty();   // layer visibility is document state, not view state
   kvBuildLayerList();
   if (typeof buildKvLayerDropdown === 'function') buildKvLayerDropdown();
   kvRebuildEraseCanvas();
@@ -10417,6 +10914,59 @@ function kvDrawLinearDim(ctx, p1w, p2w, offsetMM, label) {
   ctx.fillStyle = style.color;
   ctx.fillText(displayLabel, 0, -(style.lineWidth * kvZoom * 0.5 + 2));
   ctx.restore();
+  ctx.restore();
+}
+
+// Angular dimension: vertex plus two rays, arc drawn across the included
+// angle. Always annotates the SMALLER included angle — the reflex side is
+// almost never what a drafter means, and picking it silently would misread
+// the drawing.
+function kvDrawAngleDim(ctx, vertex, pa, pb, label) {
+  const style = DIM_STYLES[kvDimStd];
+  const vs = kvW2S(vertex.x, vertex.y);
+  let a1 = Math.atan2(pa.y - vertex.y, pa.x - vertex.x);
+  let a2 = Math.atan2(pb.y - vertex.y, pb.x - vertex.x);
+  let sweep = a2 - a1;
+  while (sweep >  Math.PI) sweep -= 2*Math.PI;
+  while (sweep < -Math.PI) sweep += 2*Math.PI;
+  const degVal = Math.abs(sweep) * 180 / Math.PI;
+
+  const rA = Math.hypot(pa.x - vertex.x, pa.y - vertex.y);
+  const rB = Math.hypot(pb.x - vertex.x, pb.y - vertex.y);
+  const rMM = Math.max(6, Math.min(rA, rB) * 0.65);
+  const rPx = rMM * kvZoom;
+
+  ctx.save();
+  ctx.strokeStyle = style.color;
+  ctx.fillStyle   = style.color;
+  ctx.lineWidth   = 1;
+
+  // Extension rays out to the arc.
+  for (const p of [pa, pb]) {
+    const ps = kvW2S(p.x, p.y);
+    ctx.beginPath(); ctx.moveTo(vs.x, vs.y); ctx.lineTo(ps.x, ps.y);
+    ctx.setLineDash([3,3]); ctx.globalAlpha = 0.55; ctx.stroke();
+    ctx.setLineDash([]);    ctx.globalAlpha = 1;
+  }
+
+  // The arc itself. Screen Y is inverted relative to page Y, so the angles
+  // are negated — the same flip kvW2S applies to positions.
+  ctx.beginPath();
+  ctx.arc(vs.x, vs.y, rPx, -a1, -(a1 + sweep), sweep > 0);
+  ctx.stroke();
+
+  const midA = a1 + sweep/2;
+  const tp = {x: vs.x + (rPx + 10)*Math.cos(midA), y: vs.y - (rPx + 10)*Math.sin(midA)};
+  const txt = label || (degVal.toFixed(degVal < 10 ? 2 : 1) + '\u00B0');
+  ctx.font = `${style.textSize || 11}px 'JetBrains Mono', monospace`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const w = ctx.measureText(txt).width;
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.fillRect(tp.x - w/2 - 2, tp.y - 7, w + 4, 14);
+  ctx.restore();
+  ctx.fillStyle = style.color;
+  ctx.fillText(txt, tp.x, tp.y);
   ctx.restore();
 }
 
@@ -10722,6 +11272,8 @@ function kvRender() {
       kvDrawLinearDim(ctx, d.p1, d.p2, d.offset || 10, d.label);
     } else if (d.type === 'radial') {
       kvDrawRadialDim(ctx, d.center, d.radius, d.label);
+    } else if (d.type === 'angle' && d.vertex && d.pa && d.pb) {
+      kvDrawAngleDim(ctx, d.vertex, d.pa, d.pb, d.label);
     }
   }
 
@@ -10757,7 +11309,7 @@ function kvRender() {
   ctx.save();
   ctx.font = `500 9px 'JetBrains Mono', monospace`;
   ctx.fillStyle = 'rgba(0,212,255,0.5)';
-  ctx.fillText(`${KV_PAGE.label} · ${KV_PAGE.dim} · ${DIM_STYLES[kvDimStd].label}`, o.x + 4, o.y - 6);
+  ctx.fillText(`${KV_PAGE.label} · ${kvPageDim(KV_PAGE)} · ${DIM_STYLES[kvDimStd].label}`, o.x + 4, o.y - 6);
   ctx.restore();
 }
 
@@ -10769,6 +11321,13 @@ function kvDrawToolPreview(ctx) {
   // Dimension preview
   if (kvTool === 'dim-linear' && kvDimState.active && kvDimState.p1) {
     kvDrawLinearDim(ctx, kvDimState.p1, kvMouseWorld, 10, null);
+  }
+  if (kvTool === 'dim-angle' && kvDimState.active && kvDimState.p1) {
+    if (kvDimState.phase === 1) {
+      kvDrawAngleDim(ctx, kvDimState.p1, kvMouseWorld, kvMouseWorld, null);
+    } else if (kvDimState.phase === 2 && kvDimState.p2) {
+      kvDrawAngleDim(ctx, kvDimState.p1, kvDimState.p2, kvMouseWorld, null);
+    }
   }
   if (kvTool === 'dim-radial' && kvDimState.active && kvDimState.p1) {
     const dx = kvMouseWorld.x - kvDimState.p1.x;
@@ -10801,7 +11360,7 @@ function kvSetTool(t) {
   const weldRow = document.getElementById('kv-weld-row');
   if (dimRow)  dimRow.style.display  = t.startsWith('dim') ? 'flex' : 'none';
   if (weldRow) weldRow.style.display = t === 'weld'        ? 'flex' : 'none';
-  kvDimState  = {active:false, p1:null, p2:null, offset:10};
+  kvDimState  = {active:false, p1:null, p2:null, offset:10, phase:0};
   kvWeldState = {active:false, p1:null, p2:null};
   showToast({
     'select':       'SELECT — click to pick, drag to pan',
@@ -10949,10 +11508,27 @@ function kvOnDown(e) {
     if (!kvDimState.active) {
       kvDimState = {active:true, p1:{...kvMouseWorld}, p2:null, offset:10};
     } else {
+      markKanvasDirty();
       KVM.dims.push({id:KVM.nextId++, layer:KVM.activeLayer, type:'linear', p1:kvDimState.p1, p2:{...kvMouseWorld}, offset:10, label:null});
       kvDimState = {active:false, p1:null, p2:null, offset:10};
       kvScheduleDraw();
     }
+  } else if (kvTool === 'dim-angle') {
+    // Three clicks: vertex, first ray, second ray.
+    if (kvDimState.phase === 0) {
+      kvDimState = {active:true, p1:{...kvMouseWorld}, p2:null, offset:10, phase:1};
+      showToast('Angle: click the first ray');
+    } else if (kvDimState.phase === 1) {
+      kvDimState.p2 = {...kvMouseWorld};
+      kvDimState.phase = 2;
+      showToast('Angle: click the second ray');
+    } else {
+      markKanvasDirty();
+      KVM.dims.push({id:KVM.nextId++, layer:KVM.activeLayer, type:'angle',
+                     vertex:kvDimState.p1, pa:kvDimState.p2, pb:{...kvMouseWorld}, label:null});
+      kvDimState = {active:false, p1:null, p2:null, offset:10, phase:0};
+    }
+    kvScheduleDraw();
   } else if (kvTool === 'dim-radial') {
     if (!kvDimState.active) {
       kvDimState.active = true;
@@ -10960,6 +11536,7 @@ function kvOnDown(e) {
     } else {
       const dx = kvMouseWorld.x - kvDimState.p1.x;
       const dy = kvMouseWorld.y - kvDimState.p1.y;
+      markKanvasDirty();
       KVM.dims.push({id:KVM.nextId++, layer:KVM.activeLayer, type:'radial', center:kvDimState.p1, radius:Math.sqrt(dx*dx+dy*dy), label:null});
       kvDimState.active = false;
       kvScheduleDraw();
@@ -10968,6 +11545,7 @@ function kvOnDown(e) {
     if (!kvWeldState.active) {
       kvWeldState = {active:true, p1:{...kvMouseWorld}, p2:null};
     } else {
+      markKanvasDirty();
       KVM.welds.push({
         id:KVM.nextId++, layer:KVM.activeLayer,
         p1:kvWeldState.p1, p2:{...kvMouseWorld},
@@ -11162,6 +11740,7 @@ function kvInitDrawing() {
 // them — which is why the buffer is rebuilt in order rather than each
 // stroke being drawn straight to screen.
 function kvRebuildEraseCanvas() {
+  markKanvasDirty();   // every ink mutation passes through here
   if (!kvCanvas || !kvEraseC || !kvEraseCtx) return;
   kvEraseCtx.save();
   kvEraseCtx.setTransform(1, 0, 0, 1, 0, 0);
@@ -11300,7 +11879,15 @@ function kvRenderStroke(ctx, s) {
     ctx.font = `bold ${Math.round((s.size||10) * kvZoom * 0.5)}px 'JetBrains Mono', monospace`;
     ctx.fillStyle = s.color || '#ff3cac';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(s.text, sp.x, sp.y);
+    // Notes turn with the sheet. Screen Y runs opposite page Y, so the stored
+    // page-space angle is negated to rotate the right way on canvas.
+    if (s.rot) {
+      ctx.translate(sp.x, sp.y);
+      ctx.rotate(-s.rot * Math.PI / 180);
+      ctx.fillText(s.text, 0, 0);
+    } else {
+      ctx.fillText(s.text, sp.x, sp.y);
+    }
     ctx.restore();
   }
 }
@@ -11325,39 +11912,89 @@ const KVS_MIME    = 'application/octet-stream';  // stops the .json suffix
 // all three annotation stores, and a snapshot of the model geometry the
 // annotations were placed against — without which dimensions would lose the
 // thing they dimension.
+// ── .kvs — ONE SHEET ──────────────────────────────────────────────────────────
+// A .kvs is a single paperspace: one page, one viewport, one set of
+// annotations. It is the sheet you hand to someone who needs that sheet, and
+// opening one fills a single KANVAS tab. Whole-drawing state — every sheet,
+// plus the model — is the job of .kad, and only .kad.
 function kvSerialize() {
-  return JSON.stringify({
+  return JSON.stringify(kvSheetPayload(true), null, 2);
+}
+
+// The live sheet as a plain object. `withRef` attaches a snapshot of the model
+// geometry so a .kvs is legible on its own; the .kad container omits it,
+// because the real model sits alongside it in the same file.
+function kvSheetPayload(withRef) {
+  const p = {
     format: 'KVS',
     version: KVS_VERSION,
     generator: 'KAD KANVAS',
     saved: new Date().toISOString(),
     units: unitMode,
-    page: {
-      name: Object.keys(KV_PAGE_SIZES).find(k => KV_PAGE_SIZES[k] === KV_PAGE) || 'a3p',
-      w: KV_PAGE.w, h: KV_PAGE.h
-    },
-    viewport:    { scale: KV_VIEW.scale, ox: KV_VIEW.ox, oy: KV_VIEW.oy, show: KV_VIEW.show },
+    sheetName: (KV_SHEETS[kvSheetIdx] && KV_SHEETS[kvSheetIdx].name) || 'Sheet 1',
+    // Identified by its own key, not by identity against the preset table —
+    // KV_PAGE is a clone, so identity comparison would always have missed.
+    page: { name: KV_PAGE.key || 'a3p', w: KV_PAGE.w, h: KV_PAGE.h, orient: KV_PAGE.orient || 'p' },
+    // rot is part of the viewport, not decoration — omitting it would drop the
+    // sheet's rotation on save and reopen the drawing with the underlay turned
+    // away from the annotations that point at it.
+    viewport:    { scale: KV_VIEW.scale, ox: KV_VIEW.ox, oy: KV_VIEW.oy, show: KV_VIEW.show, rot: KV_VIEW.rot || 0 },
     dimStandard: kvDimStd,
+    grid:        kvShowGrid,
+    snap:        kvSnapEnabled,
+    brush:       { color:B.color, size:B.size, alpha:B.alpha },
     activeLayer: KVM.activeLayer,
     nextId:      KVM.nextId,
     layers:      KVM.layers,
     strokes:     KVM.strokes,
     dims:        KVM.dims,
     welds:       KVM.welds,
-    modelRef:    { role:'kad-reference', locked:true, units:unitMode, objects:GeoMemory.objects }
-  }, null, 2);
+  };
+  if (withRef) p.modelRef = { role:'kad-reference', locked:true, units:unitMode, objects:GeoMemory.objects };
+  return p;
 }
 
+// Every sheet, for the .kad container. No modelRef: the model is a sibling
+// key in that file, so duplicating it per sheet would bloat it for nothing.
+function kvSheetsPayload() {
+  kvCommitSheetState();
+  return {
+    activeSheet: kvSheetIdx,
+    sheets: KV_SHEETS.map(s => ({
+      name: s.name, page: s.page, view: s.view, dimStd: s.dimStd,
+      strokes: s.mem.strokes, dims: s.mem.dims, welds: s.mem.welds,
+      layers: s.mem.layers, activeLayer: s.mem.activeLayer, nextId: s.mem.nextId
+    })),
+    grid: kvShowGrid, snap: kvSnapEnabled,
+    brush: { color:B.color, size:B.size, alpha:B.alpha },
+  };
+}
+
+// Applies one sheet's worth of data to whatever tab is currently active.
+// Deliberately does NOT touch KV_SHEETS: opening a .kvs fills one tab, it
+// never restructures the drawing.
 function kvDeserialize(text) {
   let d;
-  try { d = JSON.parse(text); } catch (e) { return false; }
+  try { d = (typeof text === 'string') ? JSON.parse(text) : text; } catch (e) { return false; }
   if (!d || (d.format !== 'KVS' && d.source !== 'KAD KANVAS')) return false;  // .vad files still load
 
-  if (d.page && KV_PAGE_SIZES[d.page.name]) kvSetPage(d.page.name);
-  else if (d.page && d.page.w) { KV_PAGE.w = d.page.w; KV_PAGE.h = d.page.h; }
+  kvEnsureSheets();
 
+  if (d.page && KV_PAGE_SIZES[d.page.name]) KV_PAGE = {...KV_PAGE_SIZES[d.page.name]};
+  else if (d.page && d.page.w) {
+    const o = d.page.orient || (d.page.w > d.page.h ? 'l' : 'p');
+    KV_PAGE = {key:null, label:'Custom', dim:d.page.w+'\u00d7'+d.page.h+' mm',
+               w:d.page.w, h:d.page.h, unit:'mm', orient:o, pair:null, family:'Custom'};
+  }
   if (d.viewport) Object.assign(KV_VIEW, d.viewport);
   if (d.dimStandard) kvDimStd = d.dimStandard;
+  if (typeof d.grid === 'boolean') kvShowGrid    = d.grid;
+  if (typeof d.snap === 'boolean') kvSnapEnabled = d.snap;
+  if (d.brush) {
+    if (d.brush.color) B.color = d.brush.color;
+    if (d.brush.size)  B.size  = d.brush.size;
+    if (d.brush.alpha != null) B.alpha = d.brush.alpha;
+  }
   if (Array.isArray(d.layers) && d.layers.length) KVM.layers = d.layers;
   KVM.strokes = Array.isArray(d.strokes) ? d.strokes : [];
   KVM.dims    = Array.isArray(d.dims)    ? d.dims    : [];
@@ -11368,16 +12005,73 @@ function kvDeserialize(text) {
     .reduce((m,o) => Math.max(m, o.id || 0), 0);
   KVM.nextId = Math.max(d.nextId || 1, maxId + 1);
 
+  // Reference geometry travels with a standalone sheet so it is legible on its
+  // own — but it must never overwrite a drawing already open. Adopted only
+  // into an empty model space, which is exactly the standalone case.
+  if (d.modelRef && Array.isArray(d.modelRef.objects) && d.modelRef.objects.length
+      && GeoMemory.objects.length === 0) {
+    GeoMemory.objects = d.modelRef.objects;
+    GeoMemory.nextId  = d.modelRef.objects.reduce((m,o)=>Math.max(m,o.id||0),0) + 1;
+    updateProps();
+    if (typeof render === 'function') render();
+    showToast('Sheet opened with its reference geometry');
+  }
+
+  // Fold the loaded data into the active sheet record and relabel that tab.
+  const sh = KV_SHEETS[kvSheetIdx];
+  if (sh && d.sheetName) sh.name = d.sheetName;
+  kvCommitSheetState();
+  kvSyncPageUI();
+  kvBuildSheetTabs();
   kvBuildLayerList();
-  if (typeof buildKvLayerDropdown === 'function') buildKvLayerDropdown();
+  if (typeof buildKvLayerDropdown === 'function' && kvActive) buildKvLayerDropdown();
   kvRebuildEraseCanvas();
+  kvZoomFit();
   kvScheduleDraw();
+  if (History.kanvas) { History.kanvas.past.length = 0; History.kanvas.future.length = 0; History.kanvas.last = null; }
   return true;
 }
 
+// Restores the whole set of sheets — .kad only.
+function kvRestoreSheets(k) {
+  if (!k) return;
+  if (typeof k.grid === 'boolean') kvShowGrid    = k.grid;
+  if (typeof k.snap === 'boolean') kvSnapEnabled = k.snap;
+  if (k.brush) {
+    if (k.brush.color) B.color = k.brush.color;
+    if (k.brush.size)  B.size  = k.brush.size;
+    if (k.brush.alpha != null) B.alpha = k.brush.alpha;
+  }
+  if (!Array.isArray(k.sheets) || !k.sheets.length) {
+    // A .kad written before sheets existed, or one carrying a single sheet.
+    kvDeserialize(k);
+    return;
+  }
+  KV_SHEETS.length = 0;
+  _kvSheetSeq = 1;
+  for (const sh of k.sheets) {
+    KV_SHEETS.push({
+      id:_kvSheetSeq, name: sh.name || ('Sheet ' + _kvSheetSeq),
+      page: sh.page ? {...sh.page} : {...KV_PAGE_SIZES.a3p},
+      view: {...(sh.view || KV_VIEW)}, dimStd: sh.dimStd || kvDimStd, cam: null,
+      mem: { strokes:sh.strokes||[], dims:sh.dims||[], welds:sh.welds||[],
+             layers:sh.layers||kvBlankMemory().layers,
+             activeLayer:sh.activeLayer||'Annotations', nextId:sh.nextId||1 },
+      hist: { past:[], future:[], last:null, timer:null }
+    });
+    _kvSheetSeq++;
+  }
+  kvApplySheetState(Math.min(k.activeSheet||0, KV_SHEETS.length-1));
+  kvZoomFit();
+  kvScheduleDraw();
+}
+
 function kvSaveKVS() {
-  downloadText(kvSerialize(), 'drawing.kvs', KVS_MIME);
-  showToast('Saved drawing.kvs');
+  // Names the file after the sheet, since a .kvs IS a sheet.
+  const nm = ((KV_SHEETS[kvSheetIdx] && KV_SHEETS[kvSheetIdx].name) || 'sheet')
+               .replace(/[^\w -]/g,'').trim().replace(/\s+/g,'-').toLowerCase() || 'sheet';
+  downloadText(kvSerialize(), nm + '.kvs', KVS_MIME);
+  showToast('Saved ' + nm + '.kvs · this sheet only');
 }
 
 function kvOpenKVS(event) {
@@ -11385,8 +12079,31 @@ function kvOpenKVS(event) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    const ok = kvDeserialize(e.target.result);
-    showToast(ok ? 'Loaded ' + file.name : 'Not a valid .kvs file');
+    // A .kvs arrives as its OWN sheet. It never overwrites work that is already
+    // open, so there is nothing to warn about and nothing to lose — the file
+    // lands beside your existing sheets and becomes the active tab.
+    //
+    // Validate before creating the tab, otherwise a bad file leaves an empty
+    // sheet behind as a souvenir.
+    let d = null;
+    try { d = JSON.parse(e.target.result); } catch (err) { d = null; }
+    if (!d || (d.format !== 'KVS' && d.source !== 'KAD KANVAS')) {
+      showToast('Not a valid .kvs file');
+      event.target.value = ''; return;
+    }
+    kvAddSheet();
+    const ok = kvDeserialize(d);
+    if (ok) {
+      const sh = KV_SHEETS[kvSheetIdx];
+      if (sh && !d.sheetName) {
+        sh.name = file.name.replace(/\.kvs$/i, '').slice(0, 32) || sh.name;
+        kvBuildSheetTabs();
+      }
+      showToast('Opened ' + file.name + ' as ' + (KV_SHEETS[kvSheetIdx]||{}).name);
+    } else {
+      kvDeleteSheetSilent();          // roll the empty tab back
+      showToast('Could not read ' + file.name);
+    }
     event.target.value = '';
   };
   reader.readAsText(file);
@@ -11443,18 +12160,6 @@ function kvExportSVG() {
   // Erase strokes become a mask. Canvas carves holes with destination-out;
   // SVG has no such operator, so the equivalent is a luminance mask —
   // white keeps, black removes — wrapped around everything erasable.
-  const erasers = KVM.strokes.filter(s => s.type === 'erase');
-  if (erasers.length) {
-    out.push(`<defs><mask id="kvs-erase" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">`);
-    out.push(`<rect width="${W}" height="${H}" fill="#ffffff"/>`);
-    out.push(`<g fill="#000000">`);
-    for (const s of erasers) {
-      const g = kvStrokeGeometry(s);
-      if (g) out.push(pathFor(g));
-    }
-    out.push(`</g></mask></defs>`);
-  }
-  const maskAttr = erasers.length ? ' mask="url(#kvs-erase)"' : '';
 
   // Model reference, drawn through the viewport so it lands at drawing scale.
   out.push(`<g data-kvs-role="model-reference" fill="none" stroke="#1b3a4b" stroke-width="0.25" stroke-linecap="round">`);
@@ -11496,36 +12201,87 @@ function kvExportSVG() {
   }
   out.push(`</g>`);
 
-  // Annotations, grouped by layer so the structure survives the round trip.
-  out.push(`<g data-kvs-role="annotations"${maskAttr}>`);
-  for (const lay of KVM.layers) {
-    const mine = {
-      strokes: KVM.strokes.filter(s => s.layer === lay.name && s.type !== 'erase'),
-      dims:    KVM.dims.filter(d => d.layer === lay.name),
-      welds:   KVM.welds.filter(w => w.layer === lay.name),
-    };
-    if (!mine.strokes.length && !mine.dims.length && !mine.welds.length) continue;
+  // ── Annotations ──
+  // Two fidelity bugs lived in the previous version of this block.
+  //
+  // 1. Z-ORDER. Strokes were emitted grouped by layer, but KANVAS renders in
+  //    stroke order regardless of layer. A mark made on layer A after a mark
+  //    on layer B therefore swapped places in the export. Strokes are now
+  //    walked in creation order and a new <g> is opened whenever the layer
+  //    changes — so both the stacking and the layer labelling survive, at the
+  //    cost of a layer sometimes appearing as several groups.
+  //
+  // 2. ERASE SCOPE. Canvas erase is destination-out, which only affects ink
+  //    already laid down. The export applied one mask to every annotation, so
+  //    a stroke drawn AFTER an erase was wrongly cut by it. Each run of ink
+  //    now gets a mask built only from the erasers that follow it, which is
+  //    the static equivalent of an order-dependent operator.
+  const eraseIdx = [];
+  KVM.strokes.forEach((s, i) => { if (s.type === 'erase') eraseIdx.push(i); });
+
+  // maskFrom[k] masks with every eraser at or after stroke index k.
+  const maskIdFor = new Map();
+  eraseIdx.forEach((_, n) => {
+    const id = 'kvs-erase-' + n;
+    maskIdFor.set(n, id);
+    out.push(`<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">`);
+    out.push(`<rect width="${W}" height="${H}" fill="#ffffff"/><g fill="#000000">`);
+    for (let m = n; m < eraseIdx.length; m++) {
+      const g = kvStrokeGeometry(KVM.strokes[eraseIdx[m]]);
+      if (g) out.push(pathFor(g));
+    }
+    out.push(`</g></mask></defs>`);
+  });
+  // How many erasers still lie ahead of a given stroke index.
+  const maskForIndex = i => {
+    const n = eraseIdx.findIndex(e => e > i);
+    return n === -1 ? '' : ` mask="url(#${maskIdFor.get(n)})"`;
+  };
+
+  out.push(`<g data-kvs-role="annotations">`);
+  let openLayer = null;
+  const closeLayer = () => { if (openLayer !== null) { out.push('</g>'); openLayer = null; } };
+  const openFor = lay => {
+    if (openLayer === lay.name) return;
+    closeLayer();
     const hidden = lay.visible ? '' : ' style="display:none"';
     out.push(`<g id="layer-${kvSvgEsc(lay.name).replace(/\s+/g,'-')}" data-kvs-layer="${kvSvgEsc(lay.name)}"${hidden}>`);
+    openLayer = lay.name;
+  };
 
-    for (const s of mine.strokes) {
-      if (s.type === 'text') {
-        out.push(`<text data-kvs-id="${s.id}" x="${X(s.x)}" y="${Y(s.y)}" `
-               + `font-family="JetBrains Mono, monospace" font-size="${kvN((s.size||10)*0.5)}" `
-               + `fill="${s.color||lay.color}">${kvSvgEsc(s.text)}</text>`);
-      } else {
-        const g = kvStrokeGeometry(s);
-        if (!g) continue;
-        out.push(`<g data-kvs-id="${s.id}" data-kvs-mode="${s.mode||'curve'}" `
-               + `fill="${s.color||lay.color}" fill-opacity="${s.alpha!=null?s.alpha:0.9}" stroke="none">`
-               + pathFor(g) + `</g>`);
-      }
+  KVM.strokes.forEach((s, i) => {
+    if (s.type === 'erase') return;                 // erasers live in the masks
+    const lay = KVM.layerOf(s.layer) || {name:s.layer||'Annotations', color:'#ff3cac', visible:true};
+    openFor(lay);
+    const mk = maskForIndex(i);
+    if (s.type === 'text') {
+      // SVG rotates clockwise-positive about the anchor, which is already the
+      // screen convention — so the page angle is negated here exactly as it is
+      // on canvas, keeping export and display identical.
+      const tr = s.rot ? ` transform="rotate(${kvN(-s.rot)} ${X(s.x)} ${Y(s.y)})"` : '';
+      out.push(`<text data-kvs-id="${s.id}" x="${X(s.x)}" y="${Y(s.y)}"${mk}${tr} `
+             + `font-family="JetBrains Mono, monospace" font-size="${kvN((s.size||10)*0.5)}" `
+             + `fill="${s.color||lay.color}">${kvSvgEsc(s.text)}</text>`);
+    } else {
+      const g = kvStrokeGeometry(s);
+      if (!g) return;
+      out.push(`<g data-kvs-id="${s.id}" data-kvs-mode="${s.mode||'curve'}"${mk} `
+             + `fill="${s.color||lay.color}" fill-opacity="${s.alpha!=null?s.alpha:0.9}" stroke="none">`
+             + pathFor(g) + `</g>`);
     }
+  });
+  closeLayer();
 
-    for (const d of mine.dims) {
-      out.push(kvDimToSVG(d, lay, X, Y));
-    }
-    for (const w of mine.welds) {
+  // Dimensions and welds sit above the ink, as they do on canvas, and are
+  // never cut by an eraser — erase is an ink tool.
+  for (const lay of KVM.layers) {
+    const dims  = KVM.dims.filter(d => d.layer === lay.name);
+    const welds = KVM.welds.filter(w => w.layer === lay.name);
+    if (!dims.length && !welds.length) continue;
+    const hidden = lay.visible ? '' : ' style="display:none"';
+    out.push(`<g data-kvs-layer="${kvSvgEsc(lay.name)}" data-kvs-role="measures"${hidden}>`);
+    for (const d of dims) out.push(kvDimToSVG(d, lay, X, Y));
+    for (const w of welds) {
       const a = { x:X(w.p1.x), y:Y(w.p1.y) }, b = { x:X(w.p2.x), y:Y(w.p2.y) };
       out.push(`<g data-kvs-role="weld" data-kvs-weld="${kvSvgEsc(w.weldType||'')}" `
              + `stroke="${lay.color}" stroke-width="0.3" fill="none">`
@@ -11579,6 +12335,19 @@ function kvPrintPDF() {
   window.print();
 }
 
+// Asked once per session, host only, on first entry to KANVAS while a space
+// is live. Declining is permanent for the session — the sheet stays local
+// while model geometry keeps syncing, which is the point of separate channels.
+function kloudMaybeAskKanvas() {
+  if (kloudRole !== 'host' || kloudAskedKanvas) return;
+  if (!kloudConns.some(c => c.open)) return;   // nobody to share with yet
+  kloudAskedKanvas = true;
+  kloudShareKanvas = confirm('SHARE KANVAS WITH KLOUD?\n\nCollaborators are in your live space. Share the KANVAS sheet with them too?\n\nModel Space keeps syncing either way.');
+  showToast(kloudShareKanvas ? 'KLOUD · KANVAS shared' : 'KLOUD · KANVAS kept local');
+  kloudPeersLabel();
+  if (kloudShareKanvas) kloudBroadcast('kanvas', true);
+}
+
 // ── KANVAS MODE TOGGLE (TAB) ──────────────────────────────────────────────────
 function kadSwitchTab(tab) {
   kvActive = (tab === 'kanvas');
@@ -11616,6 +12385,9 @@ function kadSwitchTab(tab) {
     kvSetTool('brush');
     kvBuildLayerList();
     kvBuildSwatches();
+    kvEnsureSheets();
+    kvBuildSheetTabs();
+    kvSyncPageUI();
     // render() is what normally reconciles the floating buttons, and it
     // stops running the moment KANVAS takes over — so retire the
     // model-space ones explicitly on the way in.
@@ -11626,6 +12398,7 @@ function kadSwitchTab(tab) {
     // A drawer left open from model space would cover the sheet on arrival.
     if (document.body.classList.contains('mobile-mode')) toggleMobileSidebar(false);
     showToast('KANVAS paperspace · KB brush · Z fit · UNDO · KD back to model');
+    kloudMaybeAskKanvas();
   } else {
     kvCanvas.removeEventListener('pointerdown',  kvOnDown);
     kvCanvas.removeEventListener('pointermove',  kvOnMove);
@@ -11684,7 +12457,12 @@ function kvOnWheel(e) {
 
 function kvOnKey(e) {
   if ((e.ctrlKey||e.metaKey) && e.key==='w') { e.preventDefault(); kadSwitchTab('model'); return; }
-  if ((e.ctrlKey||e.metaKey) && e.key==='z') { SPACE().undo(); return; }
+  if ((e.ctrlKey||e.metaKey) && (e.key==='z'||e.key==='Z')) {
+    e.preventDefault();
+    if (e.shiftKey) SPACE().redo(); else SPACE().undo();
+    return;
+  }
+  if ((e.ctrlKey||e.metaKey) && e.key==='y') { e.preventDefault(); SPACE().redo(); return; }
   if (e.key==='b') kvSetTool('brush');
   if (e.key==='t') kvSetTool('text');
   if (e.key==='d') kvSetTool('dim-linear');
@@ -11695,6 +12473,7 @@ function kvOnKey(e) {
   if (e.key==='s') kvSetTool('select');
   if (e.key==='f') SPACE().zoomFit();        // same key, same meaning as model
   if (e.key==='g') SPACE().toggleGrid();
+  if (e.key==='o') kvToggleOrientation();    // turn the sheet
   if (e.key==='x') kvFitViewport();          // fit the model into the sheet
   if (e.key==='z') kvCycleViewScale();       // step drawing scale
   if (e.key==='Escape') SPACE().cancel();
@@ -11735,11 +12514,267 @@ function kvSetColor(hex) {
   if (chip) chip.style.background = hex;
 }
 
+// ══ SHEETS ════════════════════════════════════════════════════════════════════
+// A KANVAS sheet is exactly the bundle kvSerialize already round-trips: a page,
+// a viewport, a dimension standard, and the three annotation stores. Because
+// that bundle was already self-contained, supporting several of them is a
+// matter of swapping which one is live rather than re-architecting anything.
+//
+// Each sheet also carries its OWN undo timeline. A shared one would let undo
+// on sheet 2 revert work on sheet 1 — invisible, and unrecoverable once you
+// switched away.
+//
+// Model space stays singular on purpose: see the note on kvAddSheet.
+const KV_SHEETS = [];
+let kvSheetIdx = 0;
+let _kvSheetSeq = 1;
+
+function kvBlankMemory() {
+  return {
+    strokes: [], dims: [], welds: [],
+    layers: [{name:'Annotations',color:'#ff3cac',visible:true},
+             {name:'Dimensions', color:'#00d4ff',visible:true},
+             {name:'Weld Symbols',color:'#ffaa00',visible:true},
+             {name:'Notes',       color:'#00ff9d',visible:true}],
+    activeLayer: 'Annotations', nextId: 1
+  };
+}
+
+// Write whatever is live back into its sheet record.
+function kvCommitSheetState() {
+  const s = KV_SHEETS[kvSheetIdx];
+  if (!s) return;
+  s.page   = {...KV_PAGE};
+  s.view   = {...KV_VIEW};
+  s.dimStd = kvDimStd;
+  s.cam    = {zoom:kvZoom, panX:kvPanX, panY:kvPanY};
+  s.mem    = { strokes:KVM.strokes, dims:KVM.dims, welds:KVM.welds,
+               layers:KVM.layers, activeLayer:KVM.activeLayer, nextId:KVM.nextId };
+  s.hist   = History.kanvas;
+}
+
+// Make a sheet record live. Arrays are assigned by reference, not copied —
+// the sheet record IS the storage, so edits land in the right sheet.
+function kvApplySheetState(i) {
+  const s = KV_SHEETS[i];
+  if (!s) return;
+  kvSheetIdx = i;
+  KV_PAGE  = {...s.page};
+  Object.assign(KV_VIEW, s.view);
+  kvDimStd = s.dimStd;
+  KVM.strokes = s.mem.strokes; KVM.dims = s.mem.dims; KVM.welds = s.mem.welds;
+  KVM.layers  = s.mem.layers;  KVM.activeLayer = s.mem.activeLayer; KVM.nextId = s.mem.nextId;
+  History.kanvas = s.hist;     // each sheet keeps its own undo timeline
+  if (s.cam) { kvZoom = s.cam.zoom; kvPanX = s.cam.panX; kvPanY = s.cam.panY; }
+  kvSyncPageUI();
+  kvBuildSheetTabs();
+  kvBuildLayerList();
+  if (typeof buildKvLayerDropdown === 'function' && kvActive) buildKvLayerDropdown();
+  if (typeof kvSetDimStd === 'function') {
+    document.querySelectorAll('.kv-dim-btn').forEach(b => b.classList.remove('act'));
+    const b = document.getElementById('kv-dim-' + kvDimStd); if (b) b.classList.add('act');
+  }
+  kvRebuildEraseCanvas();
+  kvScheduleDraw();
+}
+
+function kvEnsureSheets() {
+  if (KV_SHEETS.length) return;
+  KV_SHEETS.push({
+    id:_kvSheetSeq++, name:'Sheet 1',
+    page:{...KV_PAGE}, view:{...KV_VIEW}, dimStd:kvDimStd,
+    cam:{zoom:kvZoom, panX:kvPanX, panY:kvPanY},
+    mem:{ strokes:KVM.strokes, dims:KVM.dims, welds:KVM.welds,
+          layers:KVM.layers, activeLayer:KVM.activeLayer, nextId:KVM.nextId },
+    hist:History.kanvas
+  });
+  kvSheetIdx = 0;
+}
+
+// Model space is deliberately NOT multi-tabbed. In CAD there is one model —
+// that singularity is what the model/paper split means, and it is what lets
+// every sheet's viewport show the same geometry at a different scale. Several
+// "model tabs" would be several documents, which is a file-management feature
+// (separate GeoMemory, LAYERS, undo stack and KLOUD channel per document),
+// not a layout one.
+function kvAddSheet(pageKey) {
+  kvEnsureSheets();
+  kvCommitSheetState();
+  const preset = KV_PAGE_SIZES[pageKey] || KV_PAGE_SIZES[KV_PAGE.key] || KV_PAGE_SIZES.a3p;
+  KV_SHEETS.push({
+    id:_kvSheetSeq, name:'Sheet ' + _kvSheetSeq,
+    page:{...preset}, view:{scale:KV_VIEW.scale, ox:20, oy:20, show:true, rot:0}, dimStd:kvDimStd,
+    cam:null, mem:kvBlankMemory(),
+    hist:{ past:[], future:[], last:null, timer:null }
+  });
+  _kvSheetSeq++;
+  kvApplySheetState(KV_SHEETS.length - 1);
+  kvZoomFit();
+  showToast('Added ' + KV_SHEETS[kvSheetIdx].name + ' · ' + KV_PAGE.label);
+}
+
+function kvGoSheet(i) {
+  kvEnsureSheets();
+  if (i === kvSheetIdx || !KV_SHEETS[i]) return;
+  kvCommitSheetState();
+  kvApplySheetState(i);
+  showToast(KV_SHEETS[i].name + ' · ' + KV_PAGE.label);
+}
+
+function kvDuplicateSheet() {
+  kvEnsureSheets();
+  kvCommitSheetState();
+  const src = KV_SHEETS[kvSheetIdx];
+  const copy = JSON.parse(JSON.stringify({page:src.page, view:src.view, mem:src.mem}));
+  KV_SHEETS.splice(kvSheetIdx + 1, 0, {
+    id:_kvSheetSeq, name:src.name + ' copy', page:copy.page, view:copy.view,
+    dimStd:src.dimStd, cam:null, mem:copy.mem,
+    hist:{ past:[], future:[], last:null, timer:null }
+  });
+  _kvSheetSeq++;
+  kvApplySheetState(kvSheetIdx + 1);
+  showToast('Duplicated to ' + KV_SHEETS[kvSheetIdx].name);
+}
+
+// Used when an import fails after its tab was created. No prompt: the sheet
+// is empty and the user never asked for it.
+function kvDeleteSheetSilent() {
+  if (KV_SHEETS.length < 2) return;
+  KV_SHEETS.splice(kvSheetIdx, 1);
+  kvApplySheetState(Math.min(kvSheetIdx, KV_SHEETS.length - 1));
+}
+
+function kvDeleteSheet() {
+  kvEnsureSheets();
+  if (KV_SHEETS.length < 2) { showToast('A drawing needs at least one sheet'); return; }
+  const s = KV_SHEETS[kvSheetIdx];
+  const populated = s.mem.strokes.length + s.mem.dims.length + s.mem.welds.length;
+  if (populated && !confirm('Delete ' + s.name + '?\n\n' + populated + ' annotation' +
+      (populated>1?'s':'') + ' on this sheet will be lost.')) return;
+  KV_SHEETS.splice(kvSheetIdx, 1);
+  kvApplySheetState(Math.min(kvSheetIdx, KV_SHEETS.length - 1));
+  showToast('Sheet deleted');
+}
+
+function kvRenameSheet() {
+  kvEnsureSheets();
+  const s = KV_SHEETS[kvSheetIdx];
+  const n = prompt('Sheet name:', s.name);
+  if (n && n.trim()) { s.name = n.trim(); kvBuildSheetTabs(); }
+}
+
+function kvBuildSheetTabs() {
+  const el = document.getElementById('kv-sheet-tabs');
+  if (!el) return;
+  kvEnsureSheets();
+  el.innerHTML = '';
+  KV_SHEETS.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.className = 'kv-sheet-tab' + (i === kvSheetIdx ? ' act' : '');
+    b.innerHTML = `<span class="kvs-name">${s.name}</span>` +
+                  `<span class="kvs-dim">${kvPageDim(s.page)}</span>`;
+    b.onclick = () => kvGoSheet(i);
+    b.ondblclick = () => { if (i === kvSheetIdx) kvRenameSheet(); };
+    el.appendChild(b);
+    // Scroll the active tab into view. With several sheets a new one lands off
+    // the right edge, which is exactly what made adding a sheet read as
+    // replacing one.
+    if (i === kvSheetIdx) requestAnimationFrame(() => {
+      if (b.scrollIntoView) b.scrollIntoView({block:'nearest', inline:'nearest'});
+    });
+  });
+}
+
 function kvSetPageSize(key) {
-  KV_PAGE = KV_PAGE_SIZES[key] || KV_PAGE_SIZES.a3p;
+  const preset = KV_PAGE_SIZES[key] || KV_PAGE_SIZES.a3p;
+  KV_PAGE = {...preset};          // clone: never hand out the table's own object
+  kvSyncPageUI();
   kvZoomFit();
   kvScheduleDraw();
-  showToast('Page: ' + KV_PAGE.label);
+  showToast('Page: ' + KV_PAGE.label + ' · ' + kvPageDim(KV_PAGE));
+}
+
+// ── SHEET ORIENTATION ─────────────────────────────────────────────────────────
+// Portrait and landscape exist as separate presets, but hunting for the paired
+// entry in a forty-item list is not how anyone turns a sheet at a drafting
+// table. This flips the current sheet in place, keeping the size family and
+// swapping only the orientation.
+// ── SHEET ROTATION ────────────────────────────────────────────────────────────
+// Turning the sheet turns EVERYTHING on it. Ink, notes, dimensions, welds and
+// the model viewport all rotate together, so a mark that sat 20mm in from the
+// top-left corner still sits 20mm in from that same corner of the paper after
+// the turn — exactly like picking the sheet up off the table and putting it
+// down the other way.
+//
+// The earlier behaviour only swapped the trim and slid the contents to stay
+// centred. That kept notes upright, but it also meant the composition drifted
+// relative to the paper and anything past the new short edge fell off. Locking
+// rotation to orientation removes both problems: nothing can leave the sheet,
+// because the sheet and its contents are one rigid body.
+//
+// A quarter turn clockwise on a page W×H maps (x,y) → (y, W−x); the sheet
+// becomes H×W. The inverse is the counter-clockwise map, so a turn and a turn
+// back is exactly lossless — verified by round-trip, not by inspection.
+function kvRotatePoint(p, cw, W0, H0) {
+  return cw ? { x: p.y,      y: W0 - p.x }
+            : { x: H0 - p.y, y: p.x };
+}
+
+function kvRotateSheet(cw) {
+  const W0 = KV_PAGE.w, H0 = KV_PAGE.h;
+  const R  = p => kvRotatePoint(p, cw, W0, H0);
+  const move = o => { const r = R(o); o.x = r.x; o.y = r.y; };
+
+  for (const s of KVM.strokes) {
+    if (s.pts) for (const p of s.pts) move(p);
+    if (s.x != null && s.y != null) move(s);
+    // Text turns with the paper too — otherwise "everything rotates together"
+    // would quietly exclude the one thing you read.
+    if (s.type === 'text') s.rot = (((s.rot || 0) + (cw ? -90 : 90)) % 360 + 360) % 360;
+  }
+  for (const d of KVM.dims)
+    for (const k of ['p1','p2','center','vertex','pa','pb']) if (d[k]) move(d[k]);
+  for (const w of KVM.welds)
+    for (const k of ['p1','p2']) if (w[k]) move(w[k]);
+
+  // The viewport is an affine map, so rotating it is the same map applied to
+  // its origin plus a quarter turn on its own rotation — no need to touch the
+  // model geometry itself, which never moves.
+  const o = R({x: KV_VIEW.ox, y: KV_VIEW.oy});
+  KV_VIEW.ox = o.x; KV_VIEW.oy = o.y;
+  KV_VIEW.rot = ((KV_VIEW.rot + (cw ? -90 : 90)) % 360 + 360) % 360;
+
+  // Swap the trim last, so every map above used the pre-turn dimensions.
+  const pair = KV_PAGE.pair && KV_PAGE_SIZES[KV_PAGE.pair];
+  KV_PAGE = pair ? {...pair}
+                 : {...KV_PAGE, w: H0, h: W0,
+                    orient: KV_PAGE.orient === 'l' ? 'p' : 'l',
+                    label: 'Custom ' + (KV_PAGE.orient === 'l' ? 'Portrait' : 'Landscape'),
+                    dim: H0 + '\u00d7' + W0 + ' mm'};
+
+  kvSyncPageUI();
+  kvZoomFit();
+  kvRebuildEraseCanvas();
+  kvScheduleDraw();
+  markKanvasDirty();
+  showToast('Sheet turned · ' + KV_PAGE.label + ' \u00b7 ' + kvPageDim(KV_PAGE));
+}
+
+// Orientation IS rotation now — asking for the other orientation turns the
+// sheet rather than reshaping the trim underneath the art.
+function kvSetOrientation(o) {
+  if (KV_PAGE.orient === o) return;
+  kvRotateSheet(o === 'l');    // portrait -> landscape turns clockwise
+}
+function kvToggleOrientation() { kvRotateSheet(KV_PAGE.orient !== 'l'); }
+function kvRotateCW()  { kvRotateSheet(true);  }
+function kvRotateCCW() { kvRotateSheet(false); }
+
+function kvSyncPageUI() {
+  const sel = document.querySelector('.kv-page-sel');
+  if (sel && KV_PAGE.key) sel.value = KV_PAGE.key;
+  document.querySelectorAll('.kv-orient-btn').forEach(b =>
+    b.classList.toggle('act', b.dataset.orient === KV_PAGE.orient));
 }
 
 function kvSetDimStd(std) {
@@ -11938,7 +12973,8 @@ const SPACES = {
     zoomFit:    () => { zoomExtents(); },
     toggleGrid: () => { toggleGrid(); return showGrid; },
     toggleSnap: () => { toggleSnap(); return snapEnabled; },
-    undo:       () => { const o = GeoMemory.objects; if (!o.length) return false; o.pop(); render(); return true; },
+    undo:       () => undoSpace('model'),
+    redo:       () => redoSpace('model'),
     cancel:     () => { cancelTool(); render(); },
     clear:      () => { GeoMemory.clear(); render(); },
     del:        () => { deleteSelected(); },
@@ -11954,19 +12990,16 @@ const SPACES = {
     toggleSnap: () => { kvSnapEnabled = !kvSnapEnabled; kvScheduleDraw(); return kvSnapEnabled; },
     // Annotations land in three stores; undo has to pop whichever was
     // written last, or "undo" silently skips your most recent mark.
-    undo:       () => {
-                   const pools = [KVM.strokes, KVM.dims, KVM.welds].filter(p => p && p.length);
-                   if (!pools.length) return false;
-                   pools.sort((a,b) => (b[b.length-1].id||0) - (a[a.length-1].id||0));
-                   pools[0].pop();
-                   kvRebuildEraseCanvas(); kvScheduleDraw(); return true;
-                 },
-    cancel:     () => { kvDimState.active=false; kvWeldState.active=false;
+    undo:       () => undoSpace('kanvas'),
+    redo:       () => redoSpace('kanvas'),
+    cancel:     () => { kvDimState = {active:false, p1:null, p2:null, offset:10, phase:0};
+                        kvWeldState.active=false;
                         kvPendingPt=null; kvCloseTextEntry();
                         kvAbortStroke(); kvCancelHold(); kvIsPanning=false; kvScheduleDraw(); },
     clear:      () => { KVM.strokes.length=0; KVM.dims.length=0; KVM.welds.length=0;
                         kvRebuildEraseCanvas(); kvScheduleDraw(); },
     del:        () => { SPACES.kanvas.undo(); },   // no selection model on a sheet yet
+    // (redo defined above)
     text:       () => kvSetTool('text'),
     dim:        () => kvSetTool('dim-linear'),
     select:     () => kvSetTool('select'),
@@ -11988,7 +13021,8 @@ const UNIVERSAL_KOMMANDS = {
   'IN':     () => { splashSelectUnit('in'); SPACE().refresh(); kecho('Units: in'); },
   'MM':     () => { splashSelectUnit('mm'); SPACE().refresh(); kecho('Units: mm'); },
   'UNDO':   () => { kecho(SPACE().undo() ? 'Undo · ' + SPACE().label : 'Nothing to undo'); },
-  'REDO':   () => { if (typeof redo==='function') redo(); kecho('Redo'); },
+  'REDO':   () => { kecho(SPACE().redo() ? 'Redo · ' + SPACE().label : 'Nothing to redo'); },
+  'RE':     () => { kecho(SPACE().redo() ? 'Redo · ' + SPACE().label : 'Nothing to redo'); },
   'ESCAPE': () => { SPACE().cancel(); kecho('Cancelled'); },
   'CANCEL': () => { SPACE().cancel(); kecho('Cancelled'); },
   'DELETE': () => { SPACE().del(); },
@@ -12024,13 +13058,22 @@ const KV_KOMMANDS = {
   'KE': () => kvSetTool('erase'),   'ERASE': () => kvSetTool('erase'),
   'KX': () => kvFitViewport(),
   'KZ': () => kvCycleViewScale(),
+  'KT': () => kvToggleOrientation(),
+  'KRW':() => kvRotateCW(),
+  'KRC':() => kvRotateCCW(),
+  'KH': () => kvAddSheet(),
+  'KJ': () => kvDuplicateSheet(),
+  'KQ': () => kvGoSheet((kvSheetIdx + 1) % Math.max(1, KV_SHEETS.length)),
+  'KY': () => kvRenameSheet(),
+  'KML':() => kvSetOrientation('l'),
+  'KMP':() => kvSetOrientation('p'),
   'KP': () => { KV_VIEW.show = !KV_VIEW.show; kvScheduleDraw(); kecho('Viewport frame ' + (KV_VIEW.show?'on':'off')); },
   'KVS': () => kvSaveKVS(),
   'KO':  () => document.getElementById('kvs-file-input').click(),
   'KG':  () => kvExportSVG(),
 };
 
-const KV_ONLY_HINT = 'KB brush · KN note · KL/KR/KA dims · KW weld · KE erase · KX fit · KZ scale · KP frame · KVS save · KO open · KG svg';
+const KV_ONLY_HINT = 'KB brush · KN note · KL/KR/KA dims · KW weld · KE erase · KX fit · KZ scale · KT turn · KH new sheet · KQ next sheet · KP frame · KVS save · KO open · KG svg';
 
 function submitKommandSingle(tokenText) {
   const raw = tokenText.trim().toUpperCase();
@@ -12353,7 +13396,6 @@ function toggleTheme() {
 })();
 
 </script>
-</script>
 <script>
 // ── PWA: service worker registration ────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -12388,9 +13430,18 @@ if ('launchQueue' in window) {
         dt.items.add(file);
         input.files = dt.files;
         input.dispatchEvent(new Event('change'));
+      } else if (/\.kvs$/i.test(file.name)) {
+        // Same contract as the file picker: a .kvs becomes its own sheet.
+        kadSwitchTab('kanvas');
+        kvEnsureSheets();
+        kvAddSheet();
+        const ok = kvDeserialize(text);
+        if (!ok) kvDeleteSheetSilent();
+        showToast(ok ? `Opened ${file.name} as a new sheet` : `Could not open ${file.name}`);
       } else {
-        const ok = GeoMemory.deserialize(text); // existing .kad load path
-        if (ok) render();
+        // Full-document load — same container path as the file picker, so a
+        // launched .kad restores both spaces rather than geometry alone.
+        const ok = deserializeDocument(text);
         showToast(ok ? `Opened ${file.name}` : `Could not open ${file.name}`);
       }
     }));
@@ -12444,15 +13495,27 @@ if ('launchQueue' in window) {
 //  invite URL carries it as a hash, so opening the link both
 //  authenticates (bearer token) and auto-joins the space.
 //  Sync model: full-document, host-authoritative, last-write-wins.
-//  A 600ms change poll on GeoMemory.serialize() catches every
+//  A revision-gated 600ms poll (modelRev / kanvasRev) catches every
 //  mutation path (draw, move, delete, undo, props) without hooking
 //  dozens of functions — honest alpha engineering.
 // ═══════════════════════════════════════════════════════════════
 let kloudPeer = null;
 let kloudConns = [];            // host: all guests · guest: [hostConn]
 let kloudRole = null;           // 'host' | 'guest' | null
+// ── Unified session, independent channels ──
+// One space code covers the whole session; model and KANVAS ride it as two
+// separate streams. The host decides whether the sheet travels at all — the
+// prompt fires the first time the KANVAS tab is opened during a live session
+// — and that answer holds for the rest of the session. A guest never asks;
+// it simply honours whatever the host sends.
+let kloudShareKanvas = null;    // null = not yet asked, true/false = host's answer
+let kloudAskedKanvas = false;
+let kloudLastModel   = '';      // last model payload sent, per-channel baseline
+let kloudLastKanvas  = '';
+let kloudSentModelRev = -1, kloudSentKanvasRev = -1;
 let kloudApplyingRemote = false;
-let kloudLastDoc = null;
+// (kloudLastDoc retired — replaced by kloudLastModel / kloudLastKanvas,
+//  one baseline per channel, so the two can't overwrite each other.)
 
 function kloudSafeOrigin(){ try{ const o=location.origin; return (o&&o!=='null')?o:''; }catch(e){ return ''; } }
 function kloudInviteURL(id){
@@ -12467,7 +13530,9 @@ function kloudPeersLabel(){
   const el=document.getElementById('kloud-peers');
   if(!el) return;
   const n=kloudConns.filter(c=>c.open).length;
-  el.textContent = kloudRole ? `${kloudRole.toUpperCase()} · ${n} peer${n!==1?'s':''} connected` : '';
+  const kv = kloudRole==='host' && kloudShareKanvas!==null
+           ? ` · KANVAS ${kloudShareKanvas?'shared':'local'}` : '';
+  el.textContent = kloudRole ? `${kloudRole.toUpperCase()} · ${n} peer${n!==1?'s':''} connected${kv}` : '';
   const dot=document.getElementById('kloud-dot');
   if(dot) dot.classList.toggle('live', n>0);
 }
@@ -12505,8 +13570,17 @@ function kloudHost(){
     kloudConns.push(c);
     kloudWire(c);
     c.on('open', ()=>{
-      // New guest receives the whole current document immediately
-      c.send({type:'doc', kad:GeoMemory.serialize()});
+      // If the host is already sitting in KANVAS when someone joins, this is
+      // the first moment there is anyone to share with — so ask now rather
+      // than waiting for a tab switch that may never come.
+      if (kvActive) kloudMaybeAskKanvas();
+      // A joining guest gets the space the host currently has open first, so
+      // it lands looking at the same thing rather than at whichever channel
+      // happened to be enumerated first.
+      const first = kvActive ? 'kanvas' : 'model';
+      kloudSendSpace(c, first);
+      if (first === 'kanvas') kloudSendSpace(c, 'model');
+      else if (kloudShareKanvas) kloudSendSpace(c, 'kanvas');
       kloudStatus('Collaborator joined.', 'var(--green)');
       kloudPeersLabel();
       showToast('KLOUD · collaborator joined');
@@ -12540,21 +13614,110 @@ function kloudJoin(rawArg){
   kloudPeer.on('error', e=>kloudStatus('Could not connect: '+e.type, 'var(--red)'));
 }
 
+// One space, one message. Keeping them separate is what stops a brush stroke
+// from forcing a resend of every line in the model — and lets the host refuse
+// the KANVAS channel outright while model geometry keeps flowing.
+function kloudSpacePayload(space) {
+  // The KANVAS channel syncs every sheet — a collaborator seeing only the
+  // sheet you happen to have open would silently lose the others.
+  return space === 'kanvas' ? JSON.stringify(kvSheetsPayload()) : GeoMemory.serialize();
+}
+function kloudSendSpace(c, space) {
+  if (space === 'kanvas' && kloudRole === 'host' && kloudShareKanvas !== true) return;
+  try { c.send({type:'doc', space, payload: kloudSpacePayload(space)}); } catch(e) {}
+}
+function kloudBroadcast(space, force) {
+  if (!kloudRole) return;
+  if (space === 'kanvas' && kloudRole === 'host' && kloudShareKanvas !== true) return;
+  const live = kloudConns.filter(x => x.open);
+  if (!live.length) return;
+  const payload = kloudSpacePayload(space);
+  if (!force) {
+    if (space === 'model'  && payload === kloudLastModel)  return;
+    if (space === 'kanvas' && payload === kloudLastKanvas) return;
+  }
+  if (space === 'model') kloudLastModel = payload; else kloudLastKanvas = payload;
+  for (const x of live) { try { x.send({type:'doc', space, payload}); } catch(e) {} }
+}
+
+// ── SHELVED · PER-USER UNDO ─────────────────────────────────────
+// TODO (shelved, not scheduled): undo is currently GLOBAL — one shared
+// timeline per space, so pressing undo reverses the last edit by anyone,
+// including a collaborator working in a different corner of the drawing.
+//
+// The alternative is per-user undo, where each person only ever reverses their
+// own edits. It is what Figma and Google Docs do, and it is a substantially
+// larger build than this one:
+//   · history must become OPERATION-based rather than snapshot-based, since
+//     "undo my edit" means inverting one change while everyone else's stand
+//   · every operation needs an author id and a position in document order
+//   · undoing a non-latest operation requires transforming it against every
+//     operation applied after it — operational transform, or a CRDT
+//   · conflicting inverses need a resolution rule: undoing a delete whose
+//     object someone else has since modified, and so on
+//
+// Deliberately deferred. The snapshot model below is correct for a shared
+// timeline and should be REPLACED wholesale, not extended, when we build this.
+
+// ── SHARED HISTORY ────────────────────────────────────────────────────────────
+// Undo is global across a space: pressing it reverses the last edit made by
+// ANYONE, and everyone sees the reversal.
+//
+// That requires a single ordered timeline, and the host is already the
+// sequencer — every guest edit passes through it on the way to the other
+// guests. So the host owns the one stack: it captures its own edits and the
+// guest edits it receives, in the order it receives them. Guests capture
+// nothing while connected and send undo/redo to the host as a request; the
+// resulting document comes back down the normal channel.
+//
+// The alternative — every peer keeping its own stack — cannot work without a
+// sequencer anyway, and quietly diverges the moment two people edit at once.
+function kloudRequestHistory(op, space) {
+  const host = kloudConns.find(x => x.open);
+  if (!host) return false;
+  try { host.send({type:'hist', op, space}); } catch(e) { return false; }
+  showToast(op === 'undo' ? 'Undo sent to host' : 'Redo sent to host');
+  return true;
+}
+
 function kloudWire(c){
   c.on('data', data=>{
-    if(data && data.type==='doc' && typeof data.kad==='string'){
-      kloudApplyingRemote=true;
-      const ok=GeoMemory.deserialize(data.kad);
-      kloudApplyingRemote=false;
-      if(ok){
-        kloudLastDoc=data.kad;   // remote state is now the baseline — don't echo it
-        render();
-        // Host relays guest edits to every other guest
-        if(kloudRole==='host'){
-          for(const other of kloudConns){
-            if(other!==c && other.open){ try{ other.send(data); }catch(e){} }
-          }
-        }
+    // History requests from a guest. Only the host acts on them, because only
+    // the host holds the shared timeline.
+    if(data && data.type==='hist'){
+      if(kloudRole!=='host') return;
+      const sp = data.space === 'kanvas' ? 'kanvas' : 'model';
+      const did = (data.op === 'redo') ? redoSpace(sp) : undoSpace(sp);
+      if(!did){
+        try{ c.send({type:'note', text:'Nothing to ' + (data.op||'undo')}); }catch(e){}
+      }
+      return;   // the resulting document reaches everyone via the normal poll
+    }
+    if(data && data.type==='note'){ showToast(data.text || ''); return; }
+    if(!data || data.type!=='doc') return;
+    // Older peers send {kad:...} with no space field — treat as model.
+    const space   = data.space || 'model';
+    const payload = (typeof data.payload==='string') ? data.payload : data.kad;
+    if(typeof payload!=='string') return;
+
+    kloudApplyingRemote=true;
+    let ok=false;
+    if(space==='kanvas'){
+      try { kvRestoreSheets(JSON.parse(payload)); ok = true; } catch(e) { ok = false; }
+      if(ok) kloudLastKanvas = payload;   // baseline, so we don't echo it back
+    } else {
+      ok = GeoMemory.deserialize(payload);
+      if(ok){ kloudLastModel = payload; buildLayerPanel(); render(); }
+    }
+    kloudApplyingRemote=false;
+    // The host records incoming guest edits as steps in the shared timeline —
+    // without this, undo would step straight over everyone else's work.
+    if(ok && kloudRole==='host') captureHistory(space);
+
+    if(ok && kloudRole==='host'){
+      // Host relays guest edits to every other guest, on the same channel.
+      for(const other of kloudConns){
+        if(other!==c && other.open){ try{ other.send({type:'doc', space, payload}); }catch(e){} }
       }
     }
   });
@@ -12568,20 +13731,35 @@ function kloudWire(c){
 
 function kloudTeardown(){
   if(kloudPeer){ try{ kloudPeer.destroy(); }catch(e){} }
+  // A guest captured nothing while connected, so its stacks are empty and its
+  // baseline is stale. Reset both spaces: local undo resumes from the document
+  // as it stands right now rather than from whatever it held before joining.
+  resetHistory('model'); resetHistory('kanvas');
   kloudPeer=null; kloudConns=[]; kloudRole=null;
+  // The KANVAS answer belongs to the session, not the app — a new space asks again.
+  kloudShareKanvas=null; kloudAskedKanvas=false;
+  kloudLastModel=''; kloudLastKanvas='';
+  kloudSentModelRev=-1; kloudSentKanvasRev=-1;
   document.getElementById('kloud-invite').classList.remove('show');
   kloudPeersLabel();
 }
 
-// Change poll — one watcher covers every mutation path in the app
+// Change poll — revision-gated, one independent channel per space.
+// The counters mean an untouched session never serialises anything: the tick
+// compares two integers and returns. Serialising only happens when a space
+// has actually changed, and then only that space. The string compare inside
+// kloudBroadcast is a backstop for counters that tick without a real edit.
 setInterval(()=>{
   if(!kloudRole || kloudApplyingRemote) return;
-  const live=kloudConns.filter(c=>c.open);
-  if(live.length===0) return;
-  const doc=GeoMemory.serialize();
-  if(doc===kloudLastDoc) return;
-  kloudLastDoc=doc;
-  for(const c of live){ try{ c.send({type:'doc', kad:doc}); }catch(e){} }
+  if(!kloudConns.some(c=>c.open)) return;
+  if(modelRev !== kloudSentModelRev){
+    kloudSentModelRev = modelRev;
+    kloudBroadcast('model');
+  }
+  if(kanvasRev !== kloudSentKanvasRev){
+    kloudSentKanvasRev = kanvasRev;
+    kloudBroadcast('kanvas');
+  }
 }, 600);
 
 function kloudCopyInvite(){
@@ -12604,16 +13782,11 @@ function kloudGoogleSignIn(){
     .catch(e=>{ document.getElementById('kloud-auth-status').textContent='Sign-in failed: '+e.code; });
 }
 
-// Invitation link = authentication link: opening it auto-joins the space.
-// KADsuite normally boots to the landing page, not drafting mode — enter
-// drafting mode first so the canvas/engine are live before the panel and
-// join call run (the standalone KAD app skips this since it's always in
-// drafting mode already).
+// Invitation link = authentication link: opening it auto-joins the space
 window.addEventListener('load', ()=>{
   try {
     const hash=(location.hash||'').replace('#','');
     if(hash && hash.length>4 && !hash.includes('/')){
-      openDraftingMode();
       kloudOpenPanel();
       document.getElementById('kloud-join-input').value=hash;
       kloudStatus('Invitation detected — authenticating into space…', 'var(--accent)');
