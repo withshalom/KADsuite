@@ -2394,6 +2394,43 @@ body.light-mode .tool-btn.active .tool-icon svg {
   overscroll-behavior: contain;
 }
 .mobile-mode.sidebar-open #sidebar { transform: translateX(0); }
+/* KANVAS's tool palette was a fixed --sidebar-w column with no mobile rule
+   at all, so on a phone it permanently ate a third of the sheet and there
+   was no way to dismiss it — while the identical palette in model space
+   slid away behind the ☰. Same drawer treatment, same geometry, same
+   scrim, same toggle: the two tabs now behave like one program. */
+.mobile-mode #kanvas-sidebar {
+  position: fixed;
+  top: var(--toolbar-h);
+  bottom: var(--status-h);
+  left: 0;
+  width: min(300px, 84vw);
+  z-index: 200;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+  box-shadow: 10px 0 30px rgba(0,0,0,0.45);
+  pointer-events: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.mobile-mode.sidebar-open #kanvas-sidebar { transform: translateX(0); }
+/* Larger tap targets in the KANVAS palette, matching the model tool grid. */
+.mobile-mode .kv-tbtn { padding: 9px 4px; }
+
+/* Inline annotation entry. Fixed-position so it can sit exactly where the
+   sheet was tapped, above the KOMMAND bar but below the layer dropdown. */
+#kv-text-input {
+  display: none; position: fixed; z-index: 235;
+  min-width: 200px; padding: 7px 10px;
+  background: var(--panel); border: 1px solid var(--accent); border-radius: 5px;
+  font-family: var(--fm); font-size: 13px; letter-spacing: 0.02em;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  outline: none;
+}
+#kv-text-input::placeholder { color: var(--t3); font-size: 11px; }
+.mobile-mode #kv-text-input { min-width: 0; width: calc(100vw - 24px); left: 12px !important; }
 
 /* KOMMAND becomes a floating, keyboard-aware pill instead of a docked grid row */
 .mobile-mode #kommand-bar {
@@ -4042,7 +4079,7 @@ document.addEventListener('keydown', function(e) {
     <div id="layer-dd-panel">
       <span class="layer-hint">Tap a layer to draw on it</span>
       <div id="layer-dd-list"></div>
-      <button class="layer-add-btn" onclick="addCustomLayer()">+ New Layer</button>
+      <button class="layer-add-btn" onclick="addLayerHere()">+ New Layer</button>
     </div>
   </div>
 </div>
@@ -4452,10 +4489,15 @@ document.addEventListener('keydown', function(e) {
   <!-- Export (always at bottom) -->
   <div class="kv-export-row">
     <div class="section-head" style="font-size:10.5px;border:none;padding:4px 0 3px;">EXPORT</div>
-    <button class="kv-export-btn vad" onclick="kvExportVAD()">
+    <button class="kv-export-btn kvs" onclick="kvSaveKVS()">
       <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-      Save .vad
+      Save .kvs
     </button>
+    <button class="kv-export-btn kvs" onclick="document.getElementById('kvs-file-input').click()">
+      <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Open .kvs
+    </button>
+    <input type="file" id="kvs-file-input" accept=".kvs,.vad,application/json" style="display:none" onchange="kvOpenKVS(event)">
     <button class="kv-export-btn svg" onclick="kvExportSVG()">
       <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       Export .svg
@@ -4466,6 +4508,10 @@ document.addEventListener('keydown', function(e) {
     </button>
   </div>
 </div>
+
+<!-- Inline annotation text entry — floats over the sheet at the tap point -->
+<input id="kv-text-input" type="text" placeholder="Annotation… Enter to place, Esc to cancel"
+       onkeydown="kvTextKey(event)" onblur="kvCommitTextEntry()" autocomplete="off">
 
 <!-- ── KANVAS CANVAS ── -->
 <div style="flex:1;overflow:hidden;position:relative;">
@@ -4555,7 +4601,6 @@ document.addEventListener('keydown', function(e) {
     </div>
   </div>
 </div>
-
 </div><!-- end #app -->
 
 <!-- STARTUP UNIT SPLASH — mm / inch selection.
@@ -4895,6 +4940,12 @@ function resizeCanvas() {
   render();
 }
 window.addEventListener('resize', resizeCanvas);
+// KANVAS has its own backing store and its own fit; without this it kept
+// the size it had when the tab was opened, so rotating the device or
+// opening the tool drawer left the sheet stretched or clipped.
+window.addEventListener('resize', () => {
+  if (typeof kvActive !== 'undefined' && kvActive) { kvResizeCanvas(); kvScheduleDraw(); }
+});
 
 // ── CAMERA ──────────────────────────────────────────────
 const cam = { panX:0, panY:0, zoom:3.0, minZoom:0.05, maxZoom:200 };
@@ -5556,6 +5607,10 @@ function dynBoxKeydown(e) {
   if (e.key === 'Enter') { e.preventDefault(); commitDynBox(); }
   else if (e.key === 'Escape') { e.preventDefault(); resetDynBox(); this.blur(); }
   else if (e.key === 'Tab') {
+    // Deliberate, explicit length<->angle cycle instead of native DOM tab
+    // order, which was landing inconsistently once focus could be
+    // retained from a prior commit (see resetDynBox above). Tab never
+    // commits here — only Enter (here) or GO/Enter in KOMMAND do.
     e.preventDefault();
     const lenInp = document.getElementById('dyn-len-input');
     const angInp = document.getElementById('dyn-ang-input');
@@ -6969,6 +7024,11 @@ function toggleMobileSidebar(force) {
   const open = typeof force === 'boolean' ? force : !document.body.classList.contains('sidebar-open');
   document.body.classList.toggle('sidebar-open', open);
   document.getElementById('sidebar-toggle-btn').textContent = open ? '✕' : '☰';
+  // The KANVAS pane resizes when the drawer transitions in or out of the
+  // layout; re-measure once the 0.22s slide has finished.
+  if (typeof kvActive !== 'undefined' && kvActive) {
+    setTimeout(() => { kvResizeCanvas(); kvScheduleDraw(); }, 240);
+  }
 }
 
 // Tapping GO shifts focus away from #kommand-input before its onclick
@@ -7034,7 +7094,7 @@ function toggleToolsMenu() {
 function updateCommitFab() {
   const fab = document.getElementById('commit-fab');
   if (!fab) return;
-  const ready = activeTool==='line' && lineState.active && lineChain.length>=2;
+  const ready = !kvActive && activeTool==='line' && lineState.active && lineChain.length>=2;
   fab.classList.toggle('show', ready);
 }
 function commitFabTap() {
@@ -7050,6 +7110,14 @@ function commitFabTap() {
 function updateEscFab() {
   const fab = document.getElementById('esc-fab');
   if (!fab) return;
+  // KANVAS two-click tools (linear/radial dim, weld) had no way to back
+  // out on touch once the first point was down. Same FAB, same meaning.
+  if (kvActive) {
+    const kvBusy = (kvDimState && kvDimState.active) || (kvWeldState && kvWeldState.active)
+                   || !!kvPendingPt || (kvTextState && kvTextState.active);
+    fab.classList.toggle('show', !!kvBusy);
+    return;
+  }
   const drawing = (lineState && lineState.active) || (rectState && rectState.active) ||
                   (circleState && circleState.active) || (polyState && polyState.active) ||
                   (arcState && arcState.active);
@@ -7060,12 +7128,16 @@ function updateEscFab() {
 function updateDeleteFab() {
   const fab = document.getElementById('delete-fab');
   if (!fab) return;
+  if (kvActive) { fab.classList.remove('show'); return; }
   fab.classList.toggle('show', selectedIds.size > 0);
 }
 function deleteFabTap() {
   deleteSelected();
 }
 function escFabTap() {
+  // Both spaces cancel through the same seam now — the FAB doesn't need to
+  // know which one is in front.
+  if (kvActive) { SPACE().cancel(); showToast('Cancelled'); return; }
   kommandClear();
   if (activeTool !== 'select') cancelTool();
   else selectedIds.clear();
@@ -7944,10 +8016,6 @@ function lineLineIntersect(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2){
   const t2=((bx1-ax1)*dy1-(by1-ay1)*dx1)/d;
   return{x:ax1+t1*dx1,y:ay1+t1*dy1,t1,t2};
 }
-// Every intersection between one segment and every OTHER segment in the
-// drawing — including other polylines' individual segments, which this
-// used to be completely blind to (it only ever checked whole LINE
-// objects against other whole LINE objects).
 function findLineIntersections(seg){
   const pts=[];
   for(const other of allSegments()){
@@ -8364,6 +8432,7 @@ function setActiveLayer(name) {
   closeLayerDropdown();   // picking a layer is the end of the interaction
   showToast('Drawing on layer: ' + lay.name);
 }
+
 // Mirrors the active layer onto the canvas overlay, so the drawing layer
 // is visible even with the sidebar closed — which is the default on
 // mobile, where the layer panel is otherwise entirely out of sight.
@@ -8387,6 +8456,21 @@ function focusLayerPanel() {
       {duration:700}
     );
   }
+}
+
+// Routes "+ New Layer" to whichever space is in front — adding a model
+// layer while annotating a sheet would be a silent no-op on screen.
+function addLayerHere() {
+  if (typeof kvActive !== 'undefined' && kvActive) {
+    const name = prompt('Annotation layer name:');
+    if (!name || !name.trim()) return;
+    const key = name.trim();
+    if (KVM.layers.some(l => l.name === key)) { showToast('Layer already exists'); return; }
+    KVM.layers.push({name:key, color:B.color || '#ff3cac', visible:true});
+    kvSetActiveLayer(key);
+    return;
+  }
+  addCustomLayer();
 }
 
 function addCustomLayer() {
@@ -8444,6 +8528,10 @@ function buildLayerRow(key, lay) {
 }
 
 function buildLayerPanel() {
+  // In KANVAS the dropdown drives KVM.layers instead. Same control, same
+  // position, same gesture — it just addresses whichever space is in front,
+  // which is the whole point of the two tabs feeling like one program.
+  if (typeof kvActive !== 'undefined' && kvActive) { buildKvLayerDropdown(); return; }
   const targets = [document.getElementById('layer-list'),
                    document.getElementById('layer-dd-list')].filter(Boolean);
   if (!targets.length) return;
@@ -8453,6 +8541,33 @@ function buildLayerPanel() {
   }
   updateDrawLayerChip();
   updateLayerDropdownLabel();
+}
+
+// KANVAS layers are a plain array of {name,color,visible} rather than the
+// keyed LAYERS map, so they get their own row builder — but the same
+// .layer-row markup, so every style and tap target carries across.
+function buildKvLayerDropdown() {
+  const panel = document.getElementById('layer-dd-list');
+  if (!panel) return;
+  panel.innerHTML = '';
+  for (const lay of KVM.layers) {
+    const row = document.createElement('div');
+    row.className = 'layer-row' + (lay.name === KVM.activeLayer ? ' active' : '');
+    row.dataset.layer = lay.name;
+    row.innerHTML =
+      '<span class="layer-vis" title="Toggle visibility">' + (lay.visible ? '👁' : '○') + '</span>'
+      + '<span class="layer-color" style="display:inline-block;width:14px;height:14px;border-radius:3px;background:'
+      + lay.color + ';"></span>'
+      + '<span class="layer-name">' + lay.name + '</span>';
+    row.querySelector('.layer-vis').onclick = (ev) => { ev.stopPropagation(); kvToggleLayerVis(lay.name); };
+    row.onclick = () => { kvSetActiveLayer(lay.name); closeLayerDropdown(); };
+    panel.appendChild(row);
+  }
+  const nameEl = document.getElementById('layer-dd-name');
+  const swEl   = document.getElementById('layer-dd-swatch');
+  const cur    = KVM.layers.find(l => l.name === KVM.activeLayer) || KVM.layers[0];
+  if (nameEl && cur) { nameEl.textContent = cur.name; nameEl.style.color = cur.color; }
+  if (swEl && cur) swEl.style.background = cur.color;
 }
 
 // The dropdown button doubles as a permanent readout of the drawing
@@ -8500,6 +8615,7 @@ document.addEventListener('keydown', (e) => {
   if (!_layerDropdownIsOpen()) return;   // never touches Escape otherwise
   if (e.key === 'Escape') closeLayerDropdown();
 });
+
 // ── Layer property editors ────────────────────────────────────────────
 // Each writes straight into LAYERS, so a change shows on canvas at once
 // and carries through to DXF export (colour → ACI, ltype → LTYPE table).
@@ -9847,6 +9963,8 @@ requestAnimationFrame(()=>{
     // The layer list was never populated at startup — buildLayerPanel()
     // was only ever called from the add/rename/delete/visibility actions,
     // so #layer-list rendered empty on load with nothing in it to click.
+    // That's the real reason switching layers wasn't discoverable: there
+    // was no list, not just a hard-to-find one.
     buildLayerPanel();
     document.getElementById('cc-year').textContent = new Date().getFullYear();
     initSplash();
@@ -9959,7 +10077,11 @@ function pasteSelected() {
 
 // ══════════════════════════════════════════════════════════════════════════════
 //  KANVAS — Paperspace tab for KAD
-//  Completely isolated from KAD model space.
+//  NOT isolated from model space: kvRender reads GeoMemory.objects and
+//  LAYERS to draw the reference underlay, and both spaces now answer the
+//  same SPACE() facade for view, undo, cancel and clear. What stays
+//  separate is only what genuinely differs — bounded sheet vs unbounded
+//  world, ink vs parametric objects, raster compositing vs vector redraw.
 //  KAD geometry is read-only reference. KANVAS annotations are separate.
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -9972,6 +10094,69 @@ let kvCtx         = null;
 let kvEraseC      = null;
 let kvEraseCtx    = null;
 let kvSnapEnabled = true;
+let kvShowGrid    = true;   // page grid — the KANVAS half of the universal G
+let kvCssW = 0, kvCssH = 0;   // CSS-pixel canvas extents (see kvResizeCanvas)
+
+// ── PAPERSPACE VIEWPORT ──
+// Until now the model showed through KANVAS at 1:1 — model millimetres
+// were treated as page millimetres, so a 2m part simply ran off an A3
+// sheet and no drawing scale existed. KV_VIEW is the viewport: a scale
+// factor plus a page-space offset, making KANVAS a real paperspace where
+// the sheet is the sheet and the model is placed on it at a stated ratio.
+const KV_VIEW = { scale: 1, ox: 20, oy: 20, show: true };
+// Ratios a drafter actually calls out, largest first.
+const KV_SCALES = [1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 2, 5];
+function kvScaleLabel(s) {
+  if (Math.abs(s - 1) < 1e-9) return '1:1';
+  return s < 1 ? ('1:' + Math.round(1/s)) : (Math.round(s) + ':1');
+}
+// Model mm → page mm, then page mm → screen. Everything the reference
+// layer draws goes through this pair, so changing scale moves the whole
+// underlay coherently instead of per-primitive.
+function kvModelToPage(mx, my) {
+  return { x: KV_VIEW.ox + mx * KV_VIEW.scale, y: KV_VIEW.oy + my * KV_VIEW.scale };
+}
+function kvM2S(mx, my) { const p = kvModelToPage(mx, my); return kvW2S(p.x, p.y); }
+// Model length → screen length (scale AND page zoom, in that order).
+function kvMLen(v) { return v * KV_VIEW.scale * kvZoom; }
+
+function kvSetViewScale(s) {
+  if (!(s > 0)) return;
+  KV_VIEW.scale = s;
+  kvScheduleDraw();
+  showToast('Viewport scale ' + kvScaleLabel(s));
+}
+function kvCycleViewScale() {
+  const i = KV_SCALES.findIndex(s => Math.abs(s - KV_VIEW.scale) < 1e-9);
+  kvSetViewScale(KV_SCALES[(i + 1) % KV_SCALES.length]);
+}
+// Choose the largest standard ratio that still fits the model inside the
+// sheet margins, then centre it. Snapping to a called-out ratio rather
+// than an arbitrary best-fit number is the point — drawings are issued at
+// 1:50, never at 1:47.3.
+function kvFitViewport() {
+  const objs = GeoMemory.objects;
+  if (!objs.length) { showToast('No geometry to fit'); return; }
+  let m = {x1:Infinity, y1:Infinity, x2:-Infinity, y2:-Infinity};
+  const add = (x, y) => { m.x1=Math.min(m.x1,x); m.y1=Math.min(m.y1,y); m.x2=Math.max(m.x2,x); m.y2=Math.max(m.y2,y); };
+  for (const o of objs) {
+    if (o.type==='LINE') { add(o.x1,o.y1); add(o.x2,o.y2); }
+    else if (o.type==='CIRCLE'||o.type==='ARC') { add(o.cx-o.r,o.cy-o.r); add(o.cx+o.r,o.cy+o.r); }
+    else if (o.type==='POLYLINE'&&o.pts) o.pts.forEach(p=>add(p.x,p.y));
+    else if (o.type==='TEXT'||o.type==='POINT') add(o.x,o.y);
+  }
+  if (!isFinite(m.x1)) { showToast('No geometry to fit'); return; }
+  const margin = 15;
+  const availW = KV_PAGE.w - margin*2, availH = KV_PAGE.h - margin*2;
+  const needW = Math.max(1e-6, m.x2-m.x1), needH = Math.max(1e-6, m.y2-m.y1);
+  const raw = Math.min(availW/needW, availH/needH);
+  const fit = KV_SCALES.filter(s => s <= raw).sort((a,b)=>b-a)[0] || Math.min(...KV_SCALES);
+  KV_VIEW.scale = fit;
+  KV_VIEW.ox = (KV_PAGE.w - needW*fit)/2 - m.x1*fit;
+  KV_VIEW.oy = (KV_PAGE.h - needH*fit)/2 - m.y1*fit;
+  kvScheduleDraw();
+  showToast('Viewport fitted · ' + kvScaleLabel(fit));
+}
 let kvDimStd      = 'asme';   // 'ansi'|'asme'|'aws'|'arch'
 let kvDimState    = {active:false, p1:null, p2:null, offset:0};
 let kvWeldState   = {active:false, p1:null, p2:null};
@@ -10024,12 +10209,23 @@ function kvS2W(sx, sy) {
     y: KV_PAGE.h - (sy - kvPanY) / kvZoom
   };
 }
+// Screen point in CSS pixels. This previously multiplied by
+// canvas.width/rect.width — i.e. it returned DEVICE pixels — while
+// kvResizeCanvas sets kvCtx.setTransform(dpr,...) so everything drawn is
+// in CSS pixels. On any DPR>1 screen (every phone and tablet) that put
+// every tap at double its true position: the whole KANVAS surface was
+// mis-registered on exactly the devices it exists for.
 function kvSpt(e) {
   const r = kvCanvas.getBoundingClientRect();
-  return {
-    x: (e.clientX - r.left) * (kvCanvas.width / r.width),
-    y: (e.clientY - r.top)  * (kvCanvas.height / r.height)
-  };
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+// Pen pressure, normalised. Pens report a real 0..1 value; mouse reports a
+// constant 0.5 while down; touch commonly reports 0 or 1 with no useful
+// gradation. Anything that isn't a pen is pinned to the mid value so line
+// weight stays steady rather than flickering between extremes.
+function kvPressure(e) {
+  if (e.pointerType === 'pen' && e.pressure > 0) return Math.max(0.05, Math.min(1, e.pressure));
+  return 0.5;
 }
 function kvSnapPt(wx, wy) {
   if (!kvSnapEnabled) return {x:wx, y:wy};
@@ -10038,8 +10234,11 @@ function kvSnapPt(wx, wy) {
 }
 function kvZoomFit() {
   if (!kvCanvas) return;
-  const W = kvCanvas.width / (window.devicePixelRatio || 1);
-  const H = kvCanvas.height / (window.devicePixelRatio || 1);
+  // Use the CSS extents recorded by kvResizeCanvas rather than dividing by
+  // devicePixelRatio here — the resize caps dpr at 2, so on a 3x screen the
+  // two disagreed and every fit came out a third too small.
+  const W = kvCssW || kvCanvas.clientWidth;
+  const H = kvCssH || kvCanvas.clientHeight;
   const margin = 40;
   kvZoom = Math.min((W - margin*2) / KV_PAGE.w, (H - margin*2) / KV_PAGE.h);
   kvPanX = (W - KV_PAGE.w * kvZoom) / 2;
@@ -10059,13 +10258,42 @@ const KVM = {
   nextId: 1,
   push(obj){ this.strokes.push(obj); },
   undo(){ this.strokes.pop(); },
-  visibleStrokes(){ return this.strokes.filter(s=>{
-    const L = this.layers.find(l=>l.name===s.layer);
-    return !L || L.visible;
-  }); }
+  layerOf(name){ return this.layers.find(l=>l.name===name); },
+  _vis(arr){ return arr.filter(o=>{ const L=this.layerOf(o.layer); return !L || L.visible; }); },
+  visibleStrokes(){ return this._vis(this.strokes); },
+  // Dimensions and welds were never filtered by layer, so hiding a layer
+  // hid its ink but left its dimensions floating on the sheet.
+  visibleDims(){  return this._vis(this.dims);  },
+  visibleWelds(){ return this._vis(this.welds); }
 };
 
-// ── BRUSH STATE (shared with VAD engine) ─────────────────────────────────────
+// Single entry point for switching annotation layer. Everything that has to
+// react to the change reacts here, so no caller can half-apply it.
+function kvSetActiveLayer(name) {
+  const lay = KVM.layerOf(name);
+  if (!lay) return;
+  KVM.activeLayer = name;
+  // New ink adopts the layer colour — that's what makes the choice visible.
+  // Swatches still override within the layer.
+  if (typeof B !== 'undefined') B.color = lay.color;
+  kvBuildLayerList();
+  if (typeof buildKvLayerDropdown === 'function') buildKvLayerDropdown();
+  if (typeof kvBuildSwatches === 'function') kvBuildSwatches();
+  kvScheduleDraw();
+  showToast('Annotating on: ' + name);
+}
+
+function kvToggleLayerVis(name) {
+  const lay = KVM.layerOf(name);
+  if (!lay) return;
+  lay.visible = !lay.visible;
+  kvBuildLayerList();
+  if (typeof buildKvLayerDropdown === 'function') buildKvLayerDropdown();
+  kvRebuildEraseCanvas();
+  kvScheduleDraw();
+}
+
+// ── BRUSH STATE ──────────────────────────────────────────────────────────────
 const B = {
   color:'#ff3cac', opacity:0.9, size:10, alpha:0.72, taper:0.7, glow:false,
   blend:'source-over', type:'brush'
@@ -10346,7 +10574,10 @@ function kvDrawWeldSymbol(ctx, p1s, p2s, type, arrowSide, size, length, note) {
 // ── KANVAS RENDER ─────────────────────────────────────────────────────────────
 function kvRender() {
   if (!kvActive || !kvCanvas || !kvCtx) return;
-  const W = kvCanvas.width, H = kvCanvas.height;
+  updateEscFab();   // KANVAS has its own frame loop; the FAB rides it
+  // CSS-pixel extents — kvCtx carries a dpr transform, so drawing in
+  // device pixels here would paint at multiples of the real surface.
+  const W = kvCssW, H = kvCssH;
   const ctx = kvCtx;
   ctx.clearRect(0, 0, W, H);
 
@@ -10365,36 +10596,100 @@ function kvRender() {
   ctx.fillRect(o.x, o.y, pW, pH);
   ctx.restore();
 
-  // 3. KAD geometry reference layer (read-only, dimmed blue)
+  // 2b. Page grid, clipped to the sheet. KANVAS had no grid at all, which
+  //     is why the universal G had nothing to toggle here. 10mm major on
+  //     the page itself — a sheet grid, not a world grid.
+  if (kvShowGrid && kvZoom > 0.12) {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(o.x, o.y, pW, pH); ctx.clip();
+    ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let gx = 0; gx <= KV_PAGE.w; gx += 10) {
+      const s = kvW2S(gx, 0); ctx.moveTo(s.x, o.y); ctx.lineTo(s.x, o.y + pH);
+    }
+    for (let gy = 0; gy <= KV_PAGE.h; gy += 10) {
+      const s = kvW2S(0, gy); ctx.moveTo(o.x, s.y); ctx.lineTo(o.x + pW, s.y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
   ctx.save();
-  ctx.globalAlpha = 0.18;
+  ctx.restore();
+
+  // 3. KAD geometry reference layer — read-only underlay, drawn through
+  //    the viewport (scale + page offset) rather than 1:1 as before.
+  //    Every primitive goes via kvM2S/kvMLen so one scale change moves the
+  //    whole underlay together.
+  ctx.save();
+  ctx.beginPath(); ctx.rect(o.x, o.y, pW, pH); ctx.clip();  // never bleed off-sheet
+  ctx.globalAlpha = 0.28;
   ctx.strokeStyle = '#00d4ff';
-  ctx.lineWidth   = 0.8;
+  ctx.lineWidth   = 0.9;
   for (const obj of GeoMemory.objects) {
+    const L = (typeof LAYERS!=='undefined') ? LAYERS[obj.layer] : null;
+    if (L && L.visible === false) continue;   // hidden in model ⇒ hidden here
     if (obj.type === 'LINE') {
-      const a = kvW2S(obj.x1, obj.y1), b = kvW2S(obj.x2, obj.y2);
+      const a = kvM2S(obj.x1, obj.y1), b = kvM2S(obj.x2, obj.y2);
       ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
     } else if (obj.type === 'CIRCLE') {
-      const c = kvW2S(obj.cx, obj.cy);
-      ctx.beginPath();
-      ctx.arc(c.x, c.y, obj.r * kvZoom, 0, Math.PI*2);
-      ctx.stroke();
+      const cc = kvM2S(obj.cx, obj.cy);
+      ctx.beginPath(); ctx.arc(cc.x, cc.y, kvMLen(obj.r), 0, Math.PI*2); ctx.stroke();
     } else if (obj.type === 'ARC') {
-      const c = kvW2S(obj.cx, obj.cy);
-      const sa = obj.startAngle * Math.PI/180;
-      const ea = obj.endAngle   * Math.PI/180;
+      // GeoMemory stores startA/endA in RADIANS. This read obj.startAngle
+      // and obj.endAngle — fields that don't exist on an arc — so every
+      // arc came through as NaN and silently drew nothing.
+      const cc = kvM2S(obj.cx, obj.cy);
       ctx.beginPath();
-      ctx.arc(c.x, c.y, obj.r * kvZoom, -ea, -sa);
+      ctx.arc(cc.x, cc.y, kvMLen(obj.r), -obj.endA, -obj.startA, !obj.ccw);
       ctx.stroke();
-    } else if (obj.type === 'POLYLINE' && obj.pts) {
-      const pts = obj.pts.map(p => kvW2S(p.x, p.y));
+    } else if (obj.type === 'POLYLINE' && obj.pts && obj.pts.length) {
+      const pts = obj.pts.map(p => kvM2S(p.x, p.y));
       ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
       for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
       if (obj.closed) ctx.closePath();
       ctx.stroke();
+    } else if (obj.type === 'POINT') {
+      const p = kvM2S(obj.x, obj.y);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.stroke();
+    } else if (obj.type === 'TEXT') {
+      // Model text and model dimensions were missing from the underlay
+      // entirely — you could not see what you were annotating around.
+      const p = kvM2S(obj.x, obj.y);
+      ctx.save();
+      ctx.fillStyle = '#00d4ff';
+      ctx.font = `${Math.max(5, kvMLen(obj.h || 5))}px 'JetBrains Mono', monospace`;
+      ctx.fillText(obj.text || '', p.x, p.y);
+      ctx.restore();
+    } else if (obj.type === 'DIM' && obj.p1 && obj.p2) {
+      const a = kvM2S(obj.p1.x, obj.p1.y), b = kvM2S(obj.p2.x, obj.p2.y);
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
     }
   }
   ctx.restore();
+
+  // 3b. Viewport frame + scale callout. A paperspace viewport has to
+  //     declare its ratio on the sheet; a drawing without a stated scale
+  //     isn't issuable.
+  if (KV_VIEW.show) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,212,255,0.35)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6,4]);
+    const vo = kvW2S(KV_VIEW.ox, KV_VIEW.oy);
+    ctx.strokeRect(o.x + 6, o.y + 6, pW - 12, pH - 12);
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(0,212,255,0.75)';
+    ctx.font = `600 10px 'JetBrains Mono', monospace`;
+    ctx.fillText('SCALE ' + kvScaleLabel(KV_VIEW.scale), o.x + 10, o.y + pH - 12);
+    // Origin tick — where model 0,0 sits on the sheet.
+    ctx.strokeStyle = 'rgba(0,212,255,0.5)';
+    ctx.beginPath();
+    ctx.moveTo(vo.x - 5, vo.y); ctx.lineTo(vo.x + 5, vo.y);
+    ctx.moveTo(vo.x, vo.y - 5); ctx.lineTo(vo.x, vo.y + 5);
+    ctx.stroke();
+    ctx.restore();
+  }
 
   // 4. Page grid (1mm dots)
   ctx.save();
@@ -10416,13 +10711,13 @@ function kvRender() {
   ctx.beginPath();
   ctx.rect(o.x, o.y, pW, pH);
   ctx.clip();
-  if (kvEraseC && kvEraseC.width === W && kvEraseC.height === H) {
-    ctx.drawImage(kvEraseC, 0, 0, W, H);
+  if (kvEraseC && kvEraseC.width) {
+    ctx.drawImage(kvEraseC, 0, 0, kvCssW, kvCssH);
   }
   ctx.restore();
 
   // 6. Dimension annotations
-  for (const d of KVM.dims) {
+  for (const d of KVM.visibleDims()) {
     if (d.type === 'linear') {
       kvDrawLinearDim(ctx, d.p1, d.p2, d.offset || 10, d.label);
     } else if (d.type === 'radial') {
@@ -10431,13 +10726,31 @@ function kvRender() {
   }
 
   // 7. Weld symbols
-  for (const w of KVM.welds) {
+  for (const w of KVM.visibleWelds()) {
     const s1 = kvW2S(w.p1.x, w.p1.y);
     const s2 = kvW2S(w.p2.x, w.p2.y);
     kvDrawWeldSymbol(ctx, s1, s2, w.weldType, w.arrowSide, w.size, w.length, w.note);
   }
 
-  // 8. Live tool previews
+  // 8. Live tool previews — including the stroke currently under the pen,
+  //    which isn't in the erase buffer yet (it lands there on release).
+  if (kvStroke) kvStrokePath(ctx, kvStroke);
+  // Armed straight segment: the beam persists after release, exactly as the
+  // model-space rubber band does, so you can see what the next tap commits.
+  if (kvPendingPt) {
+    const a = kvW2S(kvPendingPt.x, kvPendingPt.y);
+    const b = kvW2S(kvMouseWorld.x, kvMouseWorld.y);
+    ctx.save();
+    ctx.strokeStyle = B.color || '#ff3cac';
+    ctx.globalAlpha = 0.75;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(a.x, a.y, 3, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+  }
   kvDrawToolPreview(ctx);
 
   // 9. Page label
@@ -10479,6 +10792,7 @@ let kvMouseWorld = {x:0, y:0};
 
 function kvSetTool(t) {
   kvTool = t;
+  if (typeof kContext !== 'undefined' && kContext) kContext.textContent = 'KV·' + t.toUpperCase();
   document.querySelectorAll('.kv-tbtn').forEach(b => b.classList.remove('act'));
   const btn = document.getElementById(`kv-tb-${t}`);
   if (btn) btn.classList.add('act');
@@ -10502,18 +10816,132 @@ function kvSetTool(t) {
   kvScheduleDraw();
 }
 
+// ── KANVAS TOUCH / STYLUS ENGINE ──────────────────────────────────────────────
+// Model space grew its touch support in place across several phases and
+// that code is load-bearing, so it is deliberately left untouched. What
+// follows gives KANVAS the same capabilities, but built on Pointer Events
+// rather than synthetic mouse injection — KANVAS already listens on
+// pointer*, which (unlike model space's mouse listeners) delivers real
+// touch drags natively under touch-action:none. So KANVAS never needed the
+// injection layer; what it was missing was multi-touch, hold, hover, pen
+// pressure, and any way to pan with a finger.
+//
+// Gesture map, matching model space wherever the two overlap:
+//   two fingers      → pinch zoom + pan the sheet
+//   one finger       → pan the sheet (when a pen has been seen) or draw
+//   pen              → always draws, never pans — palm and hand rest on
+//                      the glass without laying down ink
+//   hold 500ms       → context menu, with the same 12ms haptic
+const KV_SLOP    = 8;    // matches SWIPE_SLOP in model space
+const KV_HOLD_MS = 500;  // matches LONG_PRESS_MS
+
+// Once a pen is seen, finger input stops drawing and becomes navigation.
+// This is what makes a stylus usable on a tablet: the hand resting on the
+// sheet is a finger contact, and it must not draw.
+let kvPenSeen = false;
+const kvPointers = new Map();   // pointerId → {x, y, type}
+let kvPinch      = null;
+let kvStroke     = null;        // in-progress freehand stroke
+let kvHoldTimer  = null, kvHoldFired = false, kvHoldX = 0, kvHoldY = 0;
+// Two-tap straight-segment mode. A drag is a gesture and becomes a curve; a
+// tap is a deliberate placement and becomes a vector line to the next tap —
+// the same distinction model space draws between drawing and placing.
+let kvPendingPt  = null;   // first tap of a pending straight segment
+let kvStrokeMoved = false; // did this contact travel past slop?
+
+function kvIsDrawTool(t) { return t === 'brush' || t === 'erase'; }
+// Does this contact draw, or navigate? A pen always draws. A finger draws
+// only while no pen has ever been used on this canvas.
+function kvContactDraws(e) {
+  if (e.pointerType === 'pen') return true;
+  if (e.pointerType === 'touch') return !kvPenSeen;
+  return true;  // mouse
+}
+
+function kvCancelHold() { if (kvHoldTimer) { clearTimeout(kvHoldTimer); kvHoldTimer = null; } }
+function kvAbortStroke() {
+  if (!kvStroke) return;
+  kvStroke = null;
+  kvScheduleDraw();
+}
+
 // ── KANVAS POINTER EVENTS ─────────────────────────────────────────────────────
 function kvOnDown(e) {
   e.preventDefault();
   kvInitDrawing();
+  if (e.pointerType === 'pen') kvPenSeen = true;
+  // Drop any contact the browser never closed out — a swallowed pointerup
+  // used to leave a phantom finger behind, which then read as a pinch.
+  for (const id of [...kvPointers.keys()]) {
+    if (typeof kvCanvas.hasPointerCapture === 'function' && !kvCanvas.hasPointerCapture(id)) kvPointers.delete(id);
+  }
+  try { kvCanvas.setPointerCapture(e.pointerId); } catch (err) {}
   const s = kvSpt(e);
+  kvPointers.set(e.pointerId, {x:s.x, y:s.y, type:e.pointerType});
+
+  // Second contact: hand everything to pinch and undo any ink the first
+  // contact started — a two-finger gesture is never a stroke.
+  if (kvPointers.size === 2) {
+    kvCancelHold();
+    kvAbortStroke();
+    const [a, b] = [...kvPointers.values()];
+    kvPinch = {
+      startDist: Math.max(1, Math.hypot(b.x-a.x, b.y-a.y)),
+      startZoom: kvZoom, startPanX: kvPanX, startPanY: kvPanY,
+      midX: (a.x+b.x)/2, midY: (a.y+b.y)/2
+    };
+    kvIsPanning = false;
+    return;
+  }
+  if (kvPointers.size > 2) return;
+
   const w = kvS2W(s.x, s.y);
   kvMouseWorld = kvSnapPt(w.x, w.y);
 
-  if (e.button === 1 || (e.button === 0 && kvSpaceDown)) {
+  // Hold-to-context-menu, same contract as model space: cancels on move
+  // past slop, fires once, suppresses the tap that would follow.
+  kvHoldFired = false;
+  kvHoldX = e.clientX; kvHoldY = e.clientY;
+  kvCancelHold();
+  kvHoldTimer = setTimeout(() => {
+    kvHoldTimer = null;
+    kvHoldFired = true;
+    kvAbortStroke();
+    kvIsPanning = false;
+    if (navigator.vibrate) navigator.vibrate(12);
+    // Model space opens its context menu here. KANVAS deliberately doesn't:
+    // that menu is model commands (Reset View, tool picks) which would do
+    // nothing to a sheet, and showing dead entries is worse than showing
+    // none. The equivalent "reveal more" on a sheet is the tool palette,
+    // which on mobile is precisely what's tucked behind the drawer.
+    if (document.body.classList.contains('mobile-mode')) toggleMobileSidebar(true);
+    else showToast('KANVAS · ' + kvTool.toUpperCase() + ' · scale ' + kvScaleLabel(KV_VIEW.scale));
+  }, KV_HOLD_MS);
+
+  // Finger-pan: with a pen in use, or with the select tool, a single
+  // contact navigates the sheet instead of marking it. Middle-click and
+  // space-drag keep working for desktop.
+  const navigating = (e.button === 1) || (e.button === 0 && kvSpaceDown) ||
+                     !kvContactDraws(e) || kvTool === 'select';
+  if (navigating) {
     kvIsPanning = true;
     kvPanOX = s.x - kvPanX;
     kvPanOY = s.y - kvPanY;
+    return;
+  }
+
+  // Freehand ink — brush and erase share the stroke path; erase differs
+  // only in how it composites into the buffer.
+  if (kvIsDrawTool(kvTool)) {
+    kvStroke = {
+      id: KVM.nextId++, type: kvTool === 'erase' ? 'erase' : 'brush',
+      layer: KVM.activeLayer, color: B.color, size: B.size,
+      alpha: (B.alpha != null ? B.alpha : 0.9),
+      mode: 'curve',
+      pts: [{x:w.x, y:w.y, p:kvPressure(e)}]
+    };
+    kvStrokeMoved = false;
+    kvScheduleDraw();
     return;
   }
 
@@ -10521,7 +10949,7 @@ function kvOnDown(e) {
     if (!kvDimState.active) {
       kvDimState = {active:true, p1:{...kvMouseWorld}, p2:null, offset:10};
     } else {
-      KVM.dims.push({type:'linear', p1:kvDimState.p1, p2:{...kvMouseWorld}, offset:10, label:null});
+      KVM.dims.push({id:KVM.nextId++, layer:KVM.activeLayer, type:'linear', p1:kvDimState.p1, p2:{...kvMouseWorld}, offset:10, label:null});
       kvDimState = {active:false, p1:null, p2:null, offset:10};
       kvScheduleDraw();
     }
@@ -10532,7 +10960,7 @@ function kvOnDown(e) {
     } else {
       const dx = kvMouseWorld.x - kvDimState.p1.x;
       const dy = kvMouseWorld.y - kvDimState.p1.y;
-      KVM.dims.push({type:'radial', center:kvDimState.p1, radius:Math.sqrt(dx*dx+dy*dy), label:null});
+      KVM.dims.push({id:KVM.nextId++, layer:KVM.activeLayer, type:'radial', center:kvDimState.p1, radius:Math.sqrt(dx*dx+dy*dy), label:null});
       kvDimState.active = false;
       kvScheduleDraw();
     }
@@ -10541,6 +10969,7 @@ function kvOnDown(e) {
       kvWeldState = {active:true, p1:{...kvMouseWorld}, p2:null};
     } else {
       KVM.welds.push({
+        id:KVM.nextId++, layer:KVM.activeLayer,
         p1:kvWeldState.p1, p2:{...kvMouseWorld},
         weldType:kvWeldType, arrowSide:kvWeldArrow,
         size:kvWeldSize, length:kvWeldLength, note:''
@@ -10549,53 +10978,321 @@ function kvOnDown(e) {
       kvScheduleDraw();
     }
   } else if (kvTool === 'text') {
-    const txt = prompt('Annotation text:', '');
-    if (txt) {
-      KVM.strokes.push({
-        id:KVM.nextId++, type:'text', layer:KVM.activeLayer,
-        x:kvMouseWorld.x, y:kvMouseWorld.y, text:txt,
-        color:B.color, size:B.size
-      });
-      kvRebuildEraseCanvas();
-      kvScheduleDraw();
-    }
+    // Non-blocking inline entry instead: the caret is placed, an input
+    // appears at that point, and Escape or an empty commit always gets out.
+    // Tapping elsewhere while it's open commits what's there rather than
+    // stacking a second field on top.
+    if (kvTextState.active) kvCommitTextEntry();
+    else kvOpenTextEntry(kvMouseWorld.x, kvMouseWorld.y, e.clientX, e.clientY);
   }
 }
 
 function kvOnMove(e) {
   const s = kvSpt(e);
+  if (kvPointers.has(e.pointerId)) {
+    const p = kvPointers.get(e.pointerId); p.x = s.x; p.y = s.y;
+  }
+
+  // Pinch: zoom about the live midpoint so the sheet under the fingers
+  // stays under the fingers, same anchor maths as model space.
+  if (kvPinch && kvPointers.size === 2) {
+    const [a, b] = [...kvPointers.values()];
+    const d  = Math.max(1, Math.hypot(b.x-a.x, b.y-a.y));
+    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+    const nz = Math.max(0.05, Math.min(40, kvPinch.startZoom * (d / kvPinch.startDist)));
+    kvPanX = mx - (kvPinch.midX - kvPinch.startPanX) * (nz / kvPinch.startZoom);
+    kvPanY = my - (kvPinch.midY - kvPinch.startPanY) * (nz / kvPinch.startZoom);
+    kvZoom = nz;
+    kvScheduleDraw();
+    return;
+  }
+
+  // Movement past slop is a drag, not a hold.
+  if (kvHoldTimer && Math.hypot(e.clientX - kvHoldX, e.clientY - kvHoldY) > KV_SLOP) kvCancelHold();
+
   const w = kvS2W(s.x, s.y);
   kvMouseWorld = {x:w.x, y:w.y};
+
   if (kvIsPanning) {
     kvPanX = s.x - kvPanOX;
     kvPanY = s.y - kvPanOY;
+    kvScheduleDraw();
+    return;
+  }
+
+  // Accumulate ink. Points closer together than a third of a page mm add
+  // nothing but memory, so they are dropped before they reach the stroke.
+  if (kvStroke) {
+    const first = kvStroke.pts[0];
+    const last  = kvStroke.pts[kvStroke.pts.length - 1];
+    // Travel is measured from the contact point in page mm, scaled to
+    // screen, so the slop threshold means the same thing at every zoom.
+    if (!kvStrokeMoved && Math.hypot(w.x - first.x, w.y - first.y) * kvZoom > KV_SLOP) kvStrokeMoved = true;
+    if (Math.hypot(w.x - last.x, w.y - last.y) >= 0.33) {
+      kvStroke.pts.push({x:w.x, y:w.y, p:kvPressure(e)});
+    }
+    kvScheduleDraw();
+    return;
   }
   kvScheduleDraw();
 }
 
 function kvOnUp(e) {
+  kvCancelHold();
+  try { kvCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
+  kvPointers.delete(e.pointerId);
+  if (kvPointers.size < 2) kvPinch = null;
+
+  // A hold already fired its menu — the lift that follows must not also
+  // commit whatever the tool would have done.
+  if (kvHoldFired) { kvHoldFired = false; kvAbortStroke(); kvIsPanning = false; kvScheduleDraw(); return; }
+
+  if (kvStroke) {
+    if (kvStrokeMoved) {
+      // Travelled: it's a gesture. Commit the sampled path — kvStrokePath
+      // splines it into a continuous curve at render time.
+      kvStroke.mode = 'curve';
+      KVM.strokes.push(kvStroke);
+      kvRebuildEraseCanvas();
+    } else {
+      // Didn't travel: it's a tap, which places a vertex rather than ink.
+      // First tap arms the segment, second tap draws it. Erase has no
+      // two-point form, so a tap there stays a dot.
+      const pt = {...kvStroke.pts[0]};
+      if (kvStroke.type === 'erase') {
+        kvStroke.pts.push({...pt});
+        KVM.strokes.push(kvStroke);
+        kvRebuildEraseCanvas();
+      } else if (!kvPendingPt) {
+        kvPendingPt = pt;
+        showToast('Tap the end point · ESC to cancel');
+      } else {
+        KVM.strokes.push({
+          id: KVM.nextId++, type: 'brush', mode: 'line',
+          layer: kvStroke.layer, color: kvStroke.color,
+          size: kvStroke.size, alpha: kvStroke.alpha,
+          pts: [{...kvPendingPt}, pt]
+        });
+        kvPendingPt = null;
+        kvRebuildEraseCanvas();
+      }
+    }
+    kvStroke = null;
+    kvStrokeMoved = false;
+  }
   kvIsPanning = false;
+  kvScheduleDraw();
+}
+
+// ── KANVAS INLINE TEXT ENTRY ──
+// Placement is a two-step the same way a dimension is: the tap sets the
+// anchor, the input takes it from there. Nothing here blocks, so pointer
+// state unwinds normally and Escape is always available.
+let kvTextState = {active:false, x:0, y:0};
+
+function kvOpenTextEntry(wx, wy, clientX, clientY) {
+  const inp = document.getElementById('kv-text-input');
+  if (!inp) return;
+  kvTextState = {active:true, x:wx, y:wy};
+  inp.value = '';
+  inp.style.display = 'block';
+  inp.style.left = Math.min(window.innerWidth - 220, Math.max(8, clientX)) + 'px';
+  inp.style.top  = Math.min(window.innerHeight - 60, Math.max(8, clientY)) + 'px';
+  inp.style.color = B.color || '#ff3cac';
+  // Focus on the next frame: on iOS focusing during a pointer handler is
+  // ignored, which would leave the field open with no keyboard.
+  requestAnimationFrame(() => { inp.focus(); inp.select(); });
+  kvScheduleDraw();
+}
+
+function kvCommitTextEntry() {
+  const inp = document.getElementById('kv-text-input');
+  if (!inp || !kvTextState.active) return;
+  const txt = inp.value.trim();
+  if (txt) {
+    KVM.strokes.push({
+      id:KVM.nextId++, type:'text', layer:KVM.activeLayer,
+      x:kvTextState.x, y:kvTextState.y, text:txt,
+      color:B.color, size:B.size
+    });
+    kvRebuildEraseCanvas();
+  }
+  kvCloseTextEntry();
+}
+
+function kvCloseTextEntry() {
+  const inp = document.getElementById('kv-text-input');
+  kvTextState = {active:false, x:0, y:0};
+  if (inp) { inp.value = ''; inp.style.display = 'none'; inp.blur(); }
+  kvScheduleDraw();
+}
+
+function kvTextKey(e) {
+  e.stopPropagation();   // never let Enter/Escape reach the canvas handlers
+  if (e.key === 'Enter')  { e.preventDefault(); kvCommitTextEntry(); }
+  if (e.key === 'Escape') { e.preventDefault(); kvCloseTextEntry(); }
+}
+
+// ── KANVAS HOVER SENSE ──
+// A pen in the air reports pressure 0 with no buttons down. Tracking it
+// gives KANVAS the same live crosshair/preview feedback model space gets
+// from its multi-channel hover net, without needing that net's complexity:
+// KANVAS listens on pointer events, which is where pen hover arrives.
+function kvOnHover(e) {
+  if (e.pointerType === 'pen') kvPenSeen = true;
+  if (kvPointers.size) return;                 // contact is driving, not hover
+  if (e.pressure > 0 || e.buttons > 0) return; // that's contact, not hover
+  const s = kvSpt(e);
+  const w = kvS2W(s.x, s.y);
+  kvMouseWorld = kvSnapPt(w.x, w.y);
+  const badge = document.getElementById('hover-src');
+  if (badge) badge.textContent = 'kv·HOV';
+  kvScheduleDraw();
 }
 
 // ── KANVAS ERASE CANVAS ───────────────────────────────────────────────────────
 
 function kvInitDrawing() {
-  // Deferred — EMAStab/VelTrack may not exist in base KAD (those are VAD classes)
+  // Deferred — EMAStab/VelTrack are optional stabiliser classes and may be absent
   // For KAD KANVAS, we use simple freehand without EMA stabilization
 }
 
+// Replays every visible stroke into the offscreen buffer. Erase strokes
+// are destination-out, so they carve holes in the ink laid down before
+// them — which is why the buffer is rebuilt in order rather than each
+// stroke being drawn straight to screen.
 function kvRebuildEraseCanvas() {
-  if (!kvCanvas || !kvEraseC) return;
-  kvEraseC.width  = kvCanvas.width;
-  kvEraseC.height = kvCanvas.height;
+  if (!kvCanvas || !kvEraseC || !kvEraseCtx) return;
+  kvEraseCtx.save();
+  kvEraseCtx.setTransform(1, 0, 0, 1, 0, 0);
   kvEraseCtx.clearRect(0, 0, kvEraseC.width, kvEraseC.height);
+  kvEraseCtx.restore();
   for (const s of KVM.visibleStrokes()) {
     kvRenderStroke(kvEraseCtx, s);
   }
 }
 
+// ── VECTOR STROKE GEOMETRY ────────────────────────────────────────────────────
+// Strokes were drawn as a chain of straight lineTo segments, one per raw
+// input sample. At any speed the sample spacing grows and the "curve"
+// visibly faceted into a polyline — the faster the swipe, the more obvious
+// the corners. The fix is to treat the samples as control points of a real
+// curve and to build the stroke as a filled outline rather than a stack of
+// stroked segments, which is also what lets width vary continuously along
+// its length instead of stepping per segment.
+
+// Catmull-Rom through every sample. It interpolates (passes exactly through
+// the input points) rather than approximating, so the ink goes where the pen
+// went — a B-spline would round the path away from the actual gesture.
+// Pressure is carried along the same parameter so width stays in step.
+function kvSpline(pts, perSeg) {
+  const n = pts.length;
+  if (n < 3) return pts.slice();
+  const out = [];
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = pts[i-1] || pts[i], p1 = pts[i], p2 = pts[i+1], p3 = pts[i+2] || pts[i+1];
+    for (let s = 0; s < perSeg; s++) {
+      const t = s / perSeg, t2 = t*t, t3 = t2*t;
+      out.push({
+        x: 0.5*(2*p1.x + (-p0.x+p2.x)*t + (2*p0.x-5*p1.x+4*p2.x-p3.x)*t2 + (-p0.x+3*p1.x-3*p2.x+p3.x)*t3),
+        y: 0.5*(2*p1.y + (-p0.y+p2.y)*t + (2*p0.y-5*p1.y+4*p2.y-p3.y)*t2 + (-p0.y+3*p1.y-3*p2.y+p3.y)*t3),
+        p: (p1.p != null ? p1.p : 0.5) + ((p2.p != null ? p2.p : 0.5) - (p1.p != null ? p1.p : 0.5)) * t
+      });
+    }
+  }
+  out.push(pts[n-1]);
+  return out;
+}
+
+// Half-width at each sample: pen pressure, with the ends tapered. A straight
+// two-tap segment is a drawn line, not a gesture, so it keeps constant
+// weight — tapering it would make a deliberate line look like a smudge.
+function kvHalfWidths(pts, s) {
+  const base   = Math.max(0.35, (s.size || 10) * 0.35);
+  const isLine = s.mode === 'line';
+  return pts.map((pt, i) => {
+    const pr = pt.p != null ? pt.p : 0.5;
+    if (isLine) return base * 0.8;
+    const t = pts.length > 1 ? i / (pts.length - 1) : 0.5;
+    const taper = Math.min(1, Math.min(t, 1 - t) * 8 + 0.3);
+    return Math.max(0.12, base * (0.35 + 1.3 * pr) * taper);
+  });
+}
+
+// ── STROKE GEOMETRY — PAGE SPACE ──────────────────────────────────────────────
+// The outline is resolved in page millimetres, NOT screen pixels. That is what
+// makes the native format and the SVG export the same drawing rather than two
+// approximations of it: the canvas renderer transforms this result through
+// kvW2S, and the SVG writer emits it directly. One geometry function, so the
+// exported file can't drift from what's on screen.
+//
+// Returns page-mm coordinates: either a dot, or the left/right offset rails
+// plus the two end caps.
+function kvStrokeGeometry(s) {
+  const raw = s.pts;
+  if (!raw || !raw.length) return null;
+
+  const isDot = raw.length === 1 ||
+    (raw.length === 2 && raw[0].x === raw[1].x && raw[0].y === raw[1].y);
+  if (isDot) {
+    const pr = raw[0].p != null ? raw[0].p : 0.5;
+    return { dot: { x: raw[0].x, y: raw[0].y,
+                    r: Math.max(0.15, (s.size || 10) * 0.35 * (0.35 + 1.3 * pr)) } };
+  }
+
+  const dense = (s.mode === 'line') ? raw : kvSpline(raw, 12);
+  const hw    = kvHalfWidths(dense, s);
+  const left = [], right = [];
+  for (let i = 0; i < dense.length; i++) {
+    const a = dense[Math.max(0, i-1)], b = dense[Math.min(dense.length-1, i+1)];
+    let dx = b.x - a.x, dy = b.y - a.y;
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len; dy /= len;
+    const nx = -dy * hw[i], ny = dx * hw[i];
+    left.push({ x: dense[i].x + nx, y: dense[i].y + ny });
+    right.push({ x: dense[i].x - nx, y: dense[i].y - ny });
+  }
+  return {
+    left, right,
+    capA: { x: dense[0].x, y: dense[0].y, r: hw[0] },
+    capB: { x: dense[dense.length-1].x, y: dense[dense.length-1].y, r: hw[hw.length-1] }
+  };
+}
+
+function kvStrokePath(ctx, s) {
+  const g = kvStrokeGeometry(s);
+  if (!g) return;
+
+  ctx.save();
+  ctx.globalCompositeOperation = (s.type === 'erase') ? 'destination-out' : 'source-over';
+  ctx.globalAlpha = (s.type === 'erase') ? 1 : (s.alpha != null ? s.alpha : 0.9);
+  ctx.fillStyle   = s.color || '#ff3cac';
+
+  if (g.dot) {
+    const c0 = kvW2S(g.dot.x, g.dot.y);
+    ctx.beginPath(); ctx.arc(c0.x, c0.y, Math.max(0.5, g.dot.r * kvZoom), 0, Math.PI*2); ctx.fill();
+    ctx.restore(); return;
+  }
+
+  const L = g.left.map(p => kvW2S(p.x, p.y));
+  const R = g.right.map(p => kvW2S(p.x, p.y));
+  ctx.beginPath();
+  ctx.moveTo(L[0].x, L[0].y);
+  for (let i = 1; i < L.length; i++) ctx.lineTo(L[i].x, L[i].y);
+  for (let i = R.length - 1; i >= 0; i--) ctx.lineTo(R[i].x, R[i].y);
+  ctx.closePath();
+  ctx.fill();
+
+  for (const cap of [g.capA, g.capB]) {
+    const cs = kvW2S(cap.x, cap.y);
+    ctx.beginPath(); ctx.arc(cs.x, cs.y, Math.max(0.35, cap.r * kvZoom), 0, Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
 function kvRenderStroke(ctx, s) {
   if (!s) return;
+  if (s.type === 'brush' || s.type === 'erase') { kvStrokePath(ctx, s); return; }
   if (s.type === 'text') {
     const sp = kvW2S(s.x, s.y);
     ctx.save();
@@ -10609,49 +11306,272 @@ function kvRenderStroke(ctx, s) {
 }
 
 // ── KANVAS EXPORT ─────────────────────────────────────────────────────────────
-function kvExportVAD() {
-  const geoRef = {
-    type:'kad-reference', locked:true,
-    objects: GeoMemory.objects,
+// ══ KANVAS FILE FORMATS ═══════════════════════════════════════════════════════
+//
+//   .kvs   native, lossless, round-trips     ─ mirrors .kad
+//   .svg   interchange, one-way vector out   ─ mirrors .dxf
+//
+// The old writer emitted ".vad" — Vector-Aided Design, the program's former
+// name — and handed the blob an "application/json" MIME type, which is why
+// browsers were saving it as "drawing.vad.json": the OS appended the
+// extension it inferred from the type. Native files now declare
+// application/octet-stream so the filename survives exactly as written.
+
+const KVS_VERSION = '1.0';
+const KVS_MIME    = 'application/octet-stream';  // stops the .json suffix
+
+// ── NATIVE: .kvs ──────────────────────────────────────────────────────────────
+// Everything needed to reconstruct the sheet: page, viewport scale, layers,
+// all three annotation stores, and a snapshot of the model geometry the
+// annotations were placed against — without which dimensions would lose the
+// thing they dimension.
+function kvSerialize() {
+  return JSON.stringify({
+    format: 'KVS',
+    version: KVS_VERSION,
+    generator: 'KAD KANVAS',
+    saved: new Date().toISOString(),
     units: unitMode,
-    layer: 'KAD Geometry',
-  };
-  const vad = {
-    version:'0.0', source:'KAD KANVAS',
-    layers:  KVM.layers,
+    page: {
+      name: Object.keys(KV_PAGE_SIZES).find(k => KV_PAGE_SIZES[k] === KV_PAGE) || 'a3p',
+      w: KV_PAGE.w, h: KV_PAGE.h
+    },
+    viewport:    { scale: KV_VIEW.scale, ox: KV_VIEW.ox, oy: KV_VIEW.oy, show: KV_VIEW.show },
+    dimStandard: kvDimStd,
     activeLayer: KVM.activeLayer,
-    nextId:  KVM.nextId,
-    strokes: KVM.strokes,
-    dims:    KVM.dims,
-    welds:   KVM.welds,
-    page:    Object.keys(KV_PAGE_SIZES).find(k=>KV_PAGE_SIZES[k]===KV_PAGE)||'a3p',
-    dimStd:  kvDimStd,
-    kadRef:  geoRef,
-  };
-  const blob = new Blob([JSON.stringify(vad,null,2)], {type:'application/json'});
-  const a = Object.assign(document.createElement('a'),{
-    href:URL.createObjectURL(blob), download:'drawing.vad'
-  });
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  showToast('Saved drawing.vad');
+    nextId:      KVM.nextId,
+    layers:      KVM.layers,
+    strokes:     KVM.strokes,
+    dims:        KVM.dims,
+    welds:       KVM.welds,
+    modelRef:    { role:'kad-reference', locked:true, units:unitMode, objects:GeoMemory.objects }
+  }, null, 2);
 }
+
+function kvDeserialize(text) {
+  let d;
+  try { d = JSON.parse(text); } catch (e) { return false; }
+  if (!d || (d.format !== 'KVS' && d.source !== 'KAD KANVAS')) return false;  // .vad files still load
+
+  if (d.page && KV_PAGE_SIZES[d.page.name]) kvSetPage(d.page.name);
+  else if (d.page && d.page.w) { KV_PAGE.w = d.page.w; KV_PAGE.h = d.page.h; }
+
+  if (d.viewport) Object.assign(KV_VIEW, d.viewport);
+  if (d.dimStandard) kvDimStd = d.dimStandard;
+  if (Array.isArray(d.layers) && d.layers.length) KVM.layers = d.layers;
+  KVM.strokes = Array.isArray(d.strokes) ? d.strokes : [];
+  KVM.dims    = Array.isArray(d.dims)    ? d.dims    : [];
+  KVM.welds   = Array.isArray(d.welds)   ? d.welds   : [];
+  KVM.activeLayer = d.activeLayer || (KVM.layers[0] && KVM.layers[0].name) || 'Annotations';
+  // Never trust a stored nextId: a file edited elsewhere could collide ids.
+  const maxId = [...KVM.strokes, ...KVM.dims, ...KVM.welds]
+    .reduce((m,o) => Math.max(m, o.id || 0), 0);
+  KVM.nextId = Math.max(d.nextId || 1, maxId + 1);
+
+  kvBuildLayerList();
+  if (typeof buildKvLayerDropdown === 'function') buildKvLayerDropdown();
+  kvRebuildEraseCanvas();
+  kvScheduleDraw();
+  return true;
+}
+
+function kvSaveKVS() {
+  downloadText(kvSerialize(), 'drawing.kvs', KVS_MIME);
+  showToast('Saved drawing.kvs');
+}
+
+function kvOpenKVS(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const ok = kvDeserialize(e.target.result);
+    showToast(ok ? 'Loaded ' + file.name : 'Not a valid .kvs file');
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ── INTERCHANGE: .svg ─────────────────────────────────────────────────────────
+// The .kvs → .svg mapping, entity by entity. Every native record has an SVG
+// counterpart, and each carries data-kvs-* attributes so the structure is
+// still legible after a round trip through Illustrator or Inkscape:
+//
+//   layer            → <g id data-kvs-layer>            (display:none if hidden)
+//   brush stroke     → <path> filled outline + end caps
+//   line stroke      → <path> same, constant width
+//   dot              → <circle>
+//   erase stroke     → <mask> entry, black on white — SVG's answer to
+//                      destination-out, applied to the whole ink group
+//   text             → <text>
+//   linear dim       → <g> witness lines + dimension line + value
+//   radial dim       → <g> leader + Ø/R value
+//   weld symbol      → <g> leader + reference line + note
+//   model reference  → <g data-kvs-role="model-reference"> through the viewport
+//
+// Page millimetres map 1:1 to SVG user units, with the sheet declared in mm,
+// so the file opens at true size and prints to scale.
+const kvSvgEsc = t => String(t).replace(/[&<>"']/g, ch =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const kvN = v => (Math.round(v * 1000) / 1000);
 
 function kvExportSVG() {
   const W = KV_PAGE.w, H = KV_PAGE.h;
-  const lines = [`<svg xmlns="http://www.w3.org/2000/svg" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}">`];
-  lines.push(`<rect width="${W}" height="${H}" fill="white"/>`);
-  // Text strokes
-  for (const s of KVM.visibleStrokes()) {
-    if (s.type === 'text') {
-      lines.push(`<text x="${s.x.toFixed(2)}" y="${(H-s.y).toFixed(2)}" font-family="JetBrains Mono,monospace" font-size="${(s.size||10)*0.5}" fill="${s.color||'#ff3cac'}">${s.text}</text>`);
+  // SVG's origin is top-left and Y grows downward; the sheet is bottom-left.
+  const Y = y => kvN(H - y);
+  const X = x => kvN(x);
+
+  const out = [];
+  out.push(`<?xml version="1.0" encoding="UTF-8"?>`);
+  out.push(`<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}"`);
+  out.push(`     data-kvs-version="${KVS_VERSION}" data-kvs-page="${KV_PAGE.w}x${KV_PAGE.h}"`);
+  out.push(`     data-kvs-scale="${kvScaleLabel(KV_VIEW.scale)}">`);
+  out.push(`<title>KANVAS sheet — scale ${kvScaleLabel(KV_VIEW.scale)}</title>`);
+  out.push(`<rect width="${W}" height="${H}" fill="#ffffff"/>`);
+
+  const pathFor = g => {
+    if (g.dot) return `<circle cx="${X(g.dot.x)}" cy="${Y(g.dot.y)}" r="${kvN(g.dot.r)}"/>`;
+    const d = ['M ' + X(g.left[0].x) + ' ' + Y(g.left[0].y)];
+    for (let i = 1; i < g.left.length; i++) d.push('L ' + X(g.left[i].x) + ' ' + Y(g.left[i].y));
+    for (let i = g.right.length - 1; i >= 0; i--) d.push('L ' + X(g.right[i].x) + ' ' + Y(g.right[i].y));
+    d.push('Z');
+    return `<path d="${d.join(' ')}"/>`
+         + `<circle cx="${X(g.capA.x)}" cy="${Y(g.capA.y)}" r="${kvN(g.capA.r)}"/>`
+         + `<circle cx="${X(g.capB.x)}" cy="${Y(g.capB.y)}" r="${kvN(g.capB.r)}"/>`;
+  };
+
+  // Erase strokes become a mask. Canvas carves holes with destination-out;
+  // SVG has no such operator, so the equivalent is a luminance mask —
+  // white keeps, black removes — wrapped around everything erasable.
+  const erasers = KVM.strokes.filter(s => s.type === 'erase');
+  if (erasers.length) {
+    out.push(`<defs><mask id="kvs-erase" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">`);
+    out.push(`<rect width="${W}" height="${H}" fill="#ffffff"/>`);
+    out.push(`<g fill="#000000">`);
+    for (const s of erasers) {
+      const g = kvStrokeGeometry(s);
+      if (g) out.push(pathFor(g));
+    }
+    out.push(`</g></mask></defs>`);
+  }
+  const maskAttr = erasers.length ? ' mask="url(#kvs-erase)"' : '';
+
+  // Model reference, drawn through the viewport so it lands at drawing scale.
+  out.push(`<g data-kvs-role="model-reference" fill="none" stroke="#1b3a4b" stroke-width="0.25" stroke-linecap="round">`);
+  const M = (x, y) => ({ x: KV_VIEW.ox + x * KV_VIEW.scale, y: KV_VIEW.oy + y * KV_VIEW.scale });
+  const ML = v => v * KV_VIEW.scale;
+  for (const o of GeoMemory.objects) {
+    const L = (typeof LAYERS !== 'undefined') ? LAYERS[o.layer] : null;
+    if (L && L.visible === false) continue;
+    if (o.type === 'LINE') {
+      const a = M(o.x1,o.y1), b = M(o.x2,o.y2);
+      out.push(`<line x1="${X(a.x)}" y1="${Y(a.y)}" x2="${X(b.x)}" y2="${Y(b.y)}"/>`);
+    } else if (o.type === 'CIRCLE') {
+      const cc = M(o.cx,o.cy);
+      out.push(`<circle cx="${X(cc.x)}" cy="${Y(cc.y)}" r="${kvN(ML(o.r))}"/>`);
+    } else if (o.type === 'ARC') {
+      // Sampled to a polyline: an SVG arc flag set would have to re-derive
+      // sweep direction from radians, and sampling can't get that wrong.
+      const steps = 48;
+      let a0 = o.startA, a1 = o.endA;
+      if (o.ccw && a1 < a0) a1 += Math.PI*2;
+      if (!o.ccw && a1 > a0) a1 -= Math.PI*2;
+      const pts = [];
+      for (let k = 0; k <= steps; k++) {
+        const t = a0 + (a1-a0)*k/steps;
+        const p = M(o.cx + Math.cos(t)*o.r, o.cy + Math.sin(t)*o.r);
+        pts.push(`${X(p.x)},${Y(p.y)}`);
+      }
+      out.push(`<polyline points="${pts.join(' ')}"/>`);
+    } else if (o.type === 'POLYLINE' && o.pts && o.pts.length) {
+      const pts = o.pts.map(p => { const q = M(p.x,p.y); return `${X(q.x)},${Y(q.y)}`; });
+      out.push(o.closed ? `<polygon points="${pts.join(' ')}"/>` : `<polyline points="${pts.join(' ')}"/>`);
+    } else if (o.type === 'TEXT') {
+      const p = M(o.x,o.y);
+      out.push(`<text x="${X(p.x)}" y="${Y(p.y)}" font-size="${kvN(ML(o.h||5))}" fill="#1b3a4b" stroke="none">${kvSvgEsc(o.text||'')}</text>`);
+    } else if (o.type === 'POINT') {
+      const p = M(o.x,o.y);
+      out.push(`<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="0.4"/>`);
     }
   }
-  // Dims (simplified)
-  lines.push('</svg>');
-  const blob = new Blob([lines.join('\n')], {type:'image/svg+xml'});
-  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob), download:'drawing.svg'});
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  out.push(`</g>`);
+
+  // Annotations, grouped by layer so the structure survives the round trip.
+  out.push(`<g data-kvs-role="annotations"${maskAttr}>`);
+  for (const lay of KVM.layers) {
+    const mine = {
+      strokes: KVM.strokes.filter(s => s.layer === lay.name && s.type !== 'erase'),
+      dims:    KVM.dims.filter(d => d.layer === lay.name),
+      welds:   KVM.welds.filter(w => w.layer === lay.name),
+    };
+    if (!mine.strokes.length && !mine.dims.length && !mine.welds.length) continue;
+    const hidden = lay.visible ? '' : ' style="display:none"';
+    out.push(`<g id="layer-${kvSvgEsc(lay.name).replace(/\s+/g,'-')}" data-kvs-layer="${kvSvgEsc(lay.name)}"${hidden}>`);
+
+    for (const s of mine.strokes) {
+      if (s.type === 'text') {
+        out.push(`<text data-kvs-id="${s.id}" x="${X(s.x)}" y="${Y(s.y)}" `
+               + `font-family="JetBrains Mono, monospace" font-size="${kvN((s.size||10)*0.5)}" `
+               + `fill="${s.color||lay.color}">${kvSvgEsc(s.text)}</text>`);
+      } else {
+        const g = kvStrokeGeometry(s);
+        if (!g) continue;
+        out.push(`<g data-kvs-id="${s.id}" data-kvs-mode="${s.mode||'curve'}" `
+               + `fill="${s.color||lay.color}" fill-opacity="${s.alpha!=null?s.alpha:0.9}" stroke="none">`
+               + pathFor(g) + `</g>`);
+      }
+    }
+
+    for (const d of mine.dims) {
+      out.push(kvDimToSVG(d, lay, X, Y));
+    }
+    for (const w of mine.welds) {
+      const a = { x:X(w.p1.x), y:Y(w.p1.y) }, b = { x:X(w.p2.x), y:Y(w.p2.y) };
+      out.push(`<g data-kvs-role="weld" data-kvs-weld="${kvSvgEsc(w.weldType||'')}" `
+             + `stroke="${lay.color}" stroke-width="0.3" fill="none">`
+             + `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`
+             + `<line x1="${b.x}" y1="${b.y}" x2="${kvN(b.x+14)}" y2="${b.y}"/>`
+             + `<text x="${kvN(b.x+2)}" y="${kvN(b.y-1.5)}" font-size="3" fill="${lay.color}" stroke="none">`
+             + `${kvSvgEsc((w.size||'') + ' ' + (w.weldType||''))}</text></g>`);
+    }
+    out.push(`</g>`);
+  }
+  out.push(`</g>`);
+  out.push(`</svg>`);
+
+  downloadText(out.join('\n'), 'drawing.svg', 'image/svg+xml');
   showToast('Exported drawing.svg');
+}
+
+// Dimensions carry their own geometry, so they map to a group rather than a
+// single element — witness lines, the dimension line, and the measured value.
+function kvDimToSVG(d, lay, X, Y) {
+  const col = lay.color;
+  const open = `<g data-kvs-role="dim" data-kvs-dim="${d.type}" stroke="${col}" stroke-width="0.25" fill="none">`;
+  if (d.type === 'linear' && d.p1 && d.p2) {
+    const dx = d.p2.x - d.p1.x, dy = d.p2.y - d.p1.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy/len * (d.offset||10), ny = dx/len * (d.offset||10);
+    const a = {x:d.p1.x+nx, y:d.p1.y+ny}, b = {x:d.p2.x+nx, y:d.p2.y+ny};
+    const mid = {x:(a.x+b.x)/2, y:(a.y+b.y)/2};
+    const val = d.label || fmtU(len);
+    return open
+      + `<line x1="${X(d.p1.x)}" y1="${Y(d.p1.y)}" x2="${X(a.x)}" y2="${Y(a.y)}"/>`
+      + `<line x1="${X(d.p2.x)}" y1="${Y(d.p2.y)}" x2="${X(b.x)}" y2="${Y(b.y)}"/>`
+      + `<line x1="${X(a.x)}" y1="${Y(a.y)}" x2="${X(b.x)}" y2="${Y(b.y)}"/>`
+      + `<text x="${X(mid.x)}" y="${Y(mid.y)-1}" font-size="3.2" fill="${col}" stroke="none" text-anchor="middle">${kvSvgEsc(val)}</text>`
+      + `</g>`;
+  }
+  if (d.type === 'radial' && d.center) {
+    const r = d.radius || 0;
+    const e = {x: d.center.x + r*0.7071, y: d.center.y + r*0.7071};
+    return open
+      + `<circle cx="${X(d.center.x)}" cy="${Y(d.center.y)}" r="${kvN(r)}" stroke-dasharray="1.5 1.5"/>`
+      + `<line x1="${X(d.center.x)}" y1="${Y(d.center.y)}" x2="${X(e.x)}" y2="${Y(e.y)}"/>`
+      + `<text x="${X(e.x)+1}" y="${Y(e.y)-1}" font-size="3.2" fill="${col}" stroke="none">R${kvSvgEsc(d.label||fmtU(r))}</text>`
+      + `</g>`;
+  }
+  return '';
 }
 
 function kvPrintPDF() {
@@ -10685,22 +11605,43 @@ function kadSwitchTab(tab) {
     kvScheduleDraw();
     // Attach events
     kvCanvas.addEventListener('pointerdown',  kvOnDown, {passive:false});
-    kvCanvas.addEventListener('pointermove',  kvOnMove, {passive:true});
+    kvCanvas.addEventListener('pointermove',  kvOnMove, {passive:false});
     kvCanvas.addEventListener('pointerup',    kvOnUp);
     kvCanvas.addEventListener('pointercancel',kvOnUp);
+    kvCanvas.addEventListener('pointerleave', kvOnUp);
+    kvCanvas.addEventListener('pointerover',  kvOnHover, {passive:true});
+    kvCanvas.addEventListener('pointerrawupdate', kvOnHover, {passive:true});
     kvCanvas.addEventListener('wheel', kvOnWheel, {passive:false});
     kvCanvas.addEventListener('keydown', kvOnKey);
     kvSetTool('brush');
     kvBuildLayerList();
     kvBuildSwatches();
-    showToast('KANVAS paperspace · Annotate over geometry · Ctrl+W to return');
+    // render() is what normally reconciles the floating buttons, and it
+    // stops running the moment KANVAS takes over — so retire the
+    // model-space ones explicitly on the way in.
+    ['commit-fab','delete-fab'].forEach(id => {
+      const f = document.getElementById(id); if (f) f.classList.remove('show');
+    });
+    buildLayerPanel();   // dropdown re-renders against the KANVAS layer set
+    // A drawer left open from model space would cover the sheet on arrival.
+    if (document.body.classList.contains('mobile-mode')) toggleMobileSidebar(false);
+    showToast('KANVAS paperspace · KB brush · Z fit · UNDO · KD back to model');
   } else {
     kvCanvas.removeEventListener('pointerdown',  kvOnDown);
     kvCanvas.removeEventListener('pointermove',  kvOnMove);
     kvCanvas.removeEventListener('pointerup',    kvOnUp);
     kvCanvas.removeEventListener('pointercancel',kvOnUp);
+    kvCanvas.removeEventListener('pointerleave', kvOnUp);
+    kvCanvas.removeEventListener('pointerover',  kvOnHover);
+    kvCanvas.removeEventListener('pointerrawupdate', kvOnHover);
     kvCanvas.removeEventListener('wheel', kvOnWheel);
     kvCanvas.removeEventListener('keydown', kvOnKey);
+    // Leaving KANVAS mid-gesture must not strand state that a later
+    // return would resume from.
+    kvPointers.clear(); kvPinch = null; kvStroke = null; kvPendingPt = null;
+    kvCancelHold(); kvIsPanning = false; kvCloseTextEntry();
+    buildLayerPanel();   // dropdown returns to the model layer set
+    if (document.body.classList.contains('mobile-mode')) toggleMobileSidebar(false);
     render();
     showToast('Model space');
   }
@@ -10717,10 +11658,18 @@ function kvResizeCanvas() {
   kvCanvas.style.width  = W + 'px';
   kvCanvas.style.height = H + 'px';
   kvCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  kvCssW = W; kvCssH = H;
+  // The erase/annotation buffer gets the same backing-store size AND the
+  // same transform as the visible canvas, so strokes composited into it
+  // land in the same CSS-pixel space they were authored in. It used to be
+  // sized in device pixels while kvRenderStroke drew in CSS pixels, then
+  // was blitted at its device dimensions — compounding the scale error.
   if (kvEraseC) {
     kvEraseC.width  = kvCanvas.width;
     kvEraseC.height = kvCanvas.height;
+    kvEraseCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
+  kvRebuildEraseCanvas();
 }
 
 function kvOnWheel(e) {
@@ -10734,27 +11683,39 @@ function kvOnWheel(e) {
 }
 
 function kvOnKey(e) {
-  if ((e.ctrlKey||e.metaKey) && e.key==='w') { e.preventDefault(); kadSwitchTab('model'); }
+  if ((e.ctrlKey||e.metaKey) && e.key==='w') { e.preventDefault(); kadSwitchTab('model'); return; }
+  if ((e.ctrlKey||e.metaKey) && e.key==='z') { SPACE().undo(); return; }
   if (e.key==='b') kvSetTool('brush');
   if (e.key==='t') kvSetTool('text');
   if (e.key==='d') kvSetTool('dim-linear');
   if (e.key==='r') kvSetTool('dim-radial');
+  if (e.key==='a') kvSetTool('dim-angle');
   if (e.key==='w') kvSetTool('weld');
-  if (e.key==='f') kvZoomFit(), kvScheduleDraw();
-  if (e.key==='Escape') { kvDimState.active=false; kvWeldState.active=false; kvScheduleDraw(); }
-  if ((e.ctrlKey||e.metaKey) && e.key==='z') { KVM.strokes.pop(); kvRebuildEraseCanvas(); kvScheduleDraw(); }
+  if (e.key==='e') kvSetTool('erase');
+  if (e.key==='s') kvSetTool('select');
+  if (e.key==='f') SPACE().zoomFit();        // same key, same meaning as model
+  if (e.key==='g') SPACE().toggleGrid();
+  if (e.key==='x') kvFitViewport();          // fit the model into the sheet
+  if (e.key==='z') kvCycleViewScale();       // step drawing scale
+  if (e.key==='Escape') SPACE().cancel();
 }
 
 // ── KANVAS SIDEBAR HELPERS ────────────────────────────────────────────────────
 function kvBuildLayerList() {
   const el = document.getElementById('kv-layers');
   if (!el) return;
-  el.innerHTML = KVM.layers.map(l => `
-    <div class="kv-layer-item ${l.name===KVM.activeLayer?'active':''}"
-         onclick="KVM.activeLayer='${l.name}';kvBuildLayerList();">
-      <div class="kv-layer-dot" style="background:${l.color}"></div>
-      <span>${l.name}</span>
-    </div>`).join('');
+  el.innerHTML = '';
+  for (const l of KVM.layers) {
+    const row = document.createElement('div');
+    row.className = 'kv-layer-item' + (l.name === KVM.activeLayer ? ' active' : '');
+    row.innerHTML =
+      `<div class="kv-layer-dot" style="background:${l.color}"></div>` +
+      `<span style="flex:1">${l.name}</span>` +
+      `<span class="kv-layer-vis" style="opacity:${l.visible?1:0.35};cursor:pointer">${l.visible?'👁':'○'}</span>`;
+    row.querySelector('.kv-layer-vis').onclick = (ev) => { ev.stopPropagation(); kvToggleLayerVis(l.name); };
+    row.onclick = () => kvSetActiveLayer(l.name);
+    el.appendChild(row);
+  }
 }
 
 const KV_SWATCHES = ['#ff3cac','#00d4ff','#00ff9d','#ffaa00','#7c4dbd',
@@ -10858,8 +11819,6 @@ const KOMMANDS = {
   'OFFSET':  () => setTool('offset'),
   'M':       () => setTool('mirror'),
   'MIRROR':  () => setTool('mirror'),
-  'D':       () => setTool('dim'),
-  'DIM':     () => setTool('dim'),
   'MEASURE': () => setTool('measure'),
   'TR':      () => setTool('trim'),
   'TRIM':    () => setTool('trim'),
@@ -10869,8 +11828,6 @@ const KOMMANDS = {
   'BREAK':   () => setTool('break'),
   'SC':      () => { if(!selectedIds.size){setTool('select');kecho('Select objects then type SC');} else openScaleDialog(); },
   'SCALE':   () => openScaleDialog(),
-  'TX':      () => setTool('text'),
-  'TEXT':    () => setTool('text'),
   'AR':      () => openArrayDialog(),
   'ARRAY':   () => openArrayDialog(),
   'ST':      () => setTool('stretch'),
@@ -10879,31 +11836,15 @@ const KOMMANDS = {
   'FILLET':  () => setTool('fillet'),
   'CH':      () => setTool('chamfer'),
   'CHAMFER': () => setTool('chamfer'),
-  'V':       () => setTool('select'),
-  'SELECT':  () => setTool('select'),
-  'Z':       () => { zoomExtents(); kecho('Zoom extents'); },
-  'G':       () => { toggleGrid();  kecho('Grid toggled'); },
-  'S':       () => { toggleSnap();  kecho('Snap toggled'); },
-  'U':       () => { toggleUnits(); kecho('Units: ' + unitMode); },
-  'UNDO':    () => { if(typeof undo==='function') undo(); else { GeoMemory.objects.pop && GeoMemory.objects.pop(); render(); } kecho('Undo'); },
   'COPY':    () => copySelected(),
   'CP':      () => copySelected(),
   'PASTE':   () => pasteSelected(),
   'PA':      () => pasteSelected(),
-  'REDO':    () => { if(typeof redo==='function') redo(); kecho('Redo'); },
-  'CLEAR':   () => { if(confirm('Clear all?')){ GeoMemory.clear(); render(); kecho('Cleared'); } },
-  'DELETE':  () => deleteSelected(),
-  'DEL':     () => deleteSelected(),
-  'ESCAPE':  () => { cancelTool(); kecho('Cancelled'); render(); },
-  'CANCEL':  () => { cancelTool(); kecho('Cancelled'); render(); },
   'COMMIT':  () => {
     if (activeTool === 'line' && lineState.active && lineChain && lineChain.length >= 2) {
       commitLineChain(false); kecho('Committed'); render();
     } else { kecho('Nothing to commit', 'err'); }
   },
-  'IN':      () => { splashSelectUnit('in'); kecho('Units: in'); },
-  'MM':      () => { splashSelectUnit('mm'); kecho('Units: mm'); },
-  'NEW':     () => { if(confirm('New document?')){ GeoMemory.clear(); render(); kecho('New document'); } },
 };
 
 // Parse coordinate input: "X,Y" | "@dX,dY" | "@D<A"
@@ -10974,9 +11915,138 @@ function resolveCoord(parsed, lastX, lastY, lastAngle) {
 // Resolve and apply ONE token — a command word or a single coordinate/
 // angle/distance entry. Shared by plain single-token input and by each
 // step of a multi-token script line (see submitKommandText below).
+// ── SPACE ADAPTER ─────────────────────────────────────────────────────────────
+// Model space and KANVAS legitimately differ in three ways: one is unbounded
+// world millimetres and the other a bounded sheet; one holds parametric
+// objects you can trim and offset, the other holds ink; one redraws vectors,
+// the other composites raster so erase can carve holes.
+//
+// Everything ELSE about them was duplicated for no reason — camera fit, grid,
+// snap, undo, cancel, clear, and the verbs text/dimension/select all existed
+// twice in two spellings. That duplication is what produced this session's
+// bugs: kvSpt returned device pixels where its twin returned CSS pixels, and
+// the reference layer read startAngle where the model stores startA. Two
+// copies of one idea drift; one copy cannot.
+//
+// This facade is the seam. Each space answers the same small set of
+// questions, so the command layer above it never asks which tab is open.
+function activeSpace() { return (typeof kvActive !== 'undefined' && kvActive) ? 'kanvas' : 'model'; }
+
+const SPACES = {
+  model: {
+    label:      'MODEL',
+    zoomFit:    () => { zoomExtents(); },
+    toggleGrid: () => { toggleGrid(); return showGrid; },
+    toggleSnap: () => { toggleSnap(); return snapEnabled; },
+    undo:       () => { const o = GeoMemory.objects; if (!o.length) return false; o.pop(); render(); return true; },
+    cancel:     () => { cancelTool(); render(); },
+    clear:      () => { GeoMemory.clear(); render(); },
+    del:        () => { deleteSelected(); },
+    text:       () => setTool('text'),
+    dim:        () => setTool('dim'),
+    select:     () => setTool('select'),
+    refresh:    () => render(),
+  },
+  kanvas: {
+    label:      'KANVAS',
+    zoomFit:    () => { kvZoomFit(); kvScheduleDraw(); },
+    toggleGrid: () => { kvShowGrid = !kvShowGrid; kvScheduleDraw(); return kvShowGrid; },
+    toggleSnap: () => { kvSnapEnabled = !kvSnapEnabled; kvScheduleDraw(); return kvSnapEnabled; },
+    // Annotations land in three stores; undo has to pop whichever was
+    // written last, or "undo" silently skips your most recent mark.
+    undo:       () => {
+                   const pools = [KVM.strokes, KVM.dims, KVM.welds].filter(p => p && p.length);
+                   if (!pools.length) return false;
+                   pools.sort((a,b) => (b[b.length-1].id||0) - (a[a.length-1].id||0));
+                   pools[0].pop();
+                   kvRebuildEraseCanvas(); kvScheduleDraw(); return true;
+                 },
+    cancel:     () => { kvDimState.active=false; kvWeldState.active=false;
+                        kvPendingPt=null; kvCloseTextEntry();
+                        kvAbortStroke(); kvCancelHold(); kvIsPanning=false; kvScheduleDraw(); },
+    clear:      () => { KVM.strokes.length=0; KVM.dims.length=0; KVM.welds.length=0;
+                        kvRebuildEraseCanvas(); kvScheduleDraw(); },
+    del:        () => { SPACES.kanvas.undo(); },   // no selection model on a sheet yet
+    text:       () => kvSetTool('text'),
+    dim:        () => kvSetTool('dim-linear'),
+    select:     () => kvSetTool('select'),
+    refresh:    () => kvScheduleDraw(),
+  }
+};
+function SPACE() { return SPACES[activeSpace()]; }
+
+// ── TIER 1 · UNIVERSAL ────────────────────────────────────────────────────────
+// One word, one meaning, wherever you are. These are view and document
+// concepts that both spaces genuinely have, so making you learn a second
+// spelling for each was a mistake — UNDO in particular had grown three
+// spellings (UNDO, KU, and Ctrl+Z's own inline pop) for one idea.
+const UNIVERSAL_KOMMANDS = {
+  'Z':      () => { SPACE().zoomFit(); kecho('Zoom fit · ' + SPACE().label); },
+  'G':      () => { const on = SPACE().toggleGrid(); kecho('Grid ' + (on?'on':'off')); },
+  'S':      () => { const on = SPACE().toggleSnap(); kecho('Snap ' + (on?'on':'off')); },
+  'U':      () => { toggleUnits(); SPACE().refresh(); kecho('Units: ' + unitMode); },
+  'IN':     () => { splashSelectUnit('in'); SPACE().refresh(); kecho('Units: in'); },
+  'MM':     () => { splashSelectUnit('mm'); SPACE().refresh(); kecho('Units: mm'); },
+  'UNDO':   () => { kecho(SPACE().undo() ? 'Undo · ' + SPACE().label : 'Nothing to undo'); },
+  'REDO':   () => { if (typeof redo==='function') redo(); kecho('Redo'); },
+  'ESCAPE': () => { SPACE().cancel(); kecho('Cancelled'); },
+  'CANCEL': () => { SPACE().cancel(); kecho('Cancelled'); },
+  'DELETE': () => { SPACE().del(); },
+  'DEL':    () => { SPACE().del(); },
+  'CLEAR':  () => { if (confirm('Clear all in ' + SPACE().label + '?')) { SPACE().clear(); kecho('Cleared'); } },
+  'NEW':    () => { if (confirm('New document?')) { SPACE().clear(); kecho('New document'); } },
+  'KV':     () => { kadSwitchTab('kanvas'); kecho('KANVAS paperspace'); },
+  'KD':     () => { kadSwitchTab('model');  kecho('Model space'); },
+};
+
+// ── TIER 2 · POLYMORPHIC ──────────────────────────────────────────────────────
+// Same verb, same intent, space-appropriate binding. Both spaces place text
+// and both dimension; forcing TX here and KN there was the command layer
+// leaking an implementation detail into the vocabulary.
+const POLY_KOMMANDS = {
+  'TEXT':   () => SPACE().text(),   'TX': () => SPACE().text(),
+  'DIM':    () => SPACE().dim(),    'D':  () => SPACE().dim(),
+  'SELECT': () => SPACE().select(), 'V':  () => SPACE().select(),
+};
+
+// ── TIER 3 · KANVAS-EXCLUSIVE ─────────────────────────────────────────────────
+// What's left is genuinely paperspace-only: ink, welds, and the viewport.
+// KF (fit sheet), KS (select) and KU (undo) are gone — Z, V and UNDO now
+// cover them in both spaces, and a second spelling would just be the
+// duplication this pass exists to remove.
+const KV_KOMMANDS = {
+  'KB': () => kvSetTool('brush'),   'BRUSH': () => kvSetTool('brush'),
+  'KN': () => kvSetTool('text'),    'NOTE':  () => kvSetTool('text'),
+  'KL': () => kvSetTool('dim-linear'),
+  'KR': () => kvSetTool('dim-radial'),
+  'KA': () => kvSetTool('dim-angle'),
+  'KW': () => kvSetTool('weld'),    'WELD':  () => kvSetTool('weld'),
+  'KE': () => kvSetTool('erase'),   'ERASE': () => kvSetTool('erase'),
+  'KX': () => kvFitViewport(),
+  'KZ': () => kvCycleViewScale(),
+  'KP': () => { KV_VIEW.show = !KV_VIEW.show; kvScheduleDraw(); kecho('Viewport frame ' + (KV_VIEW.show?'on':'off')); },
+  'KVS': () => kvSaveKVS(),
+  'KO':  () => document.getElementById('kvs-file-input').click(),
+  'KG':  () => kvExportSVG(),
+};
+
+const KV_ONLY_HINT = 'KB brush · KN note · KL/KR/KA dims · KW weld · KE erase · KX fit · KZ scale · KP frame · KVS save · KO open · KG svg';
+
 function submitKommandSingle(tokenText) {
   const raw = tokenText.trim().toUpperCase();
   if (!raw) return;
+  // Resolution order is the tier order: universal, then polymorphic, then
+  // whatever is exclusive to the space you're standing in.
+  if (UNIVERSAL_KOMMANDS[raw]) { UNIVERSAL_KOMMANDS[raw](); return; }
+  if (POLY_KOMMANDS[raw])      { POLY_KOMMANDS[raw]();      return; }
+  if (activeSpace() === 'kanvas') {
+    if (KV_KOMMANDS[raw]) { KV_KOMMANDS[raw](); return; }
+    // Only reject what's genuinely model-only, and say so precisely rather
+    // than implying the word is unknown.
+    if (KOMMANDS[raw]) { kecho(raw + ' is model-space only — KD to switch back', 'err'); return; }
+    kecho('Unknown: ' + raw + ' · ' + KV_ONLY_HINT, 'err'); return;
+  }
+  if (KV_KOMMANDS[raw]) { kecho(raw + ' is KANVAS only — KV to switch', 'err'); return; }
   if (KOMMANDS[raw]) { KOMMANDS[raw](); return; }
   const parsed = parseKommandCoord(tokenText.trim());
   if (parsed) { applyKommandCoord(parsed); return; }
@@ -11282,6 +12352,7 @@ function toggleTheme() {
   }
 })();
 
+</script>
 </script>
 <script>
 // ── PWA: service worker registration ────────────────────────────────
