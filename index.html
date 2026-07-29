@@ -17,8 +17,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
   SPDX-License-Identifier: AGPL-3.0-or-later
-  KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™,
-  KONNECTOR™, KAMPUS™, KLOUD™, KID™, and KODEX™ are trademarks of withshalom / KADsuite.
+  KADsuite™, KAD™, KODE™, KANVAS™, KID™, KONSTRUCT™, KULTIVATE™, KUBIC™,
+  KARVE™, and KLOUD™ are trademarks of withshalom / KADsuite.
   Trademark rights are independent of and not transferred by this
   AGPL-3.0 license. Forks and derivative works may not use these
   marks or any confusingly similar names without express written
@@ -34,7 +34,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="copyright" content="Copyright (C) 2026 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, KLOUD™, KID™, and KODEX™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
+<meta name="copyright" content="Copyright (C) 2026 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KODE™, KANVAS™, KID™, KONSTRUCT™, KULTIVATE™, KUBIC™, KARVE™, and KLOUD™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0c1824">
@@ -704,7 +704,7 @@ html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; ba
 
 
 
-/* ── UNIT TOGGLE TWO-TONE (cyan ↔ amber / KAD ↔ KAM) ──────── */
+/* ── UNIT TOGGLE TWO-TONE (cyan ↔ amber) ──────── */
 
 
 
@@ -1491,7 +1491,7 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
 }
 
 
-/* ── UNIT TOGGLE TWO-TONE (cyan ↔ amber / KAD ↔ KAM) ──────── */
+/* ── UNIT TOGGLE TWO-TONE (cyan ↔ amber) ──────── */
 #unit-seg-mm { color: rgba(0,212,255,0.50); }
 #unit-seg-in { color: rgba(255,170,0,0.50); }
 #unit-seg-mm.active { background: var(--accent); color: var(--void); font-weight:700; }
@@ -1514,7 +1514,6 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --text3:   #504840;
 
   --kad:   #00d4ff;
-  --kam:   #ffaa00;
   --kubic:  #20e8c0;
   --karve: #d4aa40;
   --kode:  #e03800;
@@ -1522,7 +1521,6 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --kanvas: #4a7fb5; /* steel-hi — brought into the blueprint family */
 
   --kad-g:  rgba(0,212,255,0.12);
-  --kam-g:  rgba(255,170,0,0.12);
   --kubic-g: rgba(32,232,192,0.12);
   --karve-g:rgba(212,170,64,0.12);
   --kode-g: rgba(224,56,0,0.12);
@@ -1534,12 +1532,8 @@ body.kanvas-mode { --accent: #0090a8; --accent-dim: #006888; --accent-glow: rgba
   --konstruct:   #4a8fd4;  /* blueprint technical blue */
   --kloud:       #7ec8e3;  /* sky blue — lighter, distinct from KAD cyan */
   --kloud-g:     rgba(126,200,227,0.10);
-  --kodex:       #e8a020;  /* machinist amber */
-  --kodex-g:     rgba(232,160,32,0.10);
-  --kampus:      #E8600A;  /* construction cone orange */
   --kubic:       #20e8c0;  /* solid modeling teal */
   --kraft:       #c0c0c0;  /* brushed steel */
-  --kampus-g:    rgba(232,96,10,0.12);
   --konstruct-g: rgba(74,143,212,0.12);
 
   --ff-display: 'Syne', sans-serif;
@@ -1746,7 +1740,7 @@ nav {
 .card:hover::before { opacity: 1; }
 
 .card-kad  { --card-color: var(--kad);  --card-glow: var(--kad-g); }
-.card-kam  { --card-color: var(--kam);  --card-glow: var(--kam-g); }
+.card-kode { --card-color: var(--kode); --card-glow: var(--kode-g); }
 .card-kubic  { --card-color: var(--kubic);  --card-glow: var(--kubic-g);  }
 .card-karve { --card-color: var(--karve); --card-glow: var(--karve-g); }
 .card-karve .card-mark { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); box-shadow: 0 0 20px rgba(212,170,64,0.45); }
@@ -1768,7 +1762,7 @@ nav {
   flex-shrink: 0;
 }
 .card-kad  .card-mark { background: linear-gradient(135deg, #00d4ff, #0088bb); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
-.card-kam  .card-mark { background: linear-gradient(135deg, #ffaa00, #ff6b00); box-shadow: 0 0 20px rgba(255,170,0,0.4); }
+.card-kode .card-mark { background: linear-gradient(135deg, #1c0500, #a82600, #e03800); box-shadow: 0 0 20px rgba(224,56,0,0.45); }
 
 
   
@@ -1908,7 +1902,7 @@ nav {
   letter-spacing: 0.04em;
 }
 .flow-icon.kad       { background: linear-gradient(135deg,#006080,#00a8cc,#00d4ff); }
-.flow-icon.kam       { background: linear-gradient(135deg,#804800,#cc8000,#ffaa00); }
+.flow-icon.kode      { background: linear-gradient(135deg,#1c0500,#a82600,#e03800); }
 .flow-icon.kubic      { background: linear-gradient(135deg,#001c18,#20e8c0,#d4aa40); }
   .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
   
@@ -2865,28 +2859,26 @@ body.kanvas-mode #app {
 <div class="strip" style="border-top:2px solid #eef3f8;border-bottom:2px solid #eef3f8;position:relative;z-index:1;">
   <div class="strip-track">
     <span class="strip-item">Kernel-Aided Design</span>
-    <span class="strip-item">Kernel-Aided Manufacturing</span>
     <span class="strip-item">KONSTRUCT</span>
     <span class="strip-item">Kernel-Oriented Dev Env</span>
     <span class="strip-item">Vector-Aided Design</span>
     <span class="strip-item">KULTIVATE</span>
     <span class="strip-item">Browser Native</span>
     <span class="strip-item">No Install Required</span>
-    <span class="strip-item">DXF · NC · SVG · KNV · KAM · KSA</span>
+    <span class="strip-item">DXF · NC · SVG · KNV · KSA</span>
     <span class="strip-item">Plasma · CNC · Laser</span>
     <span class="strip-item">KARVE</span>
     <span class="strip-item">Kernel-Aided Robotic Volume Extraction</span>
     <span class="strip-item">Lathe · Mill · G-code</span>
     <!-- duplicate for seamless loop -->
     <span class="strip-item">Kernel-Aided Design</span>
-    <span class="strip-item">Kernel-Aided Manufacturing</span>
     <span class="strip-item">KONSTRUCT</span>
     <span class="strip-item">Kernel-Oriented Dev Env</span>
     <span class="strip-item">Vector-Aided Design</span>
     <span class="strip-item">KULTIVATE</span>
     <span class="strip-item">Browser Native</span>
     <span class="strip-item">No Install Required</span>
-    <span class="strip-item">DXF · NC · SVG · KNV · KAM · KSA</span>
+    <span class="strip-item">DXF · NC · SVG · KNV · KSA</span>
     <span class="strip-item">Plasma · CNC · Laser</span>
   </div>
 </div>
@@ -2896,8 +2888,6 @@ body.kanvas-mode #app {
   <section class="programs" style="position:relative;z-index:1;padding-bottom:60px;">
 
     <div class="programs-grid">
-
-      <!-- KAD -->
 
       <!-- KAD -->
       <div class="card card-kad" onclick="openDraftingMode()" style="cursor:pointer;">
@@ -2918,125 +2908,27 @@ body.kanvas-mode #app {
         </div>
       </div>
 
-      <!-- KAM -->
-
-      <!-- KAM -->
-      <a class="card card-kam" href="https://kam.kadsuite.com">
-        <div class="card-alpha-stamp">Alpha</div>
-        
-        <div class="card-mark">KM</div>
-        <div class="card-name">KAM</div>
-        <div class="card-full">Kernel-Aided Manufacturing</div>
-        <div class="card-preview">
-          <canvas id="kam-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          KAM for plasma, laser, and torch cutting. Import KAD geometry,
-          tag contours, nest parts on sheet material, set machine parameters,
-          and export verified G-code ready for the machine controller.
-        </div>
-        <div class="card-cta">
-          <span>Open KAM</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
-      <!-- KUBIC -->
-
-
-      
-      <!-- KUBIC -->
-      <a class="card card-kubic" href="https://kubic.kadsuite.com">
+      <!-- KODE -->
+      <a class="card card-kode" href="https://kode.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
-        <div class="card-mark">KB</div>
-        <div class="card-name">KUBIC</div>
-        <div class="card-full">Kernel Unified Building Informatics Control</div>
+
+        <div class="card-mark">GK</div>
+        <div class="card-name">KODE</div>
+        <div class="card-full">Kernel-Oriented Development Environment</div>
         <div class="card-preview">
-          <canvas id="kube-preview"></canvas>
+          <canvas id="kode-preview"></canvas>
         </div>
         <div class="card-desc">
-          3D solid modeler built for fabrication. Sketch profiles on a workplane,
-          extrude to solid, push and pull faces, run boolean operations.
-          Exports STL and STEP — imports back to KAM as flat cut profiles.
+          CNC G-code editor and live toolpath verifier. Plasma-aware error
+          detection and real-time cut path preview. Also runs as a full
+          JavaScript environment — KOFFEE mode for parametric scripting,
+          web development, and application logic.
         </div>
         <div class="card-cta">
-          <span>Open KUBIC</span>
+          <span>Open KODE</span>
           <span class="card-cta-arrow">→</span>
         </div>
       </a>
-
-
-      <!-- KARVE -->
-
-      <!-- KARVE -->
-      <a class="card card-karve" href="https://karve.kadsuite.com">
-        <div class="card-alpha-stamp">Alpha</div>
-        <div class="card-mark">KV</div>
-        <div class="card-name">KARVE</div>
-        <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
-        <div class="card-preview">
-          <canvas id="karve-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          Lathe and mill G-code generator for subtractive machining. Define raw
-          stock, import .KBE part geometry from KUBIC, and KARVE computes the
-          cutting operations needed. Outputs RS-274 G-code directly to KODE
-          for review and editing.
-        </div>
-        <div class="card-cta">
-          <span>Open KARVE</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
-            <!-- KONSTRUCT -->
-
-      <!-- KONSTRUCT -->
-      <a class="card card-konstruct" href="https://konstruct.kadsuite.com">
-        <div class="card-alpha-stamp">Alpha</div>
-        <div class="card-mark">KON</div>
-        <div class="card-name">KONSTRUCT</div>
-        <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
-        <div class="card-preview">
-          <canvas id="konstruct-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          Wall-aware floor plan drafting. Place typed walls — brick, block,
-          concrete, glass — with automatic miter joins. Export to KAD for
-          detailing or DXF for any CAD tool.
-        </div>
-        <div class="card-cta">
-          <span>Open KONSTRUCT</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
-      <!-- KULTIVATE -->
-
-      <!-- KULTIVATE -->
-      <a class="card card-kultivate" href="https://kultivate.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
-        <div class="card-mark">KLT</div>
-        <div class="card-name">KULTIVATE</div>
-        <div class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</div>
-        <div class="card-preview">
-          <canvas id="kultivate-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          Landscape architecture and site-plan drafting. Draw site boundaries,
-          hardscape zones, and planting regions. Place trees, shrubs, and
-          groundcover from a built-in plant library with scientific names and
-          canopy spread. Exports a plant schedule and full SVG drawing.
-        </div>
-        <div class="card-cta">
-          <span>Open KULTIVATE</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
-      <!-- KANVAS -->
-
-
 
       <!-- KANVAS -->
       <a class="card card-kanvas" href="https://kanvas.kadsuite.com">
@@ -3079,6 +2971,88 @@ body.kanvas-mode #app {
         </div>
       </a>
 
+      <!-- KONSTRUCT -->
+      <a class="card card-konstruct" href="https://konstruct.kadsuite.com">
+        <div class="card-alpha-stamp">Alpha</div>
+        <div class="card-mark">KON</div>
+        <div class="card-name">KONSTRUCT</div>
+        <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
+        <div class="card-preview">
+          <canvas id="konstruct-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Wall-aware floor plan drafting. Place typed walls — brick, block,
+          concrete, glass — with automatic miter joins. Export to KAD for
+          detailing or DXF for any CAD tool.
+        </div>
+        <div class="card-cta">
+          <span>Open KONSTRUCT</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KULTIVATE -->
+      <a class="card card-kultivate" href="https://kultivate.kadsuite.com">
+        <div class="card-beta-stamp">Beta</div>
+        <div class="card-mark">KLT</div>
+        <div class="card-name">KULTIVATE</div>
+        <div class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</div>
+        <div class="card-preview">
+          <canvas id="kultivate-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Landscape architecture and site-plan drafting. Draw site boundaries,
+          hardscape zones, and planting regions. Place trees, shrubs, and
+          groundcover from a built-in plant library with scientific names and
+          canopy spread. Exports a plant schedule and full SVG drawing.
+        </div>
+        <div class="card-cta">
+          <span>Open KULTIVATE</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KUBIC -->
+      <a class="card card-kubic" href="https://kubic.kadsuite.com">
+        <div class="card-beta-stamp">Beta</div>
+        <div class="card-mark">KB</div>
+        <div class="card-name">KUBIC</div>
+        <div class="card-full">Kernel Unified Building Informatics Control</div>
+        <div class="card-preview">
+          <canvas id="kube-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          3D solid modeler built for fabrication. Sketch profiles on a workplane,
+          extrude to solid, push and pull faces, run boolean operations.
+          Exports STL and STEP for downstream manufacturing.
+        </div>
+        <div class="card-cta">
+          <span>Open KUBIC</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- KARVE -->
+      <a class="card card-karve" href="https://karve.kadsuite.com">
+        <div class="card-alpha-stamp">Alpha</div>
+        <div class="card-mark">KV</div>
+        <div class="card-name">KARVE</div>
+        <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
+        <div class="card-preview">
+          <canvas id="karve-preview"></canvas>
+        </div>
+        <div class="card-desc">
+          Lathe and mill G-code generator for subtractive machining. Define raw
+          stock, import .KBE part geometry from KUBIC, and KARVE computes the
+          cutting operations needed. Outputs RS-274 G-code directly to KODE
+          for review and editing.
+        </div>
+        <div class="card-cta">
+          <span>Open KARVE</span>
+          <span class="card-cta-arrow">→</span>
+        </div>
+      </a>
+
     </div>
   </section>
 
@@ -3088,20 +3062,20 @@ body.kanvas-mode #app {
       <div class="flow-row">
         <div class="flow-node"><div class="flow-icon kad">KD</div><div class="flow-label">KAD</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kam">KM</div><div class="flow-label">KAM</div></div>
+        <div class="flow-node"><div class="flow-icon kode">GK</div><div class="flow-label">KODE</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kubic">KB</div><div class="flow-label">KUBIC</div></div>
+        <div class="flow-node"><div class="flow-icon kanvas">KNV</div><div class="flow-label">KANVAS</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon karve">KV</div><div class="flow-label">KARVE</div></div>
+        <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">KID</div></div>
       </div>
       <div class="flow-row">
         <div class="flow-node"><div class="flow-icon konstruct">KON</div><div class="flow-label">KONSTRUCT</div></div>
         <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kultivate">KLT</div><div class="flow-label">KULTIVATE</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kanvas">KNV</div><div class="flow-label">KANVAS</div></div>
+        <div class="flow-node"><div class="flow-icon kubic">KB</div><div class="flow-label">KUBIC</div></div>
         <div class="flow-arrow">──→</div>
-        <div class="flow-node"><div class="flow-icon kid">KD</div><div class="flow-label">KID</div></div>
+        <div class="flow-node"><div class="flow-icon karve">KV</div><div class="flow-label">KARVE</div></div>
       </div>
     </div>
   </section>
@@ -3135,7 +3109,7 @@ body.kanvas-mode #app {
         <div class="lc-subtitle">withshalom / KADsuite</div>
         <div class="lc-divider"></div>
         <ul class="lc-items">
-          <li>KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, KLOUD™, KID™, and KODEX™ are trademarks of withshalom / KADsuite</li>
+          <li>KADsuite™, KAD™, KODE™, KANVAS™, KID™, KONSTRUCT™, KULTIVATE™, KUBIC™, KARVE™, and KLOUD™ are trademarks of withshalom / KADsuite</li>
           <li>Trademark rights are independent of and not transferred by the AGPL-3.0 license</li>
           <li>Forks and derivative works may not use these marks without express written permission</li>
           <li>Forks must remain open source under AGPL</li>
@@ -3232,7 +3206,7 @@ body.kanvas-mode #app {
         ask@KADsuite.com
       </a>
     </div>
-    <div class="footer-copy">© 2026 KADsuite™ · KAD™ · KAM™ · KUBIC™ · KARVE™ · KONSTRUCT™ · KULTIVATE™ · KODE™ · KANVAS™ · KONNECTOR™ · KAMPUS™ · KID™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · kadsuite.com</div>
+    <div class="footer-copy">© 2026 KADsuite™ · KAD™ · KODE™ · KANVAS™ · KID™ · KONSTRUCT™ · KULTIVATE™ · KUBIC™ · KARVE™ · KLOUD™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · kadsuite.com</div>
   </footer>
 </div>
 
@@ -3432,34 +3406,6 @@ initPreview('kad-preview', (ctx, W, H) => {
   ctx.beginPath(); ctx.moveTo(W/2-8,H/2); ctx.lineTo(W/2+8,H/2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(W/2,H/2-8); ctx.lineTo(W/2,H/2+8); ctx.stroke();
 });
-
-// KAM preview — sheet with nested parts
-initPreview('kam-preview', (ctx, W, H) => {
-  ctx.clearRect(0, 0, W, H);
-  // Sheet
-  ctx.strokeStyle = 'rgba(255,170,0,0.55)'; ctx.lineWidth = 1.5; ctx.setLineDash([6,3]);
-  ctx.strokeRect(10, 10, W-20, H-20); ctx.setLineDash([]);
-  // Parts as outlines
-  const parts = [
-    {x:20,y:20,w:55,h:35,c:'rgba(255,170,0,0.7)'},
-    {x:85,y:20,w:40,h:35,c:'rgba(255,107,0,0.55)'},
-    {x:20,y:63,w:35,h:30,c:'rgba(255,170,0,0.55)'},
-    {x:63,y:63,w:60,h:30,c:'rgba(204,136,255,0.5)'},
-  ];
-  for (const p of parts) {
-    ctx.strokeStyle = p.c; ctx.lineWidth = 1;
-    ctx.strokeRect(p.x, p.y, p.w, p.h);
-    ctx.fillStyle = p.c.replace(')', ',0.05)').replace('rgba','rgba');
-    ctx.fillRect(p.x, p.y, p.w, p.h);
-  }
-  // Utilization bar
-  ctx.fillStyle = 'rgba(255,170,0,0.12)'; ctx.fillRect(10, H-14, W-20, 6);
-  ctx.fillStyle = 'rgba(255,170,0,0.7)';  ctx.fillRect(10, H-14, (W-20)*0.68, 6);
-  ctx.font = '7px JetBrains Mono,monospace'; ctx.fillStyle = 'rgba(255,170,0,0.5)';
-  ctx.fillText('68% utilization', 14, H-19);
-});
-
-// KODE preview — G-KODE mode (green toolpath, amber M-codes)
 
 // KUBIC preview — green 3D solid with extrude metaphor
 initPreview('kube-preview', (ctx, W, H) => {
@@ -3945,59 +3891,6 @@ initPreview('kraft-preview', (ctx, W, H) => {
   // Label
   ctx.fillStyle='#999999'; ctx.font='bold 8px monospace';
   ctx.textAlign='center'; ctx.fillText(layers+' LAYERS', W*0.5, H*0.88);
-});
-
-// ── KAMPUS preview ────────────────────────────────────────────────────────────
-initPreview('kampus-preview', (ctx, W, H) => {
-  // Dark earth background
-  ctx.fillStyle='#0e110a'; ctx.fillRect(0,0,W,H);
-  // Topo contour lines — concentric closed curves simulating a hill
-  const cx=W*0.5, cy=H*0.48;
-  const contourColors=['rgba(100,140,60,0.5)','rgba(120,160,70,0.6)','rgba(150,190,80,0.65)','rgba(200,190,80,0.7)','rgba(232,200,90,0.8)'];
-  const radii=[W*0.38,W*0.30,W*0.22,W*0.14,W*0.07];
-  for(let i=0;i<radii.length;i++){
-    ctx.strokeStyle=i===4?'#e8c870':contourColors[i];
-    ctx.lineWidth=i===4?1.4:0.9;
-    ctx.beginPath();
-    // Slightly irregular ellipses for natural look
-    ctx.ellipse(cx+W*0.04*(i%2?1:-1), cy-H*0.03*(i%3?1:0),
-      radii[i], radii[i]*0.72, 0.2, 0, Math.PI*2);
-    ctx.stroke();
-    // Elevation labels on index (every 2nd)
-    if(i%2===0 && i>0){
-      ctx.fillStyle=i===4?'#e8c870':'rgba(200,190,80,0.7)';
-      ctx.font='6px monospace';
-      ctx.fillText(String((5-i)*5)+'m', cx+radii[i]+2, cy-2);
-    }
-  }
-  // Survey points
-  const pts=[[W*.2,H*.7],[W*.75,H*.65],[W*.15,H*.35],[W*.82,H*.28],[W*.5,H*.82],[W*.6,H*.2]];
-  pts.forEach(([px,py])=>{
-    ctx.fillStyle='#E8600A';
-    ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fill();
-  });
-  // Site boundary — dashed orange
-  ctx.strokeStyle='rgba(232,96,10,0.7)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
-  ctx.strokeRect(W*0.1,H*0.12,W*0.82,H*0.8);
-  ctx.setLineDash([]);
-  // KAMPUS label
-  ctx.fillStyle='rgba(232,96,10,0.5)'; ctx.font='bold 8px monospace';
-  ctx.fillText('KAMPUS', W*0.12, H*0.1);
-});
-
-// ── KONNECTOR preview ─────────────────────────────────────────────────────────
-initPreview('konnector-preview', (ctx, W, H) => {
-  ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='#b8c8d8'; ctx.lineWidth=1.4; ctx.setLineDash([]);
-  const bx=W*.3,by=H*.25,bw=W*.4,bh=H*.5,tf=H*.08,tw=W*.06;
-  ctx.strokeRect(bx,by,bw,tf);
-  ctx.strokeRect(bx+bw/2-tw/2,by+tf,tw,bh-tf*2);
-  ctx.strokeRect(bx,by+bh-tf,bw,tf);
-  ctx.strokeStyle='rgba(184,200,216,0.4)'; ctx.lineWidth=0.8;
-  [[bx+bw*.2,by+tf/2],[bx+bw*.8,by+tf/2],[bx+bw*.2,by+bh-tf/2],[bx+bw*.8,by+bh-tf/2]].forEach(([x,y])=>{
-    ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2); ctx.stroke();
-  });
-  ctx.fillStyle='rgba(184,200,216,0.45)'; ctx.font='8px monospace'; ctx.fillText('W8x31',W*.35,H*.88);
 });
 
 // ── KID preview ───────────────────────────────────────────────────────────────
