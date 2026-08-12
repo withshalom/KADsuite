@@ -73,7 +73,7 @@
      SEO / LANDING PAGE METADATA
      ══════════════════════════════════════════════════════════════════════ -->
 <title>KADsuite — Browser-Native CAD, Publishing &amp; Design Suite</title>
-<meta name="description" content="KADsuite is a free, browser-native design suite: KAD drafts, KANVAS illustrates, DOK writes and paginates documents, KODEX typesets books to a baseline grid, KID teaches drafting, and KODE edits G-code. No install, no account required.">
+<meta name="description" content="KADsuite is a free, browser-native design suite: CAD drafting, illustration, document writing, book typesetting, and G-code editing. No install required.">
 <meta name="keywords" content="CAD software, drafting software, free CAD software, browser CAD, online CAD, web-based CAD, technical drawing, engineering software, mechanical drafting, architectural drafting, vector illustration software, SVG editor, word processor, browser word processor, document pagination, DOCX editor, book typesetting software, baseline grid typesetting, publishing software, page layout software, G-code editor, CNC software, kids CAD, learn to draft, KADsuite, KAD, KANVAS, DOK, KODEX, KID, KODE">
 <meta name="robots" content="index, follow">
 <meta name="author" content="WithShalom Design Studios">
@@ -312,15 +312,24 @@ nav {
   font-weight: 800;
   font-size: 21px;
   letter-spacing: -0.02em;
-  color: var(--text1);
 }
 
-.nav-brand sup {
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  color: var(--text2);
-  vertical-align: super;
+.nav-brand .brand-gradient {
+  display: inline-block;
+  background: linear-gradient(90deg,
+    #00d4ff 0%,
+    #00b8dd 20%,
+    #e8e4dc 44%,
+    #ffaa00 68%,
+    #ff6b00 88%,
+    #ff4400 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titlePan 6s ease-in-out infinite alternate;
 }
+
+.nav-brand .suite { font-size: 0.62em; letter-spacing: 0.1em; vertical-align: super; }
 
 
 .nav-links {
@@ -391,7 +400,7 @@ nav {
 }
 
 
-.hero-title .kerf {
+.hero-title .brand-gradient {
   display: block;
   background: linear-gradient(90deg,
     #00d4ff 0%,
@@ -762,13 +771,29 @@ footer {
 
 
 .footer-brand {
+  font-family: var(--ff-display);
   font-weight: 800;
-  font-size: 18px;
-  letter-spacing: -0.02em;
-  color: var(--text2);
+  font-size: clamp(32px, 5vw, 48px);
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
-.footer-brand sup { font-size: 12px; vertical-align: super; }
+.footer-brand .brand-gradient {
+  display: inline-block;
+  background: linear-gradient(90deg,
+    #00d4ff 0%,
+    #00b8dd 20%,
+    #e8e4dc 44%,
+    #ffaa00 68%,
+    #ff6b00 88%,
+    #ff4400 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titlePan 6s ease-in-out infinite alternate;
+}
+
+.footer-brand .suite { font-size: 0.38em; letter-spacing: 0.02em; vertical-align: super; line-height: 0; }
 
 
 .footer-links {
@@ -852,13 +877,7 @@ footer {
 }
 
 
-/* ── KLOUD (undisplayed) ── */
-.card-kloud { --card-color: var(--kloud); --card-glow: var(--kloud-g); }
-
-.card-kloud .card-mark {
-  background: linear-gradient(135deg, #0d2235, #5ab3d0, #b8e4f5);
-  box-shadow: 0 0 20px rgba(126,200,227,0.30);
-}
+/* ── KLOUD is a service, not an app card — see licensing section for its subscription card ── */
 
 .card-kubic .card-mark {
   background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40);
@@ -907,7 +926,7 @@ footer {
 
   .hero-title { font-size: clamp(40px, 11.5vw, 72px); letter-spacing:-0.02em; margin-bottom: 16px; }
 
-  .hero-title .kerf { white-space: nowrap; }
+  .hero-title .brand-gradient { white-space: nowrap; }
 
   .hero-title .suite { font-size:0.38em; letter-spacing:0.02em; vertical-align:super; line-height:0; }
 
@@ -1038,18 +1057,20 @@ footer {
 
 .lc-title {
   font-family: var(--ff-display);
-  font-size: 23px;
+  font-size: clamp(28px, 8vw, 46px);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  line-height: 1;
   color: var(--text1);
-  line-height: 1.1;
+  overflow-wrap: break-word;
 }
 
 
 .lc-subtitle {
   font-family: var(--ff-ui);
-  font-size: 14px;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--text3);
   margin-top: -6px;
@@ -1219,7 +1240,7 @@ footer {
 
 <!-- NAV -->
 <nav>
-  <div class="nav-brand">KAD<sup>suite™</sup></div>
+  <div class="nav-brand"><span class="brand-gradient">KAD<sup class="suite">suite™</sup></span></div>
   <div class="nav-links">
     <a class="nav-link" href="https://www.instagram.com/kadsuite" target="_blank">
       <span class="nav-link-text">Instagram</span>
@@ -1229,7 +1250,7 @@ footer {
       <span class="nav-link-text">LinkedIn</span>
       <svg class="nav-link-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
     </a>
-    <a class="nav-link" href="mailto:KADsuite.proton.me" title="Email KADsuite">
+    <a class="nav-link" href="mailto:ask@KADsuite.com" title="Email KADsuite">
       <span class="nav-link-text">Contact</span>
       <svg class="nav-link-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -1243,7 +1264,7 @@ footer {
 <div class="page">
   <section class="hero" style="background:rgba(6,10,16,0.92);border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;position:relative;z-index:1;">
     <p style="font-family:var(--ff-ui);font-size:1.05rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#eef3f8;opacity:1;margin:0 0 0.7rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
-    <h1 class="hero-title"><span class="kerf">KADsuite<sup class="suite">™</sup></span></h1>
+    <h1 class="hero-title"><span class="brand-gradient">KADsuite<sup class="suite">™</sup></span></h1>
     <p class="hero-tagline">Touch &amp; Tablet Optimized Drafting Software</p>
   </section>
 </div>
@@ -1279,7 +1300,7 @@ footer {
       <!-- KAD — no changes -->
       <a class="card card-kad" href="https://kad.kadsuite.com">
         <div class="card-mark">KAD</div>
-        <div class="card-name">KAD</div>
+        <h2 class="card-name">KAD</h2>
         <div class="card-full">Kernel-Aided Design</div>
         <div class="card-preview">
           <canvas id="kad-preview"></canvas>
@@ -1296,7 +1317,7 @@ footer {
       <!-- KANVAS — retinted to the KREATE-tab purple (#7c5cd6 → #a68ae8) -->
       <a class="card card-kanvas" href="https://kanvas.kadsuite.com">
         <div class="card-mark">KVS</div>
-        <div class="card-name">KANVAS</div>
+        <h2 class="card-name">KANVAS</h2>
         <div class="card-full">Kernel-Aided Node Vector Art Suite</div>
         <div class="card-preview">
           <canvas id="kanvas-preview"></canvas>
@@ -1316,7 +1337,7 @@ footer {
       <a class="card card-dok" href="https://dok.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">DOK</div>
-        <div class="card-name">DOK</div>
+        <h2 class="card-name">DOK</h2>
         <div class="card-full">Document Object Kernel</div>
         <div class="card-preview">
           <canvas id="dok-preview"></canvas>
@@ -1338,7 +1359,7 @@ footer {
       <a class="card card-kodex" href="https://kodex.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KDX</div>
-        <div class="card-name">KODEX</div>
+        <h2 class="card-name">KODEX</h2>
         <div class="card-full">Line-Matched Publishing</div>
         <div class="card-preview">
           <canvas id="kodex-preview"></canvas>
@@ -1357,7 +1378,7 @@ footer {
       <a class="card card-kid" href="https://kid.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KID</div>
-        <div class="card-name">KID</div>
+        <h2 class="card-name">KID</h2>
         <div class="card-full">Kernel-Instructed Design</div>
         <div class="card-preview">
           <canvas id="kid-preview"></canvas>
@@ -1374,7 +1395,7 @@ footer {
       <!-- KODE — red theme, unchanged -->
       <a class="card card-kode" href="https://kode.kadsuite.com">
         <div class="card-mark">GK</div>
-        <div class="card-name">KODE</div>
+        <h2 class="card-name">KODE</h2>
         <div class="card-full">Kernel-Oriented Development Environment</div>
         <div class="card-preview">
           <canvas id="kode-preview"></canvas>
@@ -1401,7 +1422,7 @@ footer {
       <a class="card card-kam card-hidden" href="https://kam.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KM</div>
-        <div class="card-name">KAM</div>
+        <h2 class="card-name">KAM</h2>
         <div class="card-full">Kernel-Aided Manufacturing</div>
         <div class="card-preview">
           <canvas id="kam-preview"></canvas>
@@ -1415,31 +1436,11 @@ footer {
         </div>
       </a>
 
-      <!-- KLOUD — Beta. Present in Old file only (not in Working file's
-           card grid — it appears lower on the page as a separate
-           "KLOUD Cloud" section in Working/Last). Suppressed, not deleted. -->
-      <a class="card card-kloud card-hidden" href="https://kloud.kadsuite.com">
-        <div class="card-beta-stamp">Beta</div>
-        <div class="card-mark">KL</div>
-        <div class="card-name">KLOUD</div>
-        <div class="card-full">Kernel Live Optimized Universal Development</div>
-        <div class="card-preview">
-          <canvas id="kloud-preview"></canvas>
-        </div>
-        <div class="card-desc">
-          KADsuite in the cloud — sign in, sync files, and collaborate in real time with your team.
-        </div>
-        <div class="card-cta">
-          <span>Open KLOUD</span>
-          <span class="card-cta-arrow">→</span>
-        </div>
-      </a>
-
       <!-- KUBIC — Beta. Explicitly requested hidden. -->
       <a class="card card-kubic card-hidden" href="https://kubic.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KB</div>
-        <div class="card-name">KUBIC</div>
+        <h2 class="card-name">KUBIC</h2>
         <div class="card-full">Kernel Unified Building Informatics Control</div>
         <div class="card-preview">
           <canvas id="kube-preview"></canvas>
@@ -1457,7 +1458,7 @@ footer {
       <a class="card card-karve card-hidden" href="https://karve.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KV</div>
-        <div class="card-name">KARVE</div>
+        <h2 class="card-name">KARVE</h2>
         <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
         <div class="card-preview">
           <canvas id="karve-preview"></canvas>
@@ -1476,7 +1477,7 @@ footer {
       <a class="card card-konstruct card-hidden" href="https://konstruct.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KON</div>
-        <div class="card-name">KONSTRUCT</div>
+        <h2 class="card-name">KONSTRUCT</h2>
         <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
         <div class="card-preview">
           <canvas id="konstruct-preview"></canvas>
@@ -1495,7 +1496,7 @@ footer {
       <a class="card card-kultivate card-hidden" href="https://kultivate.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KLT</div>
-        <div class="card-name">KULTIVATE</div>
+        <h2 class="card-name">KULTIVATE</h2>
         <div class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</div>
         <div class="card-preview">
           <canvas id="kultivate-preview"></canvas>
@@ -1513,7 +1514,7 @@ footer {
       <a class="card card-konnector card-hidden" href="https://konnector.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KN</div>
-        <div class="card-name">KONNECTOR</div>
+        <h2 class="card-name">KONNECTOR</h2>
         <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
         <div class="card-desc">
           Structural steel detailing and connection design, from bolt groups to weld tagging and piece marking.
@@ -1528,7 +1529,7 @@ footer {
       <a class="card card-kampus card-hidden" href="https://kampus.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KMP</div>
-        <div class="card-name">KAMPUS</div>
+        <h2 class="card-name">KAMPUS</h2>
         <div class="card-full">Kernel-Aided Map Plan Unified Site</div>
         <div class="card-preview">
           <canvas id="kampus-preview"></canvas>
@@ -1564,8 +1565,6 @@ footer {
         <div class="flow-node"><div class="flow-icon kode">GK</div><div class="flow-label">KODE</div></div>
       </div>
     </div>
-      </div>
-    </div>
   </section>
 
   <!-- LICENSING -->
@@ -1576,7 +1575,7 @@ footer {
       <!-- AGPL Code License -->
       <div class="license-card lc-agpl">
         <div class="lc-tag">Source Code</div>
-        <div class="lc-title">AGPL-3.0</div>
+        <div class="lc-title" style="color:var(--lc-color);">AGPL-3.0</div>
         <div class="lc-subtitle">Affero General Public License</div>
         <div class="lc-price">Open <span>/ always</span></div>
         <div class="lc-divider"></div>
@@ -1603,13 +1602,13 @@ footer {
           <li>Forks must remain open source under AGPL</li>
           <li>Native builds are separate proprietary products</li>
         </ul>
-        <a class="lc-btn" href="mailto:KADsuite.proton.me" style="border-color:rgba(139,92,246,0.4);color:#c084fc;">Get in touch →</a>
+        <a class="lc-btn" href="mailto:ask@KADsuite.com" style="border-color:rgba(139,92,246,0.4);color:#c084fc;">Get in touch →</a>
       </div>
 
       <!-- KLOUD Cloud -->
       <div class="license-card" style="--lc-color:rgba(126,200,227,0.6);--lc-glow:rgba(126,200,227,0.08);">
         <div class="lc-tag" style="background:rgba(126,200,227,0.10);color:#7ec8e3;border-color:rgba(126,200,227,0.3);">KLOUD</div>
-        <div class="lc-title" style="color:#7ec8e3;">KLOUD Subscription</div>
+        <div class="lc-title" style="color:#7ec8e3;">KLOUD <span style="font-size:0.42em;letter-spacing:-0.01em;">Subscription</span></div>
         <div class="lc-subtitle">Sync · Collaborate · Share</div>
         <div class="lc-price" style="color:#7ec8e3;">from $19.99 <span>/ mo</span></div>
         <div class="lc-divider"></div>
@@ -1629,7 +1628,7 @@ footer {
 
   <!-- FOOTER -->
   <footer style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
-    <div class="footer-brand">KAD<sup>suite™</sup></div>
+    <div class="footer-brand"><span class="brand-gradient">KADsuite<sup class="suite">™</sup></span></div>
     <div class="footer-links">
       <a class="footer-link" href="https://www.instagram.com/kadsuite" target="_blank">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1643,12 +1642,12 @@ footer {
         </svg>
         withshalom
       </a>
-      <a class="footer-link" href="mailto:KADsuite.proton.me" title="Email KADsuite">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+      <a class="footer-link" href="mailto:ask@KADsuite.com" title="Email KADsuite">
+        <svg viewBox="0 0 24 24" width="16" height="16" style="fill:none;" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
           <rect x="2" y="4" width="20" height="16" rx="2"/>
           <polyline points="2,4 12,13 22,4"/>
         </svg>
-        KADsuite.proton.me
+        ask@KADsuite.com
       </a>
     </div>
     <div class="footer-copy">© 2026 KADsuite™ · KAD™ · KAM™ · KUBIC™ · KARVE™ · KONSTRUCT™ · KULTIVATE™ · KODE™ · KANVAS™ · KONNECTOR™ · KAMPUS™ · KID™ · AGPL-3.0 · Open source · Trademarks of withshalom / KADsuite · kadsuite.com</div>
@@ -2254,70 +2253,6 @@ initPreview('konstruct-preview', (ctx, W, H) => {
   ctx.textAlign='center'; ctx.fillText('KONSTRUCT',W/2,H-8);
   ctx.textAlign='left'; ctx.fillStyle='rgba(74,143,212,0.60)';
   ctx.fillText('KON',3,10);
-});
-
-// ── KLOUD preview ──────────────────────────────────────────────────────────────
-initPreview('kloud-preview', (ctx, W, H) => {
-  // White drafting paper — KLOUD is light mode
-  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
-  // Subtle blueprint grid on white
-  ctx.strokeStyle='rgba(42,143,173,0.10)'; ctx.lineWidth=0.5;
-  for(let x=0;x<W;x+=16){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=16){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  // Part geometry — dark on white, like a real drawing
-  const pts=[[W*.22,H*.28],[W*.22,H*.68],[W*.78,H*.68],[W*.78,H*.28]];
-  ctx.strokeStyle='#1a3a52'; ctx.lineWidth=1.4; ctx.setLineDash([]);
-  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
-  pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
-  ctx.closePath(); ctx.stroke();
-  // Centerlines — yellow/gold on white
-  ctx.strokeStyle='rgba(180,140,0,0.5)'; ctx.lineWidth=0.7; ctx.setLineDash([8,3,2,3]);
-  ctx.beginPath(); ctx.moveTo(W*.5,H*.16); ctx.lineTo(W*.5,H*.78); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(W*.12,H*.48); ctx.lineTo(W*.88,H*.48); ctx.stroke();
-  ctx.setLineDash([]);
-  // User A cursor — sky blue on white
-  ctx.fillStyle='#2a8fad'; ctx.shadowColor='rgba(42,143,173,0.3)'; ctx.shadowBlur=4;
-  ctx.beginPath(); ctx.moveTo(W*.24,H*.24); ctx.lineTo(W*.24+8,H*.24+5); ctx.lineTo(W*.24+2,H*.24+11); ctx.closePath(); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.font='bold 7px monospace'; ctx.fillStyle='#2a8fad'; ctx.fillText('User A',W*.33,H*.22);
-  // User B cursor — lighter sky
-  ctx.fillStyle='#5ab3d0'; ctx.shadowColor='rgba(90,179,208,0.3)'; ctx.shadowBlur=4;
-  ctx.beginPath(); ctx.moveTo(W*.68,H*.64); ctx.lineTo(W*.68+8,H*.64+5); ctx.lineTo(W*.68+2,H*.64+11); ctx.closePath(); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.fillStyle='#5ab3d0'; ctx.fillText('User B',W*.55,H*.72);
-  // Sync line — faint sky dashes
-  ctx.strokeStyle='rgba(42,143,173,0.15)'; ctx.lineWidth=0.7; ctx.setLineDash([3,4]);
-  ctx.beginPath(); ctx.moveTo(W*.28,H*.3); ctx.lineTo(W*.68,H*.65); ctx.stroke();
-  ctx.setLineDash([]);
-  // ── Coming soon stamp — bottom of canvas ─────────────────────────────────
-  const stampY = H * 0.88;
-  const stampW = W * 0.72;
-  const stampX = (W - stampW) / 2;
-  // Pill background
-  ctx.fillStyle = 'rgba(42,143,173,0.10)';
-  const r = 10;
-  ctx.beginPath();
-  ctx.moveTo(stampX+r, stampY-10);
-  ctx.lineTo(stampX+stampW-r, stampY-10);
-  ctx.quadraticCurveTo(stampX+stampW, stampY-10, stampX+stampW, stampY);
-  ctx.lineTo(stampX+stampW, stampY+10);
-  ctx.quadraticCurveTo(stampX+stampW, stampY+20, stampX+stampW-r, stampY+20);
-  ctx.lineTo(stampX+r, stampY+20);
-  ctx.quadraticCurveTo(stampX, stampY+20, stampX, stampY+10);
-  ctx.lineTo(stampX, stampY);
-  ctx.quadraticCurveTo(stampX, stampY-10, stampX+r, stampY-10);
-  ctx.closePath(); ctx.fill();
-  // Pill border
-  ctx.strokeStyle='rgba(42,143,173,0.35)'; ctx.lineWidth=0.8; ctx.setLineDash([]);
-  ctx.stroke();
-  // Stamp text
-  ctx.font = 'bold 8px monospace';
-  ctx.fillStyle = '#2a8fad';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('✦  KAD LIVE  ·  MORE COMING  ✦', W/2, stampY+5);
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
 });
 
 // ── KAMPUS preview ────────────────────────────────────────────────────────────
