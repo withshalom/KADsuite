@@ -47,7 +47,10 @@
 <meta charset="UTF-8">
 <meta name="copyright" content="Copyright (C) 2026 KADsuite / withshalom. Licensed under AGPL-3.0-or-later. KADsuite™, KAD™, KAM™, KUBIC™, KARVE™, KONSTRUCT™, KULTIVATE™, KODE™, KANVAS™, KONNECTOR™, KAMPUS™, KLOUD™, KID™, DOK™, and KODEX™ are trademarks of withshalom / KADsuite. Forks must remain open source under AGPL. Trademarks not licensed by AGPL.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#050607">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KADsuite">
@@ -2651,6 +2654,21 @@ document.addEventListener('keydown', function(e) {
 </script>
   </div>
 </div>
+
+<script>
+// ── PWA: service worker registration ────────────────────────────────
+// Mapped from index.html's template. This landing page has no embedded
+// KAD editor, so the launchQueue/file_handlers consumer (which routes
+// launched .dxf/.kvs/.kad files into openDraftingMode()) was not carried
+// over — it has nothing to attach to here. Registration only:
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch((err) => {
+      console.warn('Service worker registration failed:', err);
+    });
+  });
+}
+</script>
 
 </body>
 </html>
