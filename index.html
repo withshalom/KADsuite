@@ -56,6 +56,62 @@
 <meta name="apple-mobile-web-app-title" content="KADsuite">
 
 <!-- ══════════════════════════════════════════════════════════════════════
+     SELF-HOSTED FONTS — only weights actually used in this file:
+       Atkinson Hyperlegible: 400, 600, 700 (no italic used anywhere)
+       JetBrains Mono:        400, 700     (no italic used anywhere)
+       Literata:               400, 700     (no italic used anywhere)
+       Syne:                   800          (700 was loaded but unused)
+     Place the matching .woff2 files at /fonts/. To get exactly these six
+     files: fetch https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Literata:wght@400;700&family=Syne:wght@800&display=swap
+     in a browser, open each src url in that returned CSS, and save the
+     woff2 it points to under the matching filename below.
+     ══════════════════════════════════════════════════════════════════════ -->
+<link rel="preload" href="/fonts/atkinson-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/syne-800.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/fonts/atkinson-400.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/fonts/atkinson-600.woff2') format('woff2');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/fonts/atkinson-700.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-400.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-700.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Literata';
+  src: url('/fonts/literata-400.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Literata';
+  src: url('/fonts/literata-700.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Syne';
+  src: url('/fonts/syne-800.woff2') format('woff2');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+</style>
+
+<!-- ══════════════════════════════════════════════════════════════════════
      SEO / LANDING PAGE METADATA
      ══════════════════════════════════════════════════════════════════════ -->
 <title>KADsuite — Browser-Native CAD, Publishing &amp; Design Suite</title>
@@ -97,9 +153,6 @@
 <!-- ══════════════════════════ END SEO BLOCK ═══════════════════════════ -->
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Literata:ital,opsz,wght@0,16..30,400;0,16..30,500;0,16..30,600;0,16..30,700;1,16..30,400&family=Syne:wght@700;800&display=swap');
-
-
 /* ── LIGHT MODE ─────────────────────────────────────────────────────────────
    Toggled via body.light-mode — all UI vars flip, accent stays cyan
    ─────────────────────────────────────────────────────────────────────────── */
@@ -121,28 +174,11 @@ body.light-mode {
 
 :root {
   --void:       #080a0e;
-  --panel:      #0b0f14;
-  --panel2:     #131a24;
-  --hover:      #1e2838;
   --border:     #263548;
-  --border-hi:  #3a5070;
   --accent:        #00d4ff;
-  --accent-dim:    #0088aa;
-  --accent-glow:   rgba(0,212,255,0.15);
-  --green:         #00ff9d;
-  --green-dim:     #00aa66;
-  --amber:         #ffaa00;
-  --red:           #ff4455;
   --t1:  #f0f4f8;
-  --t2: #a8c4dc;
-  --t3: #6888a8;
   --fm:     'JetBrains Mono', monospace;
-  --fd:       'Syne', sans-serif;
-  --fs:       'Literata', serif;
   --fu:       'Atkinson Hyperlegible', sans-serif;
-  --sidebar-w:     272px;
-  --toolbar-h:     48px;
-  --status-h:      32px;
 }
 
 
@@ -151,18 +187,7 @@ body.light-mode {
 html, body { width:100%; height:100%; overflow:hidden; box-sizing:border-box; background:var(--void); color:var(--t1); font-family:var(--fu); font-size:15px; }
 
 
-/* ── KADsuite suite tokens (override/align) ── */
-:root {
-  --fm: 'JetBrains Mono', monospace;
-  --fd: 'Syne', sans-serif;
-  --fs: 'Literata', serif;
-  --fu: 'Atkinson Hyperlegible', sans-serif;
-}
-/* ── Print ── */
-@media print {
-  body { background: white; }
 
-}
 
 
 
@@ -186,24 +211,13 @@ body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
 #btn-close-kad:hover { background:rgba(0,212,255,0.08); border-color:var(--accent); }
 
 
-/* ── KADsuite suite tokens (override/align) ── */
-:root {
-  --fm: 'JetBrains Mono', monospace;
-  --fd: 'Syne', sans-serif;
-  --fs: 'Literata', serif;
-  --fu: 'Atkinson Hyperlegible', sans-serif;
-}
-/* ── Print ── */
-@media print {
-  body { background: white; }
 
-}
 
 
 
 /* ── KADsuite suite page styles ── */
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 
 
 :root {
@@ -261,7 +275,6 @@ body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
   --kid-g: rgba(244,246,251,0.10);
 
   --kampus:      #E8600A;  /* construction cone orange */
-  --kraft:       #c0c0c0;  /* brushed steel */
   --kampus-g:    rgba(232,96,10,0.12);
   --konstruct-g: rgba(74,143,212,0.12);
 
@@ -690,16 +703,6 @@ nav {
 }
 
 
-.diagram-title {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 40px;
-}
-
-
 .diagram-flow { display:flex; flex-direction:column; align-items:center; gap:8px; }
 
 .flow-row { display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; }
@@ -744,7 +747,6 @@ nav {
 
 .flow-icon.kampus   { background: linear-gradient(135deg,#3a1200,#E8600A,#ffaa40); }
 
-.flow-icon.kraft    { background: linear-gradient(135deg,#404040,#999999,#e0e0e0); }
 
 .flow-icon.kanvas    { background: linear-gradient(105deg,#3a2a6e 0%,#7c5cd6 55%,#a68ae8 100%); }
 
@@ -907,11 +909,6 @@ footer {
 
 .card-kampus { --card-color: var(--kampus); --card-glow: var(--kampus-g); }
 
-.card-kraft .card-mark {
-  background: linear-gradient(135deg, #404040 0%, #999999 50%, #cccccc 100%);
-  box-shadow: 0 0 16px rgba(192,192,192,0.25);
-}
-
 .card-kampus .card-mark {
   background: linear-gradient(135deg, #7a2800 0%, #E8600A 60%, #ff9040 100%);
   box-shadow: 0 0 18px rgba(232,96,10,0.35);
@@ -1016,17 +1013,6 @@ footer {
   padding: 0 0 120px;
   opacity: 0;
   animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;
-}
-
-
-.licensing-header {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 40px;
-  text-align: center;
 }
 
 
@@ -1844,35 +1830,6 @@ function initPreview(id, drawFn) {
 
 // KAD preview — technical drawing lines + grid
 // ── Beta stamp — drawn on preview canvas for non-KAD programs ────────────────
-function drawBetaStamp(ctx, W, H) {
-  ctx.save();
-  // Rotate around top-right area
-  const cx = W * 0.78, cy = H * 0.22;
-  ctx.translate(cx, cy);
-  ctx.rotate(Math.PI / 6); // 30° diagonal
-
-  // Background pill
-  const pw = 48, ph = 14;
-  ctx.fillStyle = 'rgba(255,140,0,0.18)';
-  ctx.beginPath();
-  ctx.roundRect(-pw/2, -ph/2, pw, ph, 4);
-  ctx.fill();
-
-  // Border
-  ctx.strokeStyle = 'rgba(255,140,0,0.55)';
-  ctx.lineWidth = 0.9;
-  ctx.stroke();
-
-  // Text
-  ctx.fillStyle = '#ff8c00';
-  ctx.font = 'bold 8px monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('BETA', 0, 0);
-
-  ctx.restore();
-}
-
 initPreview('kad-preview', (ctx, W, H) => {
   ctx.clearRect(0, 0, W, H);
   // Draftspace fill — KAD's actual canvas color, not the card's chrome
@@ -2403,23 +2360,6 @@ initPreview('kloud-preview', (ctx, W, H) => {
   ctx.fillText('✦  KAD LIVE  ·  MORE COMING  ✦', W/2, stampY+5);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-});
-
-// ── KRAFT preview ────────────────────────────────────────────────────────────
-initPreview('kraft-preview', (ctx, W, H) => {
-  // Layer stack visualization
-  ctx.fillStyle='#1a1a1a'; ctx.fillRect(0,0,W,H);
-  const layers=8;
-  for(let i=0;i<layers;i++){
-    const y=H*0.2+i*(H*0.6/layers);
-    ctx.fillStyle=`rgba(200,200,200,${0.3+i*0.05})`;
-    ctx.fillRect(W*0.1, y, W*0.8, H*0.6/layers-2);
-  }
-  // Nozzle indicator at top
-  ctx.fillStyle='#ff8800'; ctx.beginPath(); ctx.arc(W*0.5, H*0.1, 6, 0, Math.PI*2); ctx.fill();
-  // Label
-  ctx.fillStyle='#999999'; ctx.font='bold 8px monospace';
-  ctx.textAlign='center'; ctx.fillText(layers+' LAYERS', W*0.5, H*0.88);
 });
 
 // ── KAMPUS preview ────────────────────────────────────────────────────────────
