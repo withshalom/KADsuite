@@ -2336,88 +2336,277 @@ initPreview('kid-preview', (ctx, W, H) => {
   ctx.beginPath(); ctx.arc(W*.5,H*.5,8,0,Math.PI*2); ctx.stroke();
 });
 
-// ── DOK preview — white page on ink-blue desk, flowing paragraph lines ─────
+// ── DOK preview — realistic mini app chrome: topbar, ribbon, book tabs,
+//    styles sidebar, ruled stage with an actual paginated page ──────────────
 initPreview('dok-preview', (ctx, W, H) => {
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle = '#0a0e1c'; ctx.fillRect(0,0,W,H);
 
-  // Page shadow + sheet
-  const px = W*0.20, py = H*0.10, pw = W*0.60, ph = H*0.82;
-  ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(px+3, py+4, pw, ph);
-  ctx.fillStyle = '#f4f6fb'; ctx.fillRect(px, py, pw, ph);
-  ctx.strokeStyle = 'rgba(58,104,224,0.35)'; ctx.lineWidth = 1;
-  ctx.strokeRect(px, py, pw, ph);
+  const ACC='#5b8cff', ACC2='#3a68e0';
 
-  // Heading bar
-  ctx.fillStyle = '#5b8cff'; ctx.fillRect(px+pw*0.10, py+ph*0.10, pw*0.42, ph*0.06);
+  // ── Topbar ──
+  const tbH = H*0.13;
+  ctx.fillStyle = '#0d1122'; ctx.fillRect(0,0,W,tbH);
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth=0.6;
+  ctx.beginPath(); ctx.moveTo(0,tbH); ctx.lineTo(W,tbH); ctx.stroke();
+  // brand mark
+  const bm = tbH*0.62;
+  const bmGrad = ctx.createLinearGradient(6,3,6+bm,3+bm);
+  bmGrad.addColorStop(0,ACC); bmGrad.addColorStop(1,ACC2);
+  ctx.fillStyle = bmGrad;
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(6,tbH*0.19,bm,bm,3) : ctx.rect(6,tbH*0.19,bm,bm); ctx.fill();
+  ctx.fillStyle = '#0a0e1c'; ctx.font = `bold ${bm*0.5}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('DK', 6+bm/2, tbH*0.19+bm/2+0.5);
+  // menu labels
+  ctx.font = `${tbH*0.30}px sans-serif`; ctx.fillStyle='rgba(233,236,245,0.55)'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  const menus=['File','Edit','Insert','Format','View']; let mx = 6+bm+10;
+  menus.forEach(m=>{ ctx.fillText(m, mx, tbH*0.52); mx += ctx.measureText(m).width + 12; });
+  // doc name pill, right
+  ctx.font = `${tbH*0.28}px sans-serif`; ctx.fillStyle='rgba(233,236,245,0.4)'; ctx.textAlign='right';
+  ctx.fillText('Untitled', W-8, tbH*0.52);
 
-  // Flowing paragraph lines — varied widths, like real reflowed text
-  const lineY = py+ph*0.24, lineH = ph*0.072;
-  const widths = [0.80,0.76,0.82,0.55,0.0,0.78,0.80,0.62,0.0,0.70,0.74,0.40];
-  let y = lineY;
-  ctx.fillStyle = 'rgba(20,24,40,0.55)';
-  widths.forEach(w=>{
-    if (w>0) ctx.fillRect(px+pw*0.10, y, pw*w, lineH*0.42);
-    y += lineH;
+  // ── Ribbon ──
+  const rbY = tbH, rbH = H*0.115;
+  ctx.fillStyle = '#0c0f1e'; ctx.fillRect(0,rbY,W,rbH);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.beginPath(); ctx.moveTo(0,rbY+rbH); ctx.lineTo(W,rbY+rbH); ctx.stroke();
+  let rx = 8;
+  // style + font dropdowns
+  [ [W*0.15,'Body'], [W*0.13,'Sans'] ].forEach(([w,label])=>{
+    ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(rx, rbY+rbH*0.22, w, rbH*0.56);
+    ctx.strokeStyle='rgba(255,255,255,0.10)'; ctx.lineWidth=0.6; ctx.strokeRect(rx, rbY+rbH*0.22, w, rbH*0.56);
+    ctx.fillStyle='rgba(233,236,245,0.5)'; ctx.font=`${rbH*0.34}px sans-serif`; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(label, rx+4, rbY+rbH*0.5);
+    rx += w+6;
+  });
+  rx += 6;
+  // B I U S glyphs
+  ctx.font = `bold ${rbH*0.42}px serif`; ctx.fillStyle='rgba(233,236,245,0.75)'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ['B','I','U','S'].forEach((g,i)=>{
+    const gx = rx + i*(rbH*0.62);
+    ctx.save();
+    if (i===1) ctx.font = `italic bold ${rbH*0.42}px serif`;
+    if (i===2) { ctx.font = `bold ${rbH*0.42}px serif`; }
+    ctx.fillText(g, gx+rbH*0.28, rbY+rbH*0.5);
+    if (i===2){ ctx.strokeStyle='rgba(233,236,245,0.75)'; ctx.lineWidth=0.7; ctx.beginPath(); ctx.moveTo(gx+rbH*0.10,rbY+rbH*0.74); ctx.lineTo(gx+rbH*0.46,rbY+rbH*0.74); ctx.stroke(); }
+    if (i===3){ ctx.strokeStyle='rgba(233,236,245,0.75)'; ctx.lineWidth=0.7; ctx.beginPath(); ctx.moveTo(gx+rbH*0.10,rbY+rbH*0.5); ctx.lineTo(gx+rbH*0.46,rbY+rbH*0.5); ctx.stroke(); }
+    ctx.restore();
+  });
+  rx += 4*(rbH*0.62) + 8;
+  // color swatches
+  ctx.fillStyle = '#e9ecf5'; ctx.fillRect(rx, rbY+rbH*0.3, rbH*0.4, rbH*0.4);
+  rx += rbH*0.4 + 4;
+  ctx.fillStyle = '#ffe066'; ctx.fillRect(rx, rbY+rbH*0.3, rbH*0.4, rbH*0.4);
+  rx += rbH*0.4 + 10;
+  // alignment icon (four bars, ragged right = left-align)
+  ctx.strokeStyle = 'rgba(233,236,245,0.6)'; ctx.lineWidth = 1;
+  const alW = rbH*0.5;
+  [1,0.7,0.9,0.5].forEach((f,i)=>{
+    ctx.beginPath(); ctx.moveTo(rx, rbY+rbH*0.28+i*rbH*0.14); ctx.lineTo(rx+alW*f, rbY+rbH*0.28+i*rbH*0.14); ctx.stroke();
+  });
+  rx += alW + 12;
+  // list icon (dots + lines)
+  ctx.strokeStyle='rgba(233,236,245,0.6)'; ctx.lineWidth=1;
+  [0,1,2].forEach(i=>{
+    const ly = rbY+rbH*0.26+i*rbH*0.18;
+    ctx.beginPath(); ctx.arc(rx, ly, 1, 0, Math.PI*2); ctx.fillStyle='rgba(233,236,245,0.6)'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(rx+5, ly); ctx.lineTo(rx+alW*0.7, ly); ctx.stroke();
   });
 
-  // Caret — blinking-style bar mid-paragraph
-  ctx.fillStyle = '#3a68e0';
-  ctx.fillRect(px+pw*0.10+pw*0.55, lineY+lineH*3, 1.6, lineH*0.6);
+  // ── Book tabs ──
+  const btY = rbY+rbH, btH = H*0.075;
+  ctx.fillStyle = '#0a0d1a'; ctx.fillRect(0,btY,W,btH);
+  ctx.font = `${btH*0.5}px sans-serif`; ctx.textBaseline='middle'; ctx.textAlign='left';
+  const tabs=[['Chapter 1',true],['Notes',false]];
+  let tx=8;
+  tabs.forEach(([label,active])=>{
+    const tw = ctx.measureText(label).width+16;
+    if (active){
+      ctx.fillStyle='rgba(58,104,224,0.18)'; ctx.fillRect(tx,btY+btH*0.12,tw,btH*0.76);
+      ctx.strokeStyle=ACC; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(tx,btY+btH-1); ctx.lineTo(tx+tw,btY+btH-1); ctx.stroke();
+      ctx.fillStyle='rgba(233,236,245,0.9)';
+    } else {
+      ctx.fillStyle='rgba(233,236,245,0.4)';
+    }
+    ctx.fillText(label, tx+8, btY+btH*0.52);
+    tx += tw+6;
+  });
 
-  // Page-break dashed line — pagination motif
-  ctx.strokeStyle = 'rgba(58,104,224,0.45)'; ctx.lineWidth = 0.8; ctx.setLineDash([4,3]);
-  ctx.beginPath(); ctx.moveTo(px, py+ph*0.78); ctx.lineTo(px+pw, py+ph*0.78); ctx.stroke();
+  // ── Left styles sidebar ──
+  const sbW = W*0.165, stageY = btY+btH, stageH = H-stageY;
+  ctx.fillStyle = '#0b0e1a'; ctx.fillRect(0,stageY,sbW,stageH);
+  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=0.6;
+  ctx.beginPath(); ctx.moveTo(sbW,stageY); ctx.lineTo(sbW,H); ctx.stroke();
+  ctx.font = `700 ${stageH*0.045}px sans-serif`; ctx.fillStyle='rgba(233,236,245,0.35)'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('STYLES', 6, stageY+stageH*0.06);
+  const styles=[['Title',1],['Heading 1',0.85],['Heading 2',0.72],['Body',0.62],['Quote',0.62]];
+  let sy = stageY+stageH*0.14;
+  styles.forEach(([label,scale],i)=>{
+    if (i===2){ ctx.fillStyle='rgba(91,140,255,0.14)'; ctx.fillRect(2,sy-stageH*0.032,sbW-4,stageH*0.075); ctx.fillStyle=ACC; ctx.fillRect(2,sy-stageH*0.032,2,stageH*0.075); }
+    ctx.font = `${stageH*0.05*scale+4}px serif`;
+    ctx.fillStyle = i===2 ? 'rgba(233,236,245,0.95)' : 'rgba(233,236,245,0.55)';
+    ctx.fillText(label, 8, sy);
+    sy += stageH*0.085;
+  });
+
+  // ── Stage: ruler + page ──
+  const rulerH = stageH*0.06;
+  ctx.fillStyle = '#101426'; ctx.fillRect(sbW, stageY, W-sbW, rulerH);
+  ctx.strokeStyle='rgba(233,236,245,0.15)'; ctx.lineWidth=0.5;
+  for(let x=sbW+8;x<W-4;x+=8){ ctx.beginPath(); ctx.moveTo(x,stageY+rulerH*0.4); ctx.lineTo(x,stageY+rulerH); ctx.stroke(); }
+
+  const pageX = sbW + (W-sbW)*0.10, pageY = stageY+rulerH+stageH*0.045;
+  const pageW = (W-sbW)*0.80, pageH = stageH - rulerH - stageH*0.09;
+  ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.fillRect(pageX+2,pageY+3,pageW,pageH);
+  ctx.fillStyle='#f4f6fb'; ctx.fillRect(pageX,pageY,pageW,pageH);
+  ctx.strokeStyle='rgba(58,104,224,0.3)'; ctx.lineWidth=0.8; ctx.strokeRect(pageX,pageY,pageW,pageH);
+
+  // realistic text: heading + paragraph rendered with real glyphs
+  ctx.fillStyle='#1a2038'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  const hFont = Math.max(6, pageH*0.075);
+  ctx.font = `700 ${hFont}px Georgia, serif`;
+  ctx.fillText('Chapter One', pageX+pageW*0.08, pageY+pageH*0.16);
+
+  const pFont = Math.max(3.6, pageH*0.038);
+  ctx.font = `${pFont}px Georgia, serif`;
+  ctx.fillStyle='rgba(26,32,56,0.82)';
+  const lines = [
+    'It began, as most things do, with a line drawn',
+    'carefully and then reconsidered. The paper held',
+    'its silence, patient in the way that blank pages',
+    'are, waiting on a decision that had not yet been',
+    'made. Still, something in the margin insisted.'
+  ];
+  let ly = pageY+pageH*0.30;
+  lines.forEach(line=>{
+    ctx.fillText(line, pageX+pageW*0.08, ly);
+    ly += pFont*1.7;
+  });
+  // caret
+  ctx.fillStyle = ACC2;
+  ctx.fillRect(pageX+pageW*0.08+ctx.measureText(lines[2].slice(0,22)).width, ly-2.1*pFont, 0.9, pFont*1.1);
+
+  // page-break marker + footer
+  ctx.strokeStyle='rgba(58,104,224,0.4)'; ctx.lineWidth=0.7; ctx.setLineDash([3,2]);
+  ctx.beginPath(); ctx.moveTo(pageX,pageY+pageH*0.86); ctx.lineTo(pageX+pageW,pageY+pageH*0.86); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.font = '7px monospace'; ctx.fillStyle = 'rgba(58,104,224,0.7)';
-  ctx.textAlign = 'right'; ctx.fillText('Page 1 / 2', px+pw-4, py+ph*0.78-4);
+  ctx.font=`${pFont*0.85}px monospace`; ctx.fillStyle='rgba(58,104,224,0.65)'; ctx.textAlign='right';
+  ctx.fillText('1 / 2', pageX+pageW-4, pageY+pageH*0.86-3);
 
-  // .DOK watermark
-  ctx.font = 'bold 8px monospace'; ctx.fillStyle = 'rgba(91,140,255,0.6)';
-  ctx.textAlign = 'right'; ctx.fillText('.DOK', W-6, H-6);
+  // status bar
+  ctx.fillStyle='#0a0d1a'; ctx.fillRect(0,H-stageH*0.045,W,stageH*0.045);
+  ctx.font=`${stageH*0.03}px monospace`; ctx.fillStyle='rgba(233,236,245,0.4)'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('Page 1 of 2  ·  214 words', 6, H-stageH*0.022);
 });
 
-// ── KODEX preview — open book spread on a baseline grid, bronze-gold ──────
+// ── KODEX preview — realistic mini app chrome (bronze theme) over a
+//    baseline-gridded facing-page spread ────────────────────────────────────
 initPreview('kodex-preview', (ctx, W, H) => {
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle = '#14100a'; ctx.fillRect(0,0,W,H);
 
-  // Two facing pages
-  const gx = W*0.5, py = H*0.10, ph = H*0.80, pw = W*0.42;
-  [gx-pw-4, gx+4].forEach((px,i)=>{
+  const ACC='#d4a017', ACC2='#b8763e';
+
+  // ── Topbar ──
+  const tbH = H*0.13;
+  ctx.fillStyle = '#181209'; ctx.fillRect(0,0,W,tbH);
+  ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=0.6;
+  ctx.beginPath(); ctx.moveTo(0,tbH); ctx.lineTo(W,tbH); ctx.stroke();
+  const bm = tbH*0.62;
+  const bmGrad = ctx.createLinearGradient(6,3,6+bm,3+bm);
+  bmGrad.addColorStop(0,ACC2); bmGrad.addColorStop(1,ACC);
+  ctx.fillStyle = bmGrad;
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(6,tbH*0.19,bm,bm,3) : ctx.rect(6,tbH*0.19,bm,bm); ctx.fill();
+  ctx.fillStyle = '#14100a'; ctx.font = `bold ${bm*0.42}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('KDX', 6+bm/2, tbH*0.19+bm/2+0.5);
+  ctx.font = `${tbH*0.30}px sans-serif`; ctx.fillStyle='rgba(246,239,224,0.55)'; ctx.textAlign='left';
+  const menus=['File','Type','Grid','View']; let mx = 6+bm+10;
+  menus.forEach(m=>{ ctx.fillText(m, mx, tbH*0.52); mx += ctx.measureText(m).width + 12; });
+  ctx.font = `${tbH*0.28}px sans-serif`; ctx.fillStyle='rgba(246,239,224,0.4)'; ctx.textAlign='right';
+  ctx.fillText('Genesis.kdx', W-8, tbH*0.52);
+
+  // ── Ribbon: trim size + leading readout + grid toggle ──
+  const rbY = tbH, rbH = H*0.115;
+  ctx.fillStyle = '#160f08'; ctx.fillRect(0,rbY,W,rbH);
+  ctx.strokeStyle='rgba(255,255,255,0.06)';
+  ctx.beginPath(); ctx.moveTo(0,rbY+rbH); ctx.lineTo(W,rbY+rbH); ctx.stroke();
+  let rx=8;
+  [[W*0.20,'5.5×8.5"'],[W*0.18,'12.5pt']].forEach(([w,label])=>{
+    ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(rx, rbY+rbH*0.22, w, rbH*0.56);
+    ctx.strokeStyle='rgba(255,255,255,0.10)'; ctx.lineWidth=0.6; ctx.strokeRect(rx, rbY+rbH*0.22, w, rbH*0.56);
+    ctx.fillStyle='rgba(246,239,224,0.55)'; ctx.font=`${rbH*0.32}px monospace`; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(label, rx+4, rbY+rbH*0.5);
+    rx += w+6;
+  });
+  rx += 6;
+  // active "Grid" toggle button
+  const gW = W*0.15;
+  ctx.fillStyle='rgba(212,160,23,0.22)'; ctx.fillRect(rx, rbY+rbH*0.2, gW, rbH*0.6);
+  ctx.strokeStyle=ACC; ctx.lineWidth=0.8; ctx.strokeRect(rx, rbY+rbH*0.2, gW, rbH*0.6);
+  ctx.fillStyle=ACC; ctx.font=`600 ${rbH*0.34}px sans-serif`; ctx.textAlign='center';
+  ctx.fillText('Grid', rx+gW/2, rbY+rbH*0.52);
+  rx += gW+10;
+  // recto/verso pair icon
+  ctx.strokeStyle='rgba(246,239,224,0.5)'; ctx.lineWidth=0.8;
+  ctx.strokeRect(rx, rbY+rbH*0.28, rbH*0.32, rbH*0.44);
+  ctx.strokeRect(rx+rbH*0.36, rbY+rbH*0.28, rbH*0.32, rbH*0.44);
+
+  // ── Spread stage ──
+  const stageY = rbY+rbH, stageH = H-stageY;
+  const gx = W*0.5, py = stageY+stageH*0.09, ph = stageH*0.80, pw = W*0.42;
+
+  [gx-pw-3, gx+3].forEach((px,i)=>{
+    ctx.fillStyle='rgba(0,0,0,0.30)'; ctx.fillRect(px+2, py+3, pw, ph);
     ctx.fillStyle = '#f6efe0'; ctx.fillRect(px, py, pw, ph);
-    ctx.strokeStyle = 'rgba(212,160,23,0.4)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(184,118,62,0.35)'; ctx.lineWidth = 0.8;
     ctx.strokeRect(px, py, pw, ph);
 
-    // Baseline grid — the whole point of KODEX
-    ctx.strokeStyle = 'rgba(168,114,26,0.18)'; ctx.lineWidth = 0.5;
-    for (let ly = py+ph*0.14; ly < py+ph*0.92; ly += ph*0.072) {
-      ctx.beginPath(); ctx.moveTo(px+pw*0.10, ly); ctx.lineTo(px+pw*0.90, ly); ctx.stroke();
+    // baseline grid — faint
+    ctx.strokeStyle = 'rgba(168,114,26,0.16)'; ctx.lineWidth = 0.45;
+    const leadStep = ph*0.062;
+    for (let gy = py+ph*0.16; gy < py+ph*0.90; gy += leadStep) {
+      ctx.beginPath(); ctx.moveTo(px+pw*0.11, gy); ctx.lineTo(px+pw*0.89, gy); ctx.stroke();
     }
-    // Text sitting on the grid
-    ctx.fillStyle = 'rgba(30,20,4,0.55)';
-    let ly = py+ph*0.14;
-    const widths = i===0
-      ? [0.80,0.78,0.60,0.0,0.82,0.76,0.84,0.55]
-      : [0.78,0.82,0.40,0.0,0.80,0.60,0.78,0.30];
-    widths.forEach(w=>{
-      if (w>0) ctx.fillRect(px+pw*0.10, ly-ph*0.02, pw*0.80*w, ph*0.028);
-      ly += ph*0.072;
+
+    // chapter rule on the recto (right) page opening
+    if (i===1){
+      ctx.strokeStyle = ACC2; ctx.lineWidth = 1.1;
+      ctx.beginPath(); ctx.moveTo(px+pw*0.11, py+ph*0.10); ctx.lineTo(px+pw*0.42, py+ph*0.10); ctx.stroke();
+      ctx.font = `700 ${ph*0.05}px Georgia, serif`; ctx.fillStyle='rgba(30,20,4,0.75)'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+      ctx.fillText('IV', px+pw*0.11, py+ph*0.075);
+    }
+
+    // real serif body text sitting on the baseline grid
+    const bFont = Math.max(3.4, ph*0.038);
+    ctx.font = `${bFont}px Georgia, serif`;
+    ctx.fillStyle = 'rgba(30,20,4,0.80)';
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    const linesL = ['In the beginning the margin was','without form, and the page was','void; and a hand moved gently','upon the face of the leading.','','Let there be a line, and there','was a line, set true upon the','grid, and it was good.'];
+    const linesR = ['So the first spread was ordered,','recto answering verso, folio','to folio across the gutter,','each baseline a covenant kept.','','And the type saw that the grid','held, evening to evening, a','fixed and faithful interval.'];
+    const lns = i===0? linesL : linesR;
+    let ly = py+ph*0.16+bFont*0.75;
+    const lead = ph*0.062;
+    lns.forEach(line=>{
+      if (line) ctx.fillText(line, px+pw*0.11, ly);
+      ly += lead;
     });
+
+    // folio number
+    ctx.font=`600 ${ph*0.032}px Georgia, serif`; ctx.fillStyle='rgba(30,20,4,0.55)';
+    ctx.textAlign = i===0?'left':'right';
+    ctx.fillText(i===0?'86':'87', i===0? px+pw*0.11 : px+pw*0.89, py+ph*0.965);
   });
 
-  // Gutter shadow
-  const grd = ctx.createLinearGradient(gx-14, 0, gx+14, 0);
-  grd.addColorStop(0,'rgba(0,0,0,0)'); grd.addColorStop(0.5,'rgba(0,0,0,0.30)'); grd.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle = grd; ctx.fillRect(gx-14, py, 28, ph);
+  // gutter shadow
+  const grd = ctx.createLinearGradient(gx-12, 0, gx+12, 0);
+  grd.addColorStop(0,'rgba(0,0,0,0)'); grd.addColorStop(0.5,'rgba(0,0,0,0.32)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = grd; ctx.fillRect(gx-12, py, 24, ph);
 
-  // Chapter rule — bronze-gold
-  ctx.strokeStyle = '#b8763e'; ctx.lineWidth = 1.4;
-  ctx.beginPath(); ctx.moveTo(gx-pw-4+pw*0.10, py+ph*0.065); ctx.lineTo(gx-pw-4+pw*0.55, py+ph*0.065); ctx.stroke();
-
-  // .KX watermark
-  ctx.font = 'bold 8px monospace'; ctx.fillStyle = 'rgba(184,118,62,0.7)';
-  ctx.textAlign = 'right'; ctx.fillText('.KX', W-6, H-6);
+  // status bar
+  ctx.fillStyle='#120d07'; ctx.fillRect(0,H-stageH*0.045,W,stageH*0.045);
+  ctx.font=`${stageH*0.03}px monospace`; ctx.fillStyle='rgba(246,239,224,0.4)'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText('Spread 43  ·  0.031px max drift', 6, H-stageH*0.022);
 });
 
 
