@@ -190,24 +190,28 @@ body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
   --text2:   #b0a898;
   --text3:   #e0d9cc;
 
-  --kad:   #00d4ff;
+  /* KAD card retinted to Blueprint blue — KAD's own default-theme ramp
+     (bg #123259 → axis #2a5080 → --konstruct's #4a8fd4 accent), replacing
+     the old signature cyan. Cyan remains the sitewide --accent identity
+     (see LIGHT MODE block above) and is untouched. */
+  --kad:   #4a8fd4;
   --kam:   #ffaa00;
   --kubic:  #20e8c0;
   --karve: #d4aa40;
-  --kode:  #e03800;
+  --kode:  #ffaa00;
 
-  /* KANVAS card now themed to the KREATE-tab purple (--kt / --kt2 in
-     KANVAS.html), per reorg instructions, replacing the old teal→violet
-     gradient. */
-  --kanvas:   #7c5cd6;
-  --kanvas2:  #a68ae8;
-  --kanvas-g: rgba(124,92,214,0.18);
+  /* KANVAS card now themed to the KREATE-tab pink (--kt / --kt2 in
+     KANVAS.html — KREATE's spectrum was itself retinted from violet to
+     hot pink/fuchsia), replacing the prior purple retint. */
+  --kanvas:   #c2168f;
+  --kanvas2:  #ff4fc3;
+  --kanvas-g: rgba(194,22,143,0.20);
 
-  --kad-g:  rgba(0,212,255,0.12);
+  --kad-g:  rgba(74,143,212,0.12);
   --kam-g:  rgba(255,170,0,0.12);
   --kubic-g: rgba(32,232,192,0.12);
   --karve-g:rgba(212,170,64,0.12);
-  --kode-g: rgba(224,56,0,0.12);
+  --kode-g: rgba(255,170,0,0.12);
   --kultivate: #6ab830;  /* fresh growth green */
   --kultivate-g: rgba(90,158,60,0.12);
 
@@ -242,10 +246,12 @@ body.drafting-mode #suite-scroll { pointer-events:none; opacity:0; }
   --kombiner2:  #e01130;
   --kombiner-g: rgba(224,17,48,0.20);
 
-  /* KID — switched from the orange theme to an all-white theme. */
-  --kid:   #f4f6fb;
-  --kid2:  #ffffff;
-  --kid-g: rgba(244,246,251,0.10);
+  /* KID — full cyan Frost theme now (no white pan-out — --kid2 was a
+     near-white #eafcff and is replaced with a saturated frost cyan so
+     the card mark, name, and preview stay cyan end to end). */
+  --kid:   #4fc8e0;
+  --kid2:  #8ff4ff;
+  --kid-g: rgba(79,200,224,0.20);
 
   --kampus:      #E8600A;  /* construction cone orange */
   --kampus-g:    rgba(232,96,10,0.12);
@@ -559,13 +565,13 @@ nav {
   flex-shrink: 0;
 }
 
-.card-kad  .card-mark { background: linear-gradient(135deg, #00d4ff, #0088bb); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
+.card-kad  .card-mark { background: linear-gradient(135deg, #123259, #2a5080, #4a8fd4); box-shadow: 0 0 20px rgba(74,143,212,0.4); }
 
 .card-kam  .card-mark { background: linear-gradient(135deg, #ffaa00, #ff6b00); box-shadow: 0 0 20px rgba(255,170,0,0.4); }
 
 .card-kubic .card-mark { background: linear-gradient(135deg, #061416, #20e8c0, #d4aa40); box-shadow: 0 0 20px rgba(32,232,192,0.45); }
 
-  .card-kode .card-mark { background: linear-gradient(135deg, #2a0800, #882000, #e03800); box-shadow: 0 0 20px rgba(224,56,0,0.45); }
+  .card-kode .card-mark { background: linear-gradient(135deg, #804800, #cc8000, #ffaa00); box-shadow: 0 0 20px rgba(255,170,0,0.45); }
 
 
   
@@ -716,7 +722,7 @@ nav {
   letter-spacing: 0.04em;
 }
 
-.flow-icon.kad       { background: linear-gradient(135deg,#006080,#00a8cc,#00d4ff); }
+.flow-icon.kad       { background: linear-gradient(135deg,#123259,#2a5080,#4a8fd4); }
 
 .flow-icon.dok       { background: linear-gradient(135deg,#152848,#2a4aa8,#5b8cff); }
 
@@ -726,7 +732,7 @@ nav {
 
   .flow-icon.karve     { background: linear-gradient(135deg,#1a1000,#d4aa40,#20e8c0); }
 
-  .flow-icon.kode      { background: linear-gradient(135deg,#471400,#882000,#e03800); }
+  .flow-icon.kode      { background: linear-gradient(135deg,#472800,#cc8000,#ffaa00); }
 
   .flow-icon.konstruct { background: linear-gradient(135deg,#0c1824,#1e4a80,#4a8fd4); }
 
@@ -739,7 +745,7 @@ nav {
 .flow-icon.kampus   { background: linear-gradient(135deg,#3a1200,#E8600A,#ffaa40); }
 
 
-.flow-icon.kanvas    { background: linear-gradient(105deg,#3a2a6e 0%,#7c5cd6 55%,#a68ae8 100%); }
+.flow-icon.kanvas    { background: linear-gradient(105deg,#4a0e38 0%,#c2168f 55%,#ff4fc3 100%); }
 
 .flow-icon.kultivate { background: linear-gradient(135deg,#201008,#2e5818,#6ab830); }
 
@@ -887,12 +893,12 @@ footer {
 }
 
 
-/* ── KANVAS — retinted to the KREATE-tab purple ── */
+/* ── KANVAS — retinted to the KREATE-tab pink ── */
 .card-kanvas { --card-color: var(--kanvas); --card-glow: var(--kanvas-g); }
 
 .card-kanvas .card-mark {
-  background: linear-gradient(105deg,#3a2a6e 0%,#7c5cd6 55%,#a68ae8 100%);
-  box-shadow: 0 0 20px rgba(124,92,214,0.40);
+  background: linear-gradient(105deg,#4a0e38 0%,#c2168f 55%,#ff4fc3 100%);
+  box-shadow: 0 0 20px rgba(194,22,143,0.40);
 }
 .card-kanvas .card-name { color: var(--kanvas2); }
 
@@ -926,19 +932,21 @@ footer {
   color: var(--kampus);
 }
 
-/* ── KID — switched to an all-white theme, orange retired. Mark text
-   itself is set in markup to "KI" (was wrongly duplicating KAD's "KD"
-   mark — see DECLARED CONFLICTS). ── */
+/* ── KID — full cyan Frost theme, orange retired. Mark text itself is
+   set in markup to "KI" (was wrongly duplicating KAD's "KD" mark — see
+   DECLARED CONFLICTS). The gradient no longer pans out to white at its
+   light stop — it stays inside the frost-cyan spectrum end to end,
+   matching how Blueprint is KAD's default theme identity. ── */
 .card-kid { --card-color: var(--kid); --card-glow: var(--kid-g); }
 
 .card-kid .card-mark {
-  background: linear-gradient(135deg, #c9ced8, #eef1f6, #ffffff);
+  background: linear-gradient(135deg, #0a3a44, #4fc8e0, #8ff4ff);
   color: #0a0a0c;
-  box-shadow: 0 0 20px rgba(244,246,251,0.35);
+  box-shadow: 0 0 20px rgba(79,200,224,0.40);
 }
 .card-kid .card-name { color: var(--kid2); }
-.card-kid .card-full  { color: #d8dce4; }
-.card-kid .card-desc  { color: #c8c0b4; }
+.card-kid .card-full  { color: #a0e8f0; }
+.card-kid .card-desc  { color: #8fc8d4; }
 @media (max-width: 680px) {
   /* ── Layout ── */
   nav { padding: 14px 20px; }
@@ -1636,20 +1644,14 @@ footer {
     <div class="diagram-flow">
       <div class="flow-row">
         <div class="flow-node"><div class="flow-icon kad">KAD</div><div class="flow-label">KAD</div></div>
-        <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kanvas">KVS</div><div class="flow-label">KANVAS</div></div>
-        <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon dok">DOK</div><div class="flow-label">DOK</div></div>
-        <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kodex">KDX</div><div class="flow-label">KODEX</div></div>
       </div>
       <div class="flow-row">
         <div class="flow-node"><div class="flow-icon kapture">KAP</div><div class="flow-label">KAPTURE</div></div>
-        <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kombiner">KMB</div><div class="flow-label">KOMBINER</div></div>
-        <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kid">KID</div><div class="flow-label">KID</div></div>
-        <div class="flow-arrow">──→</div>
         <div class="flow-node"><div class="flow-icon kode">GK</div><div class="flow-label">KODE</div></div>
       </div>
     </div>
@@ -1904,8 +1906,8 @@ initPreview('kad-preview', (ctx, W, H) => {
   ctx.strokeStyle = 'rgba(57,255,20,0.35)'; ctx.lineWidth = 0.5; ctx.setLineDash([3,3]);
   ctx.beginPath(); ctx.moveTo(px, H-8); ctx.lineTo(px+pw, H-8); ctx.stroke();
   ctx.setLineDash([]);
-  // Origin cross — cyan, matching KAD's actual fixed origin marker
-  ctx.strokeStyle = 'rgba(0,212,255,0.5)'; ctx.lineWidth = 1;
+  // Origin cross — Blueprint blue, matching the KAD card's retint
+  ctx.strokeStyle = 'rgba(74,143,212,0.6)'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(W/2-8,H/2); ctx.lineTo(W/2+8,H/2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(W/2,H/2-8); ctx.lineTo(W/2,H/2+8); ctx.stroke();
 });
@@ -2061,14 +2063,14 @@ initPreview('kode-preview', (ctx, W, H) => {
   ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,W,bar.h);
   // GK pill — cherry red, active
   const gkW=18, gkH=10, gkX=W*0.36, gkY=2;
-  ctx.fillStyle='rgba(224,56,0,0.22)'; ctx.beginPath();
+  ctx.fillStyle='rgba(255,170,0,0.22)'; ctx.beginPath();
   ctx.roundRect(gkX,gkY,gkW,gkH,3); ctx.fill();
-  ctx.strokeStyle='rgba(224,56,0,0.6)'; ctx.lineWidth=0.7;
+  ctx.strokeStyle='rgba(255,170,0,0.6)'; ctx.lineWidth=0.7;
   ctx.beginPath(); ctx.roundRect(gkX,gkY,gkW,gkH,3); ctx.stroke();
   // GK dot + label
-  ctx.fillStyle='rgba(224,56,0,0.9)';
+  ctx.fillStyle='rgba(255,170,0,0.9)';
   ctx.beginPath(); ctx.arc(gkX+4,gkY+5,2,0,Math.PI*2); ctx.fill();
-  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(224,56,0,0.95)';
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(255,170,0,0.95)';
   ctx.fillText('GK',gkX+7,gkY+8);
   // KF pill — dim tan
   ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(212,170,120,0.45)';
@@ -2080,7 +2082,7 @@ initPreview('kode-preview', (ctx, W, H) => {
   const tabY=bar.h;
   ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fillRect(0,tabY,W*0.52,11);
   // Cherry dot for .nc file
-  ctx.fillStyle='rgba(224,56,0,0.9)';
+  ctx.fillStyle='rgba(255,170,0,0.9)';
   ctx.beginPath(); ctx.arc(6,tabY+5.5,2.5,0,Math.PI*2); ctx.fill();
   ctx.font='6px Fira Code,monospace'; ctx.fillStyle='rgba(200,210,230,0.7)';
   ctx.fillText('program.nc',11,tabY+9);
@@ -2090,15 +2092,15 @@ initPreview('kode-preview', (ctx, W, H) => {
   // Line number gutter
   ctx.fillStyle='rgba(255,255,255,0.02)'; ctx.fillRect(0,edY,16,edH);
   // Active line highlight (cherry tint)
-  ctx.fillStyle='rgba(224,56,0,0.06)'; ctx.fillRect(0,edY+22,edW,9);
+  ctx.fillStyle='rgba(255,170,0,0.06)'; ctx.fillRect(0,edY+22,edW,9);
 
   const lines=[
     {t:'G21 G90', c:'rgba(100,115,140,0.7)'},
-    {t:'M08',     c:'rgba(224,56,0,0.9)'},
+    {t:'M08',     c:'rgba(255,170,0,0.9)'},
     {t:'G41 D1',  c:'rgba(100,115,140,0.6)'},
     {t:'G1 X80',  c:'rgba(255,232,239,0.85)'},  // foam highlight = cut move
-    {t:'G2 I10',  c:'rgba(224,56,0,0.75)'},
-    {t:'M09',     c:'rgba(224,56,0,0.8)'},
+    {t:'G2 I10',  c:'rgba(255,170,0,0.75)'},
+    {t:'M09',     c:'rgba(255,170,0,0.8)'},
     {t:'M30',     c:'rgba(255,232,239,0.6)'},
   ];
   ctx.font='6.5px Fira Code,monospace';
@@ -2115,11 +2117,11 @@ initPreview('kode-preview', (ctx, W, H) => {
   ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(255,255,255,0.25)';
   ctx.fillText('TOOLPATH',tp.x+3,tp.y+7);
   // Rapid (amber dashed)
-  ctx.strokeStyle='rgba(255,170,0,0.55)'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+  ctx.strokeStyle='rgba(255,107,0,0.55)'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
   ctx.beginPath(); ctx.moveTo(tp.x+4,tp.y+tp.h-12); ctx.lineTo(tp.x+8,tp.y+16); ctx.stroke();
   ctx.setLineDash([]);
   // Cut path (cherry) — C-shape profile
-  ctx.strokeStyle='rgba(224,56,0,0.88)'; ctx.lineWidth=1.3; ctx.lineCap='round';
+  ctx.strokeStyle='rgba(255,170,0,0.88)'; ctx.lineWidth=1.3; ctx.lineCap='round';
   const px=tp.x+8, pw=tp.w-10, py1=tp.y+16, py2=tp.y+tp.h-12;
   ctx.beginPath();
   ctx.moveTo(px,py1);
@@ -2129,8 +2131,8 @@ initPreview('kode-preview', (ctx, W, H) => {
   ctx.stroke();
   // Legend dots
   const leg=[
-    {c:'rgba(255,170,0,0.8)',  l:'G0'},
-    {c:'rgba(224,56,0,0.85)', l:'G1'},
+    {c:'rgba(255,107,0,0.8)',  l:'G0'},
+    {c:'rgba(255,170,0,0.85)', l:'G1'},
     {c:'rgba(100,120,200,0.7)',l:'G2'},
   ];
   ctx.font='5px Fira Code,monospace';
@@ -2140,8 +2142,8 @@ initPreview('kode-preview', (ctx, W, H) => {
     ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.fillText(e.l,tp.x+9,ly+2);
   });
   // GK badge — cherry
-  ctx.fillStyle='rgba(224,56,0,0.15)'; ctx.fillRect(tp.x+2,tp.y+9,12,8);
-  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(224,56,0,0.8)';
+  ctx.fillStyle='rgba(255,170,0,0.15)'; ctx.fillRect(tp.x+2,tp.y+9,12,8);
+  ctx.font='5px Fira Code,monospace'; ctx.fillStyle='rgba(255,170,0,0.8)';
   ctx.fillText('GK',tp.x+3,tp.y+15);
 });
 
@@ -2397,16 +2399,17 @@ initPreview('konnector-preview', (ctx, W, H) => {
 });
 
 // ── KID preview ───────────────────────────────────────────────────────────────
+// Full cyan Frost — no white pan-out. Background is the same frost-dark
+// tone as the card mark's dark stop, not the old white canvas.
 initPreview('kid-preview', (ctx, W, H) => {
-  ctx.fillStyle='#f4f6fb'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=1;
+  ctx.fillStyle='#0a3a44'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(143,244,255,0.08)'; ctx.lineWidth=1;
   for(let x=0;x<W;x+=16){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=0;y<H;y+=16){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   // Four drafting-layer demo lines — solid/hidden/center/dimension —
-  // left as-is; they demonstrate the layer system, not the retired
-  // orange brand color.
+  // left as-is; they demonstrate the layer system, not the brand color.
   const draws=[
-    {c:'#00d4ff',lw:2.5,d:null,pts:[[.15,.3],[.85,.3]]},
+    {c:'#8ff4ff',lw:2.5,d:null,pts:[[.15,.3],[.85,.3]]},
     {c:'#ff4444',lw:2,d:[6,4],pts:[[.15,.5],[.85,.5]]},
     {c:'#ffdd00',lw:1.5,d:[10,4,2,4],pts:[[.15,.65],[.85,.65]]},
     {c:'#39ff14',lw:1.8,d:null,pts:[[.3,.2],[.3,.8],[.7,.8],[.7,.2]]},
@@ -2417,9 +2420,9 @@ initPreview('kid-preview', (ctx, W, H) => {
     pts.slice(1).forEach(p=>ctx.lineTo(p[0]*W,p[1]*H)); ctx.stroke();
   });
   ctx.setLineDash([]);
-  // Center origin mark — neutral graphite, was the orange brand dot.
-  ctx.fillStyle='#2a2018'; ctx.beginPath(); ctx.arc(W*.5,H*.5,5,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.2;
+  // Center origin mark — Frost cyan, KAD-adjacent.
+  ctx.fillStyle='#0a3a44'; ctx.beginPath(); ctx.arc(W*.5,H*.5,5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#4fc8e0'; ctx.lineWidth=1.2;
   ctx.beginPath(); ctx.arc(W*.5,H*.5,8,0,Math.PI*2); ctx.stroke();
 });
 
@@ -2937,6 +2940,17 @@ initPreview('kombiner-preview', (ctx, W, H) => {
       Old's KLOUD/KONNECTOR/KAMPUS card markup was carried forward here,
       also hidden via .card-hidden, so nothing referenced only by Old is
       lost.
+
+   8. Reskin pass: KANVAS retinted a second time, purple → pink, to
+      follow KREATE's own spectrum change in KANVAS.html (--kt/--kt2 now
+      #c2168f/#ff4fc3). KAD's card-mark/flow-icon/preview-origin square
+      moved off its signature cyan to Blueprint blue (#123259→#2a5080→
+      #4a8fd4, pulled from KAD.html's own Blueprint theme + --konstruct),
+      leaving the sitewide --accent and brand-gradient cyan untouched —
+      those are suite-wide identity, not KAD-specific. KID's card and
+      preview were pushed to a fully saturated frost cyan; the prior
+      --kid2 (#eafcff) and card-mark's white end-stop were both replaced
+      so nothing in the KID card pans out to white anymore.
    ──────────────────────────────────────────────────────────────────────── */
 
 
