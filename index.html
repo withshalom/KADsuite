@@ -98,16 +98,354 @@
 <meta name="twitter:title" content="KADsuite — Browser-Native CAD, Publishing &amp; Design Suite">
 <meta name="twitter:description" content="Free, browser-native design suite: drafting, illustration, document writing, book typesetting, and G-code editing — no install required.">
 
+<!-- ══════════════════════════════════════════════════════════════════════
+     STRUCTURED DATA (schema.org, JSON-LD)
+     Was a single SoftwareApplication describing the whole suite in one
+     prose blob, which gives a search engine one entity and no way to tell
+     the programs apart. This is a @graph instead:
+       Organization  — the publisher, reused by reference everywhere below
+       WebSite       — the site itself
+       SoftwareApplication (#suite) — KADsuite, with hasPart pointing at
+                       each program so the relationship is explicit
+       ItemList      — every LIVE program as its own SoftwareApplication,
+                       each with its own @id, subdomain URL, category and
+                       description, so each can be understood and surfaced
+                       as a distinct product tied to its own page.
+     Only shipped programs are listed. The pre-release ones are still
+     linked from their cards (so they are discovered and crawled) but are
+     deliberately NOT declared here as available software — describing an
+     unreleased tool as InStock is the kind of mismatch between markup and
+     page that costs rich-result eligibility for everything else.
+     ══════════════════════════════════════════════════════════════════════ -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "KADsuite",
-  "url": "https://kadsuite.com/",
-  "applicationCategory": "DesignApplication",
-  "operatingSystem": "Any (runs in browser)",
-  "description": "KADsuite is a free, browser-native design suite. KAD is the core 2D CAD engine; KANVAS is a vector illustration app with a bounded-artboard mode and an infinite freeform KREATE mode; DOK is a browser-native word processor with true paragraph reflow and pagination; KODEX is a baseline-grid book typesetting and publishing tool; KID teaches drafting through age-adaptive, mission-based play; and KODE is a CNC G-code editor and live toolpath verifier. No install or account required for the core tools.",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://kadsuite.com/#organization",
+      "name": "WithShalom Studios",
+      "alternateName": "KADsuite",
+      "url": "https://kadsuite.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://kadsuite.com/icons/icon-192.png",
+        "width": 192,
+        "height": 192
+      },
+      "sameAs": [
+        "https://www.instagram.com/kadsuite",
+        "https://withshalom.com"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://kadsuite.com/#website",
+      "url": "https://kadsuite.com/",
+      "name": "KADsuite",
+      "inLanguage": "en",
+      "description": "Browser-native CAD, publishing and design suite. No install required.",
+      "publisher": {
+        "@id": "https://kadsuite.com/#organization"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://kadsuite.com/#suite",
+      "name": "KADsuite",
+      "url": "https://kadsuite.com/",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any (runs in a web browser)",
+      "description": "KADsuite is a free, browser-native design suite: 2D CAD drafting, vector illustration, word processing, book typesetting, PDF editing, note-taking and CNC G-code editing. No install or account required for the core tools.",
+      "isAccessibleForFree": true,
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://kadsuite.com/#organization"
+      },
+      "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "hasPart": [
+        {
+          "@id": "https://kad.kadsuite.com/#app"
+        },
+        {
+          "@id": "https://kanvas.kadsuite.com/#app"
+        },
+        {
+          "@id": "https://dok.kadsuite.com/#app"
+        },
+        {
+          "@id": "https://kodex.kadsuite.com/#app"
+        },
+        {
+          "@id": "https://kapture.kadsuite.com/#app"
+        },
+        {
+          "@id": "https://kombiner.kadsuite.com/#app"
+        },
+        {
+          "@id": "https://kid.kadsuite.com/#app"
+        },
+        {
+          "@id": "https://kode.kadsuite.com/#app"
+        }
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://kadsuite.com/#programs",
+      "name": "KADsuite programs",
+      "numberOfItems": 8,
+      "itemListOrder": "https://schema.org/ItemListUnordered",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://kad.kadsuite.com/#app",
+            "name": "KAD",
+            "alternateName": "Kernel-Aided Design",
+            "url": "https://kad.kadsuite.com",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "Browser-native 2D CAD and technical drafting. Precision drawing tools, layers, dimensioning, snapping and DXF import/export, with KANVAS paperspace annotation. Runs entirely in the browser with no installation.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://kanvas.kadsuite.com/#app",
+            "name": "KANVAS",
+            "alternateName": "Kernel-Aided Node Vector Art Suite",
+            "url": "https://kanvas.kadsuite.com",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "Browser-native vector illustration with brush, pen, shape and text tools, node editing, and both a bounded artboard mode and an infinite freeform KREATE canvas. Exports SVG.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://dok.kadsuite.com/#app",
+            "name": "DOK",
+            "alternateName": "Document Object Kernel",
+            "url": "https://dok.kadsuite.com",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "Browser-native word processor with real paragraph reflow, true live pagination, multi-document tabs, and direct .dok and .docx interchange.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://kodex.kadsuite.com/#app",
+            "name": "KODEX",
+            "alternateName": "Kernel-Oriented Document Engine for X-height",
+            "url": "https://kodex.kadsuite.com",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "Book and long-document typesetting to a fixed baseline grid, with real trim sizes, recto/verso control, chapter rules and manual line-break control for verse and poetry.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://kapture.kadsuite.com/#app",
+            "name": "KAPTURE",
+            "alternateName": "Kernel-Aided Page & Trace Utility Reflow Environment",
+            "url": "https://kapture.kadsuite.com",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "Note-taking that combines typed text, pressure-sensitive stylus handwriting and audio recording on a single page, with offline autosave.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://kombiner.kadsuite.com/#app",
+            "name": "KOMBINER",
+            "alternateName": "Kernel-Oriented Markup, Binding & Interactive Notation Engine for Revision",
+            "url": "https://kombiner.kadsuite.com",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "PDF editor that works on the PDF you actually have — scanned, signed or exported from elsewhere — with true redaction, annotation, page binding and revision markup.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://kid.kadsuite.com/#app",
+            "name": "KID",
+            "alternateName": "Kernel-Instructed Design",
+            "url": "https://kid.kadsuite.com",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "Teaches technical drafting through age-adaptive, mission-based play, layering real CAD concepts progressively as the learner advances.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://kode.kadsuite.com/#app",
+            "name": "KODE",
+            "alternateName": "Kernel-Oriented Development Environment",
+            "url": "https://kode.kadsuite.com",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Any (runs in a web browser)",
+            "browserRequirements": "Requires a modern web browser. No installation or account required.",
+            "description": "CNC G-code editor with live toolpath verification and simulation, plus the KOFFEE scripting environment.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "publisher": {
+              "@id": "https://kadsuite.com/#organization"
+            },
+            "isPartOf": {
+              "@id": "https://kadsuite.com/#website"
+            },
+            "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }
 </script>
 <!-- ══════════════════════════ END SEO BLOCK ═══════════════════════════ -->
@@ -417,8 +755,18 @@ nav {
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 0.92;
-  margin-bottom: 32px;
+  /* The 32px used to separate this h1 from the tagline paragraph below it.
+     The tagline now lives INSIDE the h1 (so the page's primary heading is a
+     descriptive phrase rather than a bare brand token), so that gap moves to
+     the brand line and the h1 keeps only the tagline's own bottom margin.
+     Rendering is unchanged. */
+  margin-bottom: 0.6rem;
 }
+.hero-title .brand-gradient { margin-bottom: 32px; }
+/* line-height:normal, not inherited: the h1 sets 0.92 for its display face,
+   which would squash the tagline. normal is what it rendered as when it was
+   a sibling paragraph, so the line box is unchanged. */
+.hero-title .hero-tagline  { display: block; line-height: normal; margin: 0; }
 
 
 .hero-title .brand-gradient {
@@ -583,18 +931,27 @@ nav {
   font-weight: 800;
   letter-spacing: -0.025em;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 0;          /* moved onto .card-full, now nested inside */
   color: var(--card-color);
 }
 
 
+/* Now a span nested inside each card heading rather than a sibling block.
+   The heading was the bare program name — "KAD", "DOK" — which is an opaque
+   token to a search engine; nesting the expansion makes every card heading a
+   real phrase. display:block plus the explicit font, weight and letter
+   spacing keep the two-line rendering identical now that it inherits the
+   heading's display face. */
 .card-full {
+  display: block;
   font-family: var(--ff-ui);
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.07em;
+  line-height: normal;   /* as it rendered before nesting; h2 line-height:1 would squash it */
   text-transform: uppercase;
   color: var(--text2);
+  margin-top: 6px;
   margin-bottom: 20px;
 }
 
@@ -961,7 +1318,8 @@ footer {
   /* ── Hero ── */
   .hero { padding: 72px 0 12px; text-align: left; }
 
-  .hero-title { font-size: clamp(40px, 11.5vw, 72px); letter-spacing:-0.02em; margin-bottom: 16px; }
+  .hero-title { font-size: clamp(40px, 11.5vw, 72px); letter-spacing:-0.02em; margin-bottom: 0.6rem; }
+  .hero-title .brand-gradient { margin-bottom: 16px; }
 
   .hero-title .brand-gradient { white-space: nowrap; }
 
@@ -1276,7 +1634,7 @@ footer {
 <canvas id="bg-canvas"></canvas>
 
 <!-- NAV -->
-<nav>
+<nav aria-label="Primary">
   <div class="nav-brand"><span class="brand-gradient">KAD<sup class="suite">suite™</sup></span></div>
   <div class="nav-links">
     <a class="nav-link" href="https://www.instagram.com/kadsuite" target="_blank">
@@ -1297,12 +1655,26 @@ footer {
   </div>
 </nav>
 
+<!-- The two .page wrappers below are the page's main content; the footer is
+     closed outside the main region further down so it stays a contentinfo landmark of
+     its own rather than being read as a footer belonging to the main region. -->
+<main>
+
 <!-- HERO -->
 <div class="page">
   <section class="hero" style="background:rgba(6,10,16,0.92);border-bottom:1px solid rgba(0,212,255,0.12);margin-bottom:0;position:relative;z-index:1;">
     <p style="font-family:var(--ff-ui);font-size:1.05rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#eef3f8;opacity:1;margin:0 0 0.7rem;">That&rsquo;s KAD with a &ldquo;K&rdquo;</p>
-    <h1 class="hero-title"><span class="brand-gradient">KADsuite<sup class="suite">™</sup></span></h1>
-    <p class="hero-tagline">Touch &amp; Tablet Optimized Drafting Software</p>
+    <!-- The tagline is INSIDE the h1 on purpose. As a sibling <p> the page's
+         single most heavily weighted element read "KADsuite" and nothing else
+         — a brand token that tells a search engine nothing about what this
+         is. Folding the existing visible tagline in makes the primary heading
+         a descriptive phrase without inventing copy or hiding text; the
+         spacing that used to come from .hero-title's margin now sits on
+         .brand-gradient, so the rendering is unchanged. -->
+    <h1 class="hero-title">
+      <span class="brand-gradient">KADsuite<sup class="suite">™</sup></span>
+      <span class="hero-tagline">Touch &amp; Tablet Optimized Drafting Software</span>
+    </h1>
   </section>
 </div>
 
@@ -1338,10 +1710,9 @@ footer {
       <!-- KAD — no changes -->
       <a class="card card-kad" href="https://kad.kadsuite.com">
         <div class="card-mark">KAD</div>
-        <h2 class="card-name">KAD</h2>
-        <div class="card-full">Kernel-Aided Design</div>
+        <h2 class="card-name">KAD<span class="card-full">Kernel-Aided Design</span></h2>
         <div class="card-preview">
-          <canvas id="kad-preview"></canvas>
+          <canvas id="kad-preview" role="img" aria-label="KAD drafting workspace: a technical 2D drawing on a blueprint grid">KAD drafting workspace: a technical 2D drawing on a blueprint grid.</canvas>
         </div>
         <div class="card-desc">
           Precision 2D drafting in your browser, with DXF export and KANVAS paperspace annotation.
@@ -1355,10 +1726,9 @@ footer {
       <!-- KANVAS — retinted to the KREATE-tab purple (#7c5cd6 → #a68ae8) -->
       <a class="card card-kanvas" href="https://kanvas.kadsuite.com">
         <div class="card-mark">KVS</div>
-        <h2 class="card-name">KANVAS</h2>
-        <div class="card-full">Kernel-Aided Node Vector Art Suite</div>
+        <h2 class="card-name">KANVAS<span class="card-full">Kernel-Aided Node Vector Art Suite</span></h2>
         <div class="card-preview">
-          <canvas id="kanvas-preview"></canvas>
+          <canvas id="kanvas-preview" role="img" aria-label="KANVAS illustration workspace: vector shapes and brush strokes on an artboard">KANVAS illustration workspace: vector shapes and brush strokes on an artboard.</canvas>
         </div>
         <div class="card-desc">
           Vector illustration with brush, pen, shapes, and text, in bounded-artboard or infinite KREATE mode.
@@ -1375,10 +1745,9 @@ footer {
       <a class="card card-dok" href="https://dok.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">DOK</div>
-        <h2 class="card-name">DOK</h2>
-        <div class="card-full">Document Object Kernel</div>
+        <h2 class="card-name">DOK<span class="card-full">Document Object Kernel</span></h2>
         <div class="card-preview">
-          <canvas id="dok-preview"></canvas>
+          <canvas id="dok-preview" role="img" aria-label="DOK word processor: a paginated document page with flowing paragraphs">DOK word processor: a paginated document page with flowing paragraphs.</canvas>
         </div>
         <div class="card-desc">
           Browser-native word processing with real paragraphs, true pagination, and direct .dok / .docx interchange.
@@ -1401,10 +1770,9 @@ footer {
       <a class="card card-kodex" href="https://kodex.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KDX</div>
-        <h2 class="card-name">KODEX</h2>
-        <div class="card-full">Kernel-Oriented Document Engine for X-height</div>
+        <h2 class="card-name">KODEX<span class="card-full">Kernel-Oriented Document Engine for X-height</span></h2>
         <div class="card-preview">
-          <canvas id="kodex-preview"></canvas>
+          <canvas id="kodex-preview" role="img" aria-label="KODEX typesetting workspace: book pages set to a baseline grid">KODEX typesetting workspace: book pages set to a baseline grid.</canvas>
         </div>
         <div class="card-desc">
           Book and long-document typesetting to a fixed baseline grid, with real trim sizes and chapter rules.
@@ -1424,10 +1792,9 @@ footer {
       <a class="card card-kapture" href="https://kapture.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KAP</div>
-        <h2 class="card-name">KAPTURE</h2>
-        <div class="card-full">Kernel-Aided Page &amp; Trace Utility Reflow Environment</div>
+        <h2 class="card-name">KAPTURE<span class="card-full">Kernel-Aided Page &amp; Trace Utility Reflow Environment</span></h2>
         <div class="card-preview">
-          <canvas id="kapture-preview"></canvas>
+          <canvas id="kapture-preview" role="img" aria-label="KAPTURE note page: typed text, handwritten stylus ink and an audio track">KAPTURE note page: typed text, handwritten stylus ink and an audio track.</canvas>
         </div>
         <div class="card-desc">
           Type, hand-draw and record audio on the same page — pressure-sensitive stylus support, offline autosave, and a layout that reflows for desktop, tablet or phone.
@@ -1451,10 +1818,9 @@ footer {
       <a class="card card-kombiner" href="https://kombiner.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KMB</div>
-        <h2 class="card-name">KOMBINER</h2>
-        <div class="card-full">Kernel-Oriented Markup, Binding &amp; Interactive Notation Engine for Revision</div>
+        <h2 class="card-name">KOMBINER<span class="card-full">Kernel-Oriented Markup, Binding &amp; Interactive Notation Engine for Revision</span></h2>
         <div class="card-preview">
-          <canvas id="kombiner-preview"></canvas>
+          <canvas id="kombiner-preview" role="img" aria-label="KOMBINER PDF editor: a scanned page with redaction and annotation markup">KOMBINER PDF editor: a scanned page with redaction and annotation markup.</canvas>
         </div>
         <div class="card-desc">
           Edits the PDF you actually have — scanned, signed, or exported from elsewhere — with real redaction, forms, signatures and page ops, in place.
@@ -1470,10 +1836,9 @@ footer {
       <a class="card card-kid" href="https://kid.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KID</div>
-        <h2 class="card-name">KID</h2>
-        <div class="card-full">Kernel-Instructed Design</div>
+        <h2 class="card-name">KID<span class="card-full">Kernel-Instructed Design</span></h2>
         <div class="card-preview">
-          <canvas id="kid-preview"></canvas>
+          <canvas id="kid-preview" role="img" aria-label="KID learning workspace: a playful guided drafting mission">KID learning workspace: a playful guided drafting mission.</canvas>
         </div>
         <div class="card-desc">
           Learn to draft through play, with age-adaptive layers and mission-based tutorials.
@@ -1487,10 +1852,9 @@ footer {
       <!-- KODE — red theme, unchanged -->
       <a class="card card-kode" href="https://kode.kadsuite.com">
         <div class="card-mark">GK</div>
-        <h2 class="card-name">KODE</h2>
-        <div class="card-full">Kernel-Oriented Development Environment</div>
+        <h2 class="card-name">KODE<span class="card-full">Kernel-Oriented Development Environment</span></h2>
         <div class="card-preview">
-          <canvas id="kode-preview"></canvas>
+          <canvas id="kode-preview" role="img" aria-label="KODE G-code editor: CNC toolpath verification alongside code">KODE G-code editor: CNC toolpath verification alongside code.</canvas>
         </div>
         <div class="card-desc">
           CNC G-code editor with live toolpath verification, plus a full KOFFEE scripting environment.
@@ -1514,10 +1878,9 @@ footer {
       <a class="card card-kam card-hidden" href="https://kam.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KM</div>
-        <h2 class="card-name">KAM</h2>
-        <div class="card-full">Kernel-Aided Manufacturing</div>
+        <h2 class="card-name">KAM<span class="card-full">Kernel-Aided Manufacturing</span></h2>
         <div class="card-preview">
-          <canvas id="kam-preview"></canvas>
+          <canvas id="kam-preview" role="img" aria-label="KAM nesting workspace: parts nested on sheet stock for plasma and laser cutting">KAM nesting workspace: parts nested on sheet stock for plasma and laser cutting.</canvas>
         </div>
         <div class="card-desc">
           Nest and cut plasma, laser, and torch parts from KAD geometry, exporting verified G-code.
@@ -1532,10 +1895,9 @@ footer {
       <a class="card card-kubic card-hidden" href="https://kubic.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KB</div>
-        <h2 class="card-name">KUBIC</h2>
-        <div class="card-full">Kernel Unified Building Informatics Control</div>
+        <h2 class="card-name">KUBIC<span class="card-full">Kernel Unified Building Informatics Control</span></h2>
         <div class="card-preview">
-          <canvas id="kube-preview"></canvas>
+          <canvas id="kube-preview" role="img" aria-label="KUBIC 3D modeller: a solid model built by push and pull from a sketch">KUBIC 3D modeller: a solid model built by push and pull from a sketch.</canvas>
         </div>
         <div class="card-desc">
           3D solid modeler for fabrication, sketching to solid with push/pull and booleans, exporting STL and STEP.
@@ -1550,10 +1912,9 @@ footer {
       <a class="card card-karve card-hidden" href="https://karve.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KV</div>
-        <h2 class="card-name">KARVE</h2>
-        <div class="card-full">Kernel-Aided Robotic Volume Extraction</div>
+        <h2 class="card-name">KARVE<span class="card-full">Kernel-Aided Robotic Volume Extraction</span></h2>
         <div class="card-preview">
-          <canvas id="karve-preview"></canvas>
+          <canvas id="karve-preview" role="img" aria-label="KARVE machining workspace: lathe and mill toolpaths over stock">KARVE machining workspace: lathe and mill toolpaths over stock.</canvas>
         </div>
         <div class="card-desc">
           Lathe and mill G-code generation for subtractive machining, from stock setup to RS-274 output.
@@ -1569,10 +1930,9 @@ footer {
       <a class="card card-konstruct card-hidden" href="https://konstruct.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KON</div>
-        <h2 class="card-name">KONSTRUCT</h2>
-        <div class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</div>
+        <h2 class="card-name">KONSTRUCT<span class="card-full">Kernel-Operated Navigation Site Terrain Renovation Unified Construction Technology</span></h2>
         <div class="card-preview">
-          <canvas id="konstruct-preview"></canvas>
+          <canvas id="konstruct-preview" role="img" aria-label="KONSTRUCT floor plan: typed walls with automatic mitred joins">KONSTRUCT floor plan: typed walls with automatic mitred joins.</canvas>
         </div>
         <div class="card-desc">
           Wall-aware floor plan drafting with typed walls and automatic miter joins.
@@ -1588,10 +1948,9 @@ footer {
       <a class="card card-kultivate card-hidden" href="https://kultivate.kadsuite.com">
         <div class="card-beta-stamp">Beta</div>
         <div class="card-mark">KLT</div>
-        <h2 class="card-name">KULTIVATE</h2>
-        <div class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</div>
+        <h2 class="card-name">KULTIVATE<span class="card-full">Kernel-Unified Landscape Technology Innovation Vegetation Architecture Terraform Environment</span></h2>
         <div class="card-preview">
-          <canvas id="kultivate-preview"></canvas>
+          <canvas id="kultivate-preview" role="img" aria-label="KULTIVATE site plan: landscape planting layout with a plant schedule">KULTIVATE site plan: landscape planting layout with a plant schedule.</canvas>
         </div>
         <div class="card-desc">
           Landscape and site-plan drafting with a built-in plant library and exportable plant schedule.
@@ -1606,8 +1965,10 @@ footer {
       <a class="card card-konnector card-hidden" href="https://konnector.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KN</div>
-        <h2 class="card-name">KONNECTOR</h2>
-        <div class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</div>
+        <h2 class="card-name">KONNECTOR<span class="card-full">Kernel-Oriented Node Network for Engineering Connections, Technical Output, and Relationships</span></h2>
+        <div class="card-preview">
+          <canvas id="konnector-preview" role="img" aria-label="KONNECTOR steel detail: a W8x31 wide-flange beam section with bolt holes">KONNECTOR steel detail: a W8x31 wide-flange beam section with bolt holes.</canvas>
+        </div>
         <div class="card-desc">
           Structural steel detailing and connection design, from bolt groups to weld tagging and piece marking.
         </div>
@@ -1621,10 +1982,9 @@ footer {
       <a class="card card-kampus card-hidden" href="https://kampus.kadsuite.com">
         <div class="card-alpha-stamp">Alpha</div>
         <div class="card-mark">KMP</div>
-        <h2 class="card-name">KAMPUS</h2>
-        <div class="card-full">Kernel-Aided Map Plan Unified Site</div>
+        <h2 class="card-name">KAMPUS<span class="card-full">Kernel-Aided Map Plan Unified Site</span></h2>
         <div class="card-preview">
-          <canvas id="kampus-preview"></canvas>
+          <canvas id="kampus-preview" role="img" aria-label="KAMPUS civil site plan: terrain contours and cut and fill volumes">KAMPUS civil site plan: terrain contours and cut and fill volumes.</canvas>
         </div>
         <div class="card-desc">
           Browser-native civil site engineering, from TIN surfaces and contours to cut/fill volumes and road layout.
@@ -1715,7 +2075,10 @@ footer {
 
     </div>
   </section>
+</div>
+</main>
 
+<div class="page">
   <!-- FOOTER -->
   <footer style="background:rgba(6,10,16,0.92);position:relative;z-index:1;">
     <div class="footer-brand"><span class="brand-gradient">KADsuite<sup class="suite">™</sup></span></div>
@@ -1857,22 +2220,51 @@ footer {
 })();
 
 // ── PROGRAM CARD PREVIEWS ─────────────────────────────────────────────────────
+// Every card thumbnail used to paint 10ms after parse, all fifteen of them,
+// ~1.9 MILLION backing pixels of canvas work landing in one burst on the main
+// thread while the browser was still trying to settle the page. Measured as
+// long tasks of 154ms and 223ms and a Total Blocking Time of 216ms on a 4x
+// CPU throttle — the range where Google starts marking interactivity poor,
+// and the one Core Web Vital this page was failing.
+//
+// Nothing about that work is urgent: a thumbnail eight cards down cannot be
+// seen. Deferring each canvas until it is near the viewport spreads the cost
+// across scrolling instead of stacking it at load, and — because a hidden
+// card has no box and never intersects — the seven not-yet-released programs
+// now cost nothing at all until the day their card is unhidden, at which
+// point this fires on its own with no extra wiring.
 function initPreview(id, drawFn) {
   const cv = document.getElementById(id);
   if (!cv) return;
   const ctx = cv.getContext('2d');
   const dpr = Math.min(window.devicePixelRatio, 2);
+  let painted = false;
 
   function resize() {
     const rect = cv.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;   // hidden card: nothing to draw
     cv.width  = rect.width  * dpr;
     cv.height = rect.height * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     drawFn(ctx, rect.width, rect.height);
+    painted = true;
   }
 
-  new ResizeObserver(resize).observe(cv);
-  setTimeout(resize, 10);
+  // Only respond to resizes once it has actually been painted, so the
+  // observer cannot drag the first paint back onto the load path.
+  new ResizeObserver(() => { if (painted) resize(); }).observe(cv);
+
+  if (!('IntersectionObserver' in window)) { setTimeout(resize, 10); return; }
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      io.disconnect();
+      // Idle time if the browser offers it, next frame otherwise — either way
+      // off the critical path rather than inside it.
+      (window.requestIdleCallback || window.requestAnimationFrame)(resize);
+    }
+  }, { rootMargin: '300px 0px' });   // start just before it scrolls into view
+  io.observe(cv);
 }
 
 // KAD preview — technical drawing lines + grid
